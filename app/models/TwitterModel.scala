@@ -6,15 +6,15 @@ import twitter4j.auth._
 class TwitterModel() {
 
   /** コンシューマーキー */
-  val consumer_key: String    = "lfOA43naUNLSqAjgpL0Q"
+  val consumer_key   : String = "lfOA43naUNLSqAjgpL0Q"
   /** コンシューマーシークレット */
   val consumer_secret: String = "e0A39VEr1ICgUtD7sO5nCW1diCvqQRuTRqANMj6g6E"
   /** Twitterオブジェクト */
   var requestToken: RequestToken = null
 
   /** Twitterオブジェクト */
-  var twitter:      Twitter      = null
-  var accessToken:  AccessToken  = null
+  var twitter    : Twitter     = null
+  var accessToken: AccessToken = null
 
   /** Twitterオブジェクトを取得 */
   def getTwitter: Twitter = if (twitter == null) getNewTwitter() else twitter;

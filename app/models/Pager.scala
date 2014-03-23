@@ -1,9 +1,7 @@
 package models
 
-import scala.reflect.BeanProperty
-
 /** ページング処理で利用するクラス */
-case class Pager[A](var title: String, var pageNum: Int, var totalRows: Int, var twitterUser: TwitterUser, var dataList: Seq[A]) {
+case class Pager[A](var title: String, var pageNum: Int, var totalRows: Int, var twitterUser: Option[TwitterUser], var dataList: Seq[A]) {
 
   /** １ページに表時するデータの件数 */
   val maxListCount: Int = 10

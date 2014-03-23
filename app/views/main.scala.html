@@ -30,7 +30,7 @@
           <ul class="nav navbar-nav">
             @twitterUser match {
               case Some(user) => {
-                <li><a href="/twitterLogout">&#64;@user.twitterScreenName</a></li>
+                <li><a href="https://twitter.com/@user.twitterScreenName">&#64;@user.twitterScreenName</a></li>
                 <li><a href="/twitterLogout">Logout</a></li>
               }
               case _ => {<li><a href="/twitterLogin">Login</a></li>}

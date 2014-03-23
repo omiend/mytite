@@ -22,7 +22,7 @@ case class TwitterUser (
 object TwitterUser {
   
   /**
-   * Parse a TwitterUser from a ResultSet
+   * TwitterUser Simple
    */
   val simple = {
     get[Pk[Long]]("id") ~
@@ -45,7 +45,7 @@ object TwitterUser {
         ,Option(updateDate))
     }
   }
-  
+
   /**
    * TwitterUser twitter_idを指定して取得
    */
@@ -64,7 +64,39 @@ object TwitterUser {
       )
     }
   }
-  
+
+  /**
+   * TwitterUser from-toで件数を指定して取得
+   */
+  def findFromTo(offset: Int, maxPageCount: Int) = {
+    DB.withConnection { implicit connection =>
+
+      // 親テーブル取得
+      val resultList: Seq[TwitterUser] = SQL(
+        """
+        select *
+          from twitter_user
+          limit {maxPageCount} offset {offset}
+        """
+      ).on(
+        'offset -> offset,
+        'maxPageCount -> maxPageCount
+      ).as(
+        TwitterUser.simple *
+      )
+
+      // 件数取得
+      val totalRows = SQL(
+        """
+        select count(*)
+          from twitter_user
+        """
+      ).as(scalar[Long].single)
+
+      (resultList, totalRows)
+    }
+  }
+
   /**
    * TwitterUser Insert処理
    */
