@@ -4,9 +4,10 @@
 
 # Home page
 GET     /                           controllers.Application.index(p: Int ?= 1)
-GET     /twitterLogin               controllers.Application.twitterLogin
-GET     /twitterOAuthCallback       controllers.Application.twitterOAuthCallback
-GET     /twitterLogout              controllers.Application.twitterLogout
+GET     /authTest                   controllers.Application.authTest
+GET     /twitterLogin               controllers.TwitterController.twitterLogin
+GET     /twitterOAuthCallback       controllers.TwitterController.twitterOAuthCallback
+GET     /twitterLogout              controllers.TwitterController.twitterLogout
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
