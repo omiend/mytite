@@ -34,10 +34,10 @@ Seq[Any](format.raw/*1.65*/("""
 
   <div class="row">
 
-    """),_display_(Seq[Any](/*16.6*/for(twitterUser <- pager.dataList) yield /*16.40*/{_display_(Seq[Any](format.raw/*16.41*/("""
+    """),_display_(Seq[Any](/*16.6*/for(user <- pager.dataList) yield /*16.33*/{_display_(Seq[Any](format.raw/*16.34*/("""
       <div class="col-6 col-sm-6 col-lg-4">
-        <h2><img src=""""),_display_(Seq[Any](/*18.24*/twitterUser/*18.35*/.twitterProfielImageUrl)),format.raw/*18.58*/("""" alt="Profiel Image" class="img-rounded"><a href="https://twitter.com/"""),_display_(Seq[Any](/*18.130*/twitterUser/*18.141*/.twitterScreenName)),format.raw/*18.159*/("""">&#64;"""),_display_(Seq[Any](/*18.167*/twitterUser/*18.178*/.twitterScreenName)),format.raw/*18.196*/("""</a></h2>
-        <p>音楽と映画と猫を...</p>
+        <h2><img src=""""),_display_(Seq[Any](/*18.24*/user/*18.28*/.twitterProfielImageUrl)),format.raw/*18.51*/("""" alt="Profiel Image" class="img-rounded"><a href="https://twitter.com/"""),_display_(Seq[Any](/*18.123*/user/*18.127*/.twitterScreenName)),format.raw/*18.145*/("""">&#64;"""),_display_(Seq[Any](/*18.153*/user/*18.157*/.twitterScreenName)),format.raw/*18.175*/("""</a></h2>
+        <p>"""),_display_(Seq[Any](/*19.13*/user/*19.17*/.twitterDescription)),format.raw/*19.36*/("""</p>
         <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
       </div><!--/span-->
     """)))})),format.raw/*22.6*/("""
@@ -58,11 +58,11 @@ Seq[Any](format.raw/*1.65*/("""
 }
                 /*
                     -- GENERATED --
-                    DATE: Sun Mar 23 12:26:41 JST 2014
+                    DATE: Thu Apr 03 21:52:31 JST 2014
                     SOURCE: /Users/omi-swordfish/work/play/tite_scala/app/views/index.scala.html
-                    HASH: 5b7c6e3800a8bc37873c3e1e04c3e9a5a1ff56b8
-                    MATRIX: 587->1|744->64|781->67|825->103|840->110|879->112|1182->380|1232->414|1271->415|1375->483|1395->494|1440->517|1549->589|1570->600|1611->618|1656->626|1677->637|1718->655|1906->812|1980->855
-                    LINES: 19->1|22->1|24->3|24->3|24->3|24->3|37->16|37->16|37->16|39->18|39->18|39->18|39->18|39->18|39->18|39->18|39->18|39->18|43->22|48->27
+                    HASH: 2c754c59327c69b29881d06defe344a0e1167e05
+                    MATRIX: 587->1|744->64|781->67|825->103|840->110|879->112|1182->380|1225->407|1264->408|1368->476|1381->480|1426->503|1535->575|1549->579|1590->597|1635->605|1649->609|1690->627|1748->649|1761->653|1802->672|1958->797|2032->840
+                    LINES: 19->1|22->1|24->3|24->3|24->3|24->3|37->16|37->16|37->16|39->18|39->18|39->18|39->18|39->18|39->18|39->18|39->18|39->18|40->19|40->19|40->19|43->22|48->27
                     -- GENERATED --
                 */
             

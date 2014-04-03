@@ -39,6 +39,7 @@ create table twitter_user (
   twitter_id                  bigint,
   twitter_screen_name         varchar(255),
   twitter_profiel_image_url   varchar(255),
+  twitter_description         text,
   twitter_access_token        varchar(255),
   twitter_access_token_secret varchar(255),
   create_date                 datetime not null,

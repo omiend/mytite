@@ -7,7 +7,7 @@
 		revision="1.0-SNAPSHOT"
 		conf="test-internal"
 		confs="compile, runtime, test, provided, optional, compile-internal, runtime-internal, test-internal, plugin, sources, docs, pom, scala-tool"
-		date="20140323093838"/>
+		date="20140403215228"/>
 	<dependencies>
 		<module organisation="org.twitter4j" name="twitter4j-core">
 			<revision name="3.0.3" status="release" pubdate="20121223211256" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://twitter4j.org/" downloaded="false" searched="false" default="false" conf="default(compile), default, compile, runtime, master" position="47">

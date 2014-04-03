@@ -1,6 +1,0 @@
-[0m[[0mdebug[0m] [0mCopy resource mappings: [0m
-[0m[[0mdebug[0m] [0m	(/Users/omi-swordfish/work/play/tite_scala/conf/application.conf,/Users/omi-swordfish/work/play/tite_scala/target/scala-2.10/classes/application.conf)[0m
-[0m[[0mdebug[0m] [0m	(/Users/omi-swordfish/work/play/tite_scala/conf/evolutions,/Users/omi-swordfish/work/play/tite_scala/target/scala-2.10/classes/evolutions)[0m
-[0m[[0mdebug[0m] [0m	(/Users/omi-swordfish/work/play/tite_scala/conf/routes,/Users/omi-swordfish/work/play/tite_scala/target/scala-2.10/classes/routes)[0m
-[0m[[0mdebug[0m] [0m	(/Users/omi-swordfish/work/play/tite_scala/conf/evolutions/default,/Users/omi-swordfish/work/play/tite_scala/target/scala-2.10/classes/evolutions/default)[0m
-[0m[[0mdebug[0m] [0m	(/Users/omi-swordfish/work/play/tite_scala/conf/evolutions/default/1.sql,/Users/omi-swordfish/work/play/tite_scala/target/scala-2.10/classes/evolutions/default/1.sql)[0m

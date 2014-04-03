@@ -1,21 +1,9 @@
-2014-03-25 18:37:01,750 - [INFO] - from play in pool-4-thread-1 
+2014-04-03 21:45:59,526 - [INFO] - from play in pool-4-thread-2 
 Listening for HTTP on /0:0:0:0:0:0:0:0:9000
 
-2014-03-25 18:37:22,330 - [INFO] - from play in play-internal-execution-context-1 
+2014-04-03 21:46:15,964 - [INFO] - from play in play-internal-execution-context-1 
 database [default] connected at jdbc:mysql://localhost:3306/tite_scala?reconnect=true&characterEncoding=UTF-8&characterSetResults=UTF-8
 
-2014-03-25 18:37:22,530 - [INFO] - from play in play-internal-execution-context-1 
-Application started (Dev)
-
-2014-03-25 18:37:55,667 - [INFO] - from play in play-internal-execution-context-1 
-database [default] connected at jdbc:mysql://localhost:3306/tite_scala?reconnect=true&characterEncoding=UTF-8&characterSetResults=UTF-8
-
-2014-03-25 18:37:55,681 - [INFO] - from play in play-internal-execution-context-1 
-Application started (Dev)
-
-2014-03-25 18:38:07,378 - [INFO] - from play in play-internal-execution-context-1 
-database [default] connected at jdbc:mysql://localhost:3306/tite_scala?reconnect=true&characterEncoding=UTF-8&characterSetResults=UTF-8
-
-2014-03-25 18:38:07,388 - [INFO] - from play in play-internal-execution-context-1 
+2014-04-03 21:46:16,168 - [INFO] - from play in play-internal-execution-context-1 
 Application started (Dev)
 
