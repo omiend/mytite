@@ -8,14 +8,15 @@ import anorm.SqlParser._
 
 /** Twitter Table */
 case class TwitterUser (
-	id: Pk[Long]
-	,twitterId: Long
-	,twitterScreenName: String
-	,twitterProfielImageUrl: String
-	,twitterAccessToken: String
+	id                       : Pk[Long]
+	,twitterId               : Long
+	,twitterScreenName       : String
+	,twitterProfielImageUrl  : String
+  ,twitterDescription      : String
+	,twitterAccessToken      : String
 	,twitterAccessTokenSecret: String
-	,createDate: Option[Date]
-	,updateDate: Option[Date]
+	,createDate              : Option[Date]
+	,updateDate              : Option[Date]
 ) {
 }
 
@@ -29,16 +30,18 @@ object TwitterUser {
     get[Long]("twitter_id") ~
     get[String]("twitter_screen_name") ~
     get[String]("twitter_profiel_image_url") ~
+    get[String]("twitter_description") ~
     get[String]("twitter_access_token") ~
     get[String]("twitter_access_token_secret") ~
     get[Date]("create_date") ~
     get[Date]("update_date") map {
-      case id~twitterId~twitterScreenName~twitterProfielImageUrl~accessToken~accessTokenSecret~createDate~updateDate => 
+      case id~twitterId~twitterScreenName~twitterProfielImageUrl~twitterDescription~accessToken~accessTokenSecret~createDate~updateDate => 
       TwitterUser(
          id
         ,twitterId
         ,twitterScreenName
         ,twitterProfielImageUrl
+        ,twitterDescription
         ,accessToken
         ,accessTokenSecret
         ,Option(createDate)
@@ -108,6 +111,7 @@ object TwitterUser {
              twitter_id
             ,twitter_screen_name
             ,twitter_profiel_image_url
+            ,twitter_description
             ,twitter_access_token
             ,twitter_access_token_secret
             ,create_date
@@ -116,6 +120,7 @@ object TwitterUser {
              {twitter_id}
             ,{twitter_screen_name}
             ,{twitter_profiel_image_url}
+            ,{twitter_description}
             ,{twitter_access_token}
             ,{twitter_access_token_secret}
             ,{create_date}
@@ -127,6 +132,7 @@ object TwitterUser {
         ,'twitter_id                  -> twitterUser.twitterId
         ,'twitter_screen_name         -> twitterUser.twitterScreenName
         ,'twitter_profiel_image_url   -> twitterUser.twitterProfielImageUrl
+        ,'twitter_description         -> twitterUser.twitterDescription
         ,'twitter_access_token        -> twitterUser.twitterAccessToken
         ,'twitter_access_token_secret -> twitterUser.twitterAccessTokenSecret
         ,'create_date                 -> twitterUser.createDate
@@ -145,6 +151,7 @@ object TwitterUser {
           update twitter_user
           set  twitter_screen_name         = {twitter_screen_name}
               ,twitter_profiel_image_url   = {twitter_profiel_image_url}
+              ,twitter_description         = {twitter_description}
               ,twitter_access_token        = {twitter_access_token}
               ,twitter_access_token_secret = {twitter_access_token_secret}
               ,update_date                 = {update_date}
@@ -154,6 +161,7 @@ object TwitterUser {
          'id                          -> twitterUser.id
         ,'twitter_screen_name         -> twitterUser.twitterScreenName
         ,'twitter_profiel_image_url   -> twitterUser.twitterProfielImageUrl
+        ,'twitter_description         -> twitterUser.twitterDescription
         ,'twitter_access_token        -> twitterUser.twitterAccessToken
         ,'twitter_access_token_secret -> twitterUser.twitterAccessTokenSecret
         ,'update_date                 -> twitterUser.updateDate

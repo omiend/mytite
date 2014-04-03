@@ -3,8 +3,6 @@ package controllers
 import play.api._
 import play.api.mvc._
 import models._
-import twitter4j.auth.AccessToken
-import twitter4j.User
 
 /**
  * アプリケーションコントローラ

@@ -21,8 +21,6 @@ object TwitterController extends Controller {
     // Twitter Object初期化
     twitterModel.getNewTwitter
 
-    println(twitterModel)
-
     // Twitterのログイン画面にリダイレクト
     Redirect(twitterModel.getOAuthUrl())
   }
@@ -31,8 +29,6 @@ object TwitterController extends Controller {
    * TwitterからのCallBack処理
    */
   def twitterOAuthCallback = Action { implicit request =>
-
-    println(twitterModel)
 
     request.queryString.get("denied") match {
       // Twitterのアプリケーション承認キャンセル時
@@ -65,6 +61,7 @@ object TwitterController extends Controller {
                                                   ,twitterModel.getTwitter.getId()
                                                   ,twitterModel.getTwitter.getScreenName()
                                                   ,user.getProfileImageURL()
+                                                  ,user.getDescription()
                                                   ,twitterModel.accessToken.getToken
                                                   ,twitterModel.accessToken.getTokenSecret
                                                   ,Some(nowDate)
@@ -78,6 +75,7 @@ object TwitterController extends Controller {
                                                   ,twitterModel.getTwitter.getId()
                                                   ,twitterModel.getTwitter.getScreenName()
                                                   ,user.getProfileImageURL()
+                                                  ,user.getDescription()
                                                   ,twitterModel.accessToken.getToken
                                                   ,twitterModel.accessToken.getTokenSecret
                                                   ,Some(nowDate)

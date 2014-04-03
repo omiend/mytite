@@ -4,7 +4,7 @@
 		module="tite_scala_2.10"
 		revision="1.0-SNAPSHOT"
 		status="integration"
-		publication="20140323093837"
+		publication="20140403215228"
 	>
 		<description>
 		tite_scala
