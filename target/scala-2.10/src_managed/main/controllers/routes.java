@@ -1,6 +1,6 @@
 // @SOURCE:/Users/omi-swordfish/work/play/tite_scala/conf/routes
 // @HASH:49040974b16aa4d1a9f685200d7f948e70610089
-// @DATE:Thu Apr 03 21:52:27 JST 2014
+// @DATE:Thu Apr 03 22:11:05 JST 2014
 
 package controllers;
 
