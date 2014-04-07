@@ -11,17 +11,22 @@
     <p></p>
   </div>
 
+  @pagination(pager)
+
   <div class="row">
 
     @for(user <- pager.dataList){
       <div class="col-6 col-sm-6 col-lg-4">
         <h2><img src="@user.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded"><a href="https://twitter.com/@user.twitterScreenName">&#64;@user.twitterScreenName</a></h2>
         <p>@user.twitterDescription</p>
-        <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+        <p><a class="btn btn-default" href="https://twitter.com/@user.twitterScreenName" role="button">View details &raquo;</a></p>
       </div><!--/span-->
     }
 
   </div><!--/row-->
+
+  @pagination(pager)
+
 </div><!--/span-->
 
 }

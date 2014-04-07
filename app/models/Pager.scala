@@ -4,10 +4,10 @@ package models
 case class Pager[A](var title: String, var pageNum: Int, var totalRows: Int, var twitterUser: Option[TwitterUser], var dataList: Seq[A]) {
 
   /** １ページに表時するデータの件数 */
-  val maxListCount: Int = 10
+  val maxListCount: Int = 6
 
   /** 現在ページの両脇ページ番号を表示する件数 */
-  val behindAndFrontCount: Int = 5
+  val behindAndFrontCount: Int = 2
 
   /** 取得したデータの件数からページ数を計算 */
   lazy val maxPageRowCount: Int = {
