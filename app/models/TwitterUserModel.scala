@@ -169,39 +169,3 @@ object TwitterUser {
     }
   }
 }
-
-/** Festival Table */
-case class Festival  (
-	id: Pk[Long]
-	,twitterId: String
-	,name: String
-	,createDate: Option[Date]
-	,updateDate: Option[Date]
-) {
-}
-object Festival {	
-}
-
-/** Performance Table */
-case class Performance (
-	id: Pk[Long]
-	,artist: String
-	,time: String
-	,timeLength: String
-	,createDate: Option[Date]
-	,updateDate: Option[Date]
-) {
-}
-object Performance {	
-}
-
-/** Stage Master */
-case class Stage (
-	id: Pk[Long]
-	,stageName:String
-	,createDate: Option[Date]
-	,updateDate: Option[Date]
-) {
-}
-object Stage {	
-}
