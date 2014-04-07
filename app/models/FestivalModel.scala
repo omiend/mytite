@@ -6,7 +6,6 @@ import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
 
-
 /** Festival Table */
 case class Festival  (
    id: Pk[Long]
