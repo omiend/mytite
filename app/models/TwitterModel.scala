@@ -17,7 +17,7 @@ class TwitterModel() {
   var accessToken: AccessToken = null
 
   /** Twitterオブジェクトを取得 */
-  def getTwitter: Twitter = if (twitter == null) getNewTwitter() else twitter;
+  def getTwitter: Twitter = if (twitter == null) getNewTwitter() else twitter
 
   def getNewTwitter(): Twitter = {
     shutdown;
