@@ -35,16 +35,20 @@ object Application extends Controller with Secured {
     Ok(views.html.index(pager))
   }
 
-  def authTest = IsAuthenticated { twitterId => implicit request =>
+  /**
+   * フェス一覧画面起動
+   */
+  def createFestival(twitterId: Long) = IsAuthenticated { twitterId => implicit request =>
 
     // IsAuthenticatedからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = session.get(twitterId) match {
       case Some(twitterId) => TwitterUser.getByTwitterId(twitterId)
       case _ => null
     }
+
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("とっぷ", 1, 0, twitterUser, Seq.empty)
-    Ok(views.html.index(pager))
+    Ok(views.html.festivalIndex(pager))
   }
 }
 
