@@ -59,6 +59,7 @@ object TwitterController extends Controller {
             // 既にログインした事有る場合はUpdateを行う
             val tmp: TwitterUser = new TwitterUser(s.id
                                                   ,twitterModel.getTwitter.getId()
+                                                  ,user.getName()
                                                   ,twitterModel.getTwitter.getScreenName()
                                                   ,user.getProfileImageURL()
                                                   ,user.getDescription()
@@ -73,6 +74,7 @@ object TwitterController extends Controller {
             // ログインしたらtwitter_userに登録
             val tmp: TwitterUser = new TwitterUser(null
                                                   ,twitterModel.getTwitter.getId()
+                                                  ,user.getName()
                                                   ,twitterModel.getTwitter.getScreenName()
                                                   ,user.getProfileImageURL()
                                                   ,user.getDescription()
