@@ -37,6 +37,7 @@ create table festival (
 create table twitter_user (
   id                          bigint auto_increment not null,
   twitter_id                  bigint,
+  twitter_name                varchar(255),
   twitter_screen_name         varchar(255),
   twitter_profiel_image_url   varchar(255),
   twitter_description         text,

@@ -10,6 +10,7 @@ import anorm.SqlParser._
 case class TwitterUser (
 	id                       : Pk[Long]
 	,twitterId               : Long
+  ,twitterName             : String
 	,twitterScreenName       : String
 	,twitterProfielImageUrl  : String
   ,twitterDescription      : String
@@ -28,6 +29,7 @@ object TwitterUser {
   val simple = {
     get[Pk[Long]]("id") ~
     get[Long]("twitter_id") ~
+    get[String]("twitter_name") ~
     get[String]("twitter_screen_name") ~
     get[String]("twitter_profiel_image_url") ~
     get[String]("twitter_description") ~
@@ -35,10 +37,11 @@ object TwitterUser {
     get[String]("twitter_access_token_secret") ~
     get[Date]("create_date") ~
     get[Date]("update_date") map {
-      case id~twitterId~twitterScreenName~twitterProfielImageUrl~twitterDescription~accessToken~accessTokenSecret~createDate~updateDate => 
+      case id~twitterId~twitterName~twitterScreenName~twitterProfielImageUrl~twitterDescription~accessToken~accessTokenSecret~createDate~updateDate => 
       TwitterUser(
          id
         ,twitterId
+        ,twitterName
         ,twitterScreenName
         ,twitterProfielImageUrl
         ,twitterDescription
@@ -109,6 +112,7 @@ object TwitterUser {
         """
           insert into twitter_user(
              twitter_id
+            ,twitter_name
             ,twitter_screen_name
             ,twitter_profiel_image_url
             ,twitter_description
@@ -118,6 +122,7 @@ object TwitterUser {
             ,update_date
           ) values (
              {twitter_id}
+            ,{twitter_name}
             ,{twitter_screen_name}
             ,{twitter_profiel_image_url}
             ,{twitter_description}
@@ -130,6 +135,7 @@ object TwitterUser {
       ).on(
          'id                          -> twitterUser.id
         ,'twitter_id                  -> twitterUser.twitterId
+        ,'twitter_name                  -> twitterUser.twitterName
         ,'twitter_screen_name         -> twitterUser.twitterScreenName
         ,'twitter_profiel_image_url   -> twitterUser.twitterProfielImageUrl
         ,'twitter_description         -> twitterUser.twitterDescription
@@ -149,7 +155,8 @@ object TwitterUser {
       SQL(
         """
           update twitter_user
-          set  twitter_screen_name         = {twitter_screen_name}
+          set  twitter_name                = {twitter_name}
+              ,twitter_screen_name         = {twitter_screen_name}
               ,twitter_profiel_image_url   = {twitter_profiel_image_url}
               ,twitter_description         = {twitter_description}
               ,twitter_access_token        = {twitter_access_token}
@@ -159,6 +166,7 @@ object TwitterUser {
         """
       ).on(
          'id                          -> twitterUser.id
+        ,'twitter_name                -> twitterUser.twitterName
         ,'twitter_screen_name         -> twitterUser.twitterScreenName
         ,'twitter_profiel_image_url   -> twitterUser.twitterProfielImageUrl
         ,'twitter_description         -> twitterUser.twitterDescription

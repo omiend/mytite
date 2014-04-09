@@ -15,55 +15,69 @@
   </head>
   <body>
 
-    <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+    <!-- Static navbar -->
+    <div class="navbar navbar-inverse navbar-static-top">
       <div class="container">
         <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
           <a class="navbar-brand" href="/">Twitter</a>
         </div>
-        <div class="collapse navbar-collapse navbar-right">
-          <ul class="nav navbar-nav">
-          @twitteUser match {
-            case Some(user) => {
-              <li><a href="https://twitter.com/@user.twitterScreenName">&#64;@user.twitterScreenName</a></li>
-              <li><a href="/twitterLogout">Logout</a></li>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#">Work</a></li>
+            <li><a href="#">About</a></li>
+            @twitteUser match {
+              case Some(user) => {
+                <li><a href="https://twitter.com/@user.twitterScreenName">&#64;@user.twitterScreenName</a></li>
+                <li><a href="/twitterLogout">Logout</a></li>
+              }
+              case _ => {
+                <li><a href="/twitterLogin">Login</a></li>
+              }
             }
-            case _ => {
-              <li><a href="/twitterLogin">Login</a></li>
-            }
-          }
           </ul>
-        </div><!-- /.nav-collapse -->
-      </div><!-- /.container -->
-    </div><!-- /.navbar -->
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
 
     <div class="container">
-
       <div class="row row-offcanvas row-offcanvas-right">
-
         <div class="col-xs-12 col-sm-12">
             @flash.get("success").map { message => <div class="alert alert-success"><strong>Success!</strong>@message</div> }
             @flash.get("warning").map { message => <div class="alert alert-warning"><strong>Warning!</strong>@message</div> }
             @flash.get("error").map { message => <div class="alert alert-danger"><strong>Error!</strong>@message</div> }
             @content
         </div><!--/span-->
-
       </div><!--/row-->
-
-      <hr>
-
-      <footer>
-        <p>&copy; omiend 2013</p>
-      </footer>
-
     </div><!--/.container-->
 
-
+    <!-- +++++ Footer Section +++++ -->
+    <div id="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-4">
+            <h4>My Links</h4>
+            <p>
+              <a href="#">Twitter</a><br/>
+              <a href="#">Facebook</a>
+            </p>
+            <p>&copy; omiend 2013</p>
+          </div><!-- /col-lg-4 -->
+        </div>
+      </div>
+    </div>
 
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script type="text/javascript" src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("bootstrap/js/bootstrap.min.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.at("javascripts/hover.zoom.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.at("javascripts/hover.zoom.conf.js")"></script>
 
   </body>
 </html>
