@@ -55,6 +55,10 @@ object Application extends Controller with Secured {
 
     Ok(views.html.festivalIndex(pager, targetTwitterUser.head))
   }
+
+  /**
+   * フェス登録画面起動
+   */
 }
 
 /**
