@@ -8,7 +8,7 @@ import anorm.SqlParser._
 
 /** Twitter Table */
 case class TwitterUser (
-	id                       : Pk[Long]
+	 id                      : Pk[Long]
 	,twitterId               : Long
   ,twitterName             : String
 	,twitterScreenName       : String
@@ -77,7 +77,7 @@ object TwitterUser {
   def findFromTo(offset: Int, maxPageCount: Int) = {
     DB.withConnection { implicit connection =>
 
-      // 親テーブル取得
+      // 取得
       val resultList: Seq[TwitterUser] = SQL(
         """
         select *
