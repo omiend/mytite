@@ -1,0 +1,46 @@
+@(pager: Pager[Festival], targetTwitterUser: TwitterUser)(implicit flash: play.api.mvc.Flash)
+
+@main(pager.title, pager.twitterUser)(flash) {
+
+  <!-- +++++ First Post +++++ -->
+  <div id="grey">
+      <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-lg-offset-2">
+          <p>
+            <img src="@targetTwitterUser.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded">
+            <br />
+            <ba>
+              <a href="https://twitter.com/@targetTwitterUser.twitterScreenName">&#64;@targetTwitterUser.twitterScreenName</a> &nbsp; @targetTwitterUser.twitterName
+            </ba>
+          </p>
+          <h4>@targetTwitterUser.twitterName</h4>
+          <p>
+            @targetTwitterUser.twitterDescription
+            @pager.twitterUser match {
+              case Some(user) => {
+                @if(user.twitterId==targetTwitterUser.twitterId){
+                  <br />
+                  <p><a class="btn btn-success btn-lg" href="@routes.Application.createFestival(targetTwitterUser.twitterId)" role="button">フェスを新しく作る</a></p>
+                }
+              }
+              case _ => {}
+            }
+          </p>
+        </div>
+      </div><!-- /row -->
+      </div> <!-- /container -->
+  </div><!-- /grey -->
+
+  <!-- +++++ Projects Section +++++ -->
+  <div class="container pt">
+    <div class="row mt centered">
+    @for(fes <- pager.dataList){
+      <div class="col-lg-4">
+        <p><a href="@routes.Application.timeTableDetail(targetTwitterUser.twitterId, fes.id.get)">@fes.festivalName</a></p>
+      </div>
+    }
+    </div><!-- /row -->
+  </div><!-- /container -->
+
+}
