@@ -1,0 +1,54 @@
+@(pager: Pager[TwitterUser], targetTwitterUser: TwitterUser, festivalForm: Form[Festival])(implicit flash: play.api.mvc.Flash)
+@import helper._
+
+@main(pager.title, pager.twitterUser)(flash) {
+
+  <!-- +++++ First Post +++++ -->
+  <div id="grey">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2">
+            <p>
+              <img src="@targetTwitterUser.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded">
+              <ba><a href="https://twitter.com/@targetTwitterUser.twitterScreenName">&#64;@targetTwitterUser.twitterScreenName</a>
+            </p>
+            <p><bd>January 18, 2014</bd></p>
+            <h4>@targetTwitterUser.twitterName</h4>
+            <p>@targetTwitterUser.twitterDescription</p>
+          </div>
+        </div><!-- /row -->
+
+        <!-- +++++ Contact Section +++++ -->
+        <div class="row mt">
+          <div class="col-lg-6 col-lg-offset-3 centered">
+            <h3>CONTACT ME</h3>
+            <hr>
+            <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</p>
+          </div>
+        </div>
+        <div class="row mt">  
+          <div class="col-lg-8 col-lg-offset-2">
+            <form role="form">
+              <div class="form-group">
+                <input type="name" class="form-control" id="NameInputEmail1" placeholder="Your Name">
+                <br>
+              </div>
+              <div class="form-group">
+                <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">
+                <br>
+              </div>
+              <div class="form-group">
+                <input type="email" class="form-control" id="subjectEmail1" placeholder="Subject">
+                <br>
+              </div>
+              <textarea class="form-control" rows="6" placeholder="Enter your text here"></textarea>
+                <br>
+              <button type="submit" class="btn btn-success">SUBMIT</button>
+            </form>         
+          </div>
+        </div><!-- /row -->
+
+      </div> <!-- /container -->
+  </div><!-- /grey -->
+
+}

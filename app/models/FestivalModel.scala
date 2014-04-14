@@ -8,11 +8,11 @@ import anorm.SqlParser._
 
 /** Festival Table */
 case class Festival  (
-   id        : Pk[Long]
-  ,twitterId : Long
-  ,name      : String
-  ,createDate: Option[Date]
-  ,updateDate: Option[Date]
+   id: Pk[Long]
+  ,var twitterId: Long
+  ,var festivalName: String
+  ,var createDate: Option[Date]
+  ,var updateDate: Option[Date]
 ) {
 }
 object Festival {
@@ -23,27 +23,28 @@ object Festival {
   val simple = {
     get[Pk[Long]]("id") ~
     get[Long]("twitter_id") ~
-    get[String]("name") ~
+    get[String]("festival_name") ~
     get[Date]("create_date") ~
     get[Date]("update_date") map {
-      case id~twitterId~name~createDate~updateDate => 
-      Fectival(
+      case id~twitterId~festivalName~createDate~updateDate => 
+      Festival(
          id
         ,twitterId
-        ,name
+        ,festivalName
         ,Option(createDate)
-        ,Option(updateDate))
+        ,Option(updateDate)
+      )
     }
   }
 
   /**
-   * Fectival witter_idを指定し、from-toで件数を指定して取得
+   * Festival from-toで件数を指定して取得
    */
-  def findFromTo(offset: Int, maxPageCount: Int) = {
+  def findFromTo(twitterId: Long, offset: Int, maxPageCount: Int) = {
     DB.withConnection { implicit connection =>
 
-      // 取得
-      val resultList: Seq[Fectival] = SQL(
+      // 親テーブル取得
+      val resultList: Seq[Festival] = SQL(
         """
         select *
           from festival
@@ -51,11 +52,11 @@ object Festival {
          limit {maxPageCount} offset {offset}
         """
       ).on(
-        'twitter_id   -> twitterId
+        'twitter_id   -> twitterId,
         'offset       -> offset,
         'maxPageCount -> maxPageCount
       ).as(
-        Fectival.simple *
+        Festival.simple *
       )
 
       // 件数取得
@@ -63,7 +64,10 @@ object Festival {
         """
         select count(*)
           from festival
+         where twitter_id = {twitter_id}
         """
+      ).on(
+        'twitter_id -> twitterId
       ).as(scalar[Long].single)
 
       (resultList, totalRows)
@@ -71,50 +75,50 @@ object Festival {
   }
 
   /**
-   * Fectival Insert処理
+   * Festival Insert処理
    */
-  def insart(festival: Fectival) {
+  def insart(festival: Festival) {
     DB.withConnection { implicit connection =>
       SQL(
         """
           insert into festival(
              twitter_id
-            ,name
+            ,festival_name
             ,create_date
             ,update_date
           ) values (
              {twitter_id}
-            ,{name}
+            ,{festival_name}
             ,{create_date}
             ,{update_date}
           )
         """
       ).on(
-         'id           -> festival.id
-        ,'twitter_id   -> festival.twitterId
-        ,'name         -> festival.name
-        ,'create_date  -> festival.createDate
-        ,'update_date  -> festival.updateDate
+         'id            -> festival.id
+        ,'twitter_id    -> festival.twitterId
+        ,'festival_name -> festival.festivalName
+        ,'create_date   -> festival.createDate
+        ,'update_date   -> festival.updateDate
       ).executeUpdate()
     }
   }
 
   /**
-   * festival Insert処理
+   * Festival Insert処理
    */
-  def update(festival: Fectival) {
+  def update(festival: Festival) {
     DB.withConnection { implicit connection =>
       SQL(
         """
           update festival
-          set  name        = {tname}
+          set  festival_name        = {festival_name}
               ,update_date = {update_date}
-        where id = {id}
+          where id = {id}
         """
       ).on(
-         'id          -> festival.id
-        ,'name        -> festival.name
-        ,'update_date -> festival.updateDate
+         'id            -> festival.id
+        ,'festival_name -> festival.festivalName
+        ,'update_date   -> festival.updateDate
       ).executeUpdate()
     }
   }

@@ -54,7 +54,7 @@ object TwitterController extends Controller {
 
         // TwitterUserが取得出来た場合はそのまま利用する
         def nowDate: java.util.Date = new java.util.Date
-        TwitterUser.getByTwitterId(String.valueOf(twitterModel.getTwitter.getId())) match {
+        TwitterUser.getByTwitterId(twitterModel.getTwitter.getId()) match {
           case Some(s) => {
             // 既にログインした事有る場合はUpdateを行う
             val tmp: TwitterUser = new TwitterUser(s.id
