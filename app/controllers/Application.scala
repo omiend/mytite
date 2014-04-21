@@ -38,7 +38,7 @@ object Application extends Controller with Secured {
     }
 
     // Pagerを初期化
-    val pager: Pager[TwitterUser] = Pager[TwitterUser]("とっぷ", pageNum, 0, twitterUser, Seq.empty)
+    val pager: Pager[TwitterUser] = Pager[TwitterUser]("トップ", pageNum, 0, twitterUser, Seq.empty)
 
     // TwitterUserのリストを取得
     val resultTuple = TwitterUser.findFromTo(pager.pageNum * pager.maxListCount - pager.maxListCount, pager.maxListCount)
@@ -149,33 +149,51 @@ object Application extends Controller with Secured {
     var targetTwitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(targetTwitterId)
 
     // TimeTable作成処理
-
+    // createTimeTable(festivalId)
 
     Ok(views.html.timeTableDetail(pager, targetTwitterUser.head))
   }
+
+  // def createTimeTable(festivalId: Long): Seq[TimeTable]= {
+  //   // Stageリスト取得
+  //   var stageList: Seq[Stage] = Stage.findAll
+  //   // Performance取得
+  //   var performanceList: Seq[Performance] = Performance.findByFesticalId(festivalId)
+
+  //   var tmpTimeTableList: Seq[TimeTable] = Seq.empty
+  //   var timeTableList: Seq[TimeTable] = Seq.empty
+
+  //   stageList.map {
+  //     x => timeTableList = timeTableList :+ TimeTable(x)
+  //   }
+  //   performanceList.map {
+  //     x => println(x)
+  //   }
+  //   timeTableList
+  // }
 
   // /**
   //  * Time Table List作成
   //  */
   // private void createTimeTableStructure(String twitterScreenName) {
-      
+  //  
   //     // ステージリスト取得
   //     List<Stage> stageList = StageService.getInstance().getAll();
   //     request.setAttribute("stageList", stageList);
-      
+  //  
   //     // タイムテーブル取得
   //     List<TimeTable> timeTableList = TimeTableService.getInstance().getTwitterScreenName(twitterScreenName);
-      
+  //  
   //     // 返却用
   //     List<TimeTableDto> tmpTimeTableDtoList = new ArrayList<TimeTableDto>();
   //     List<TimeTableDto> timeTableDtoList = new ArrayList<TimeTableDto>();
-
+  //
   //     // Dto初期化
   //     for (String timeLabel : CommonConstants.getTimeLabelList()) {
   //         TimeTableDto tmpDto = new TimeTableDto(timeLabel, stageList);
   //         tmpTimeTableDtoList.add(tmpDto);
   //     }
-
+  //
   //     // 時間ラベル順に処理
   //     for (String timeLabel : CommonConstants.getTimeLabelList()) {
   //         // ステージ順に処理
@@ -194,7 +212,7 @@ object Application extends Controller with Secured {
   //             }
   //         }
   //     }
-
+  //
   //     // --- 時間枠を表上で結合する処理 --- //
   //     // コピー
   //     timeTableDtoList.addAll(tmpTimeTableDtoList);
