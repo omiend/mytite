@@ -18,14 +18,22 @@ object Application extends Controller with Secured {
   /** Festival form */
   val festivalForm = Form(
     mapping(
-      "id"            -> ignored(NotAssigned: Pk[Long]),
-      "twitterId"     -> of[Long],
+      "id"           -> ignored(NotAssigned: Pk[Long]),
+      "twitterId"    -> of[Long],
       "festivalName" -> nonEmptyText,
-      "createDate"    -> optional(date("yyyy-MM-dd")),
-      "updateDate"    -> optional(date("yyyy-MM-dd"))
+      "createDate"   -> optional(date("yyyy-MM-dd")),
+      "updateDate"   -> optional(date("yyyy-MM-dd"))
     )(Festival.apply)(Festival.unapply)
   )
   
+  /** TimeTable Form */
+  val timeTableForm = Form(
+    mapping(
+      "festivalName" -> nonEmptyText,
+      "stageName"    -> seq(text)
+    )(TimeTable.apply)(TimeTable.unapply)
+  )
+
   /**
    * トップページ
    */
@@ -86,48 +94,45 @@ object Application extends Controller with Secured {
    */
   def createFestival(targetTwitterId: Long) = IsAuthenticated { twitterId => implicit request =>
 
-    // IsAuthenticatedからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = session.get(twitterId) match {
-      case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
-      case _ => null
-    }
-
+    // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
+    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
+    
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス新規登録画面", 1, 0, twitterUser, Seq.empty)
-    
-    // Festivalを表示するユーザーを取得する
-    var targetTwitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(targetTwitterId)
 
-    Ok(views.html.createFestival(pager, targetTwitterUser.head, festivalForm))
+    Ok(views.html.createFestival(pager, timeTableForm))
   }
 
   /**
    * フェス新規登録処理
    */
-  def insertFestival(targetTwitterId: Long) = Action { implicit request =>
+  def insertFestival = IsAuthenticated { twitterId => implicit request =>
 
-    // IsAuthenticatedからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = session.get("twitterId") match {
-      case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
-      case _ => null
-    }
+    // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
+    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
     
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス新規登録画面", 1, 0, twitterUser, Seq.empty)
     
-    festivalForm.bindFromRequest.fold(
+    timeTableForm.bindFromRequest.fold(
       formWithErrors => {
-        BadRequest(html.createFestival(pager, twitterUser.head, formWithErrors)).flashing("error" -> "登録に失敗しました")
+        BadRequest(html.createFestival(pager, formWithErrors)).flashing("error" -> "登録に失敗しました")
       },
-      festival => {
+      timeTable => {
         // 現在日付作成（timestamp）
         def date(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd hh:MM:dd:ss.000").parse(str)
         def nowDate: java.util.Date = new java.util.Date
-        festival.twitterId = targetTwitterId
-        festival.createDate = Some(nowDate)
-        festival.updateDate = Some(nowDate)
-        Festival.insart(festival)
-        Redirect(routes.Application.indexFestival(targetTwitterId.toLong)).flashing("success" -> "フェス %s の登録に成功しました".format(festival.festivalName))
+        // --- Festival作成処理 --- //
+        var festival: Festival = Festival(
+           null
+          ,twitterId.toLong
+          ,timeTable.festivalName
+          ,Some(nowDate)
+          ,Some(nowDate)
+        )
+        // FestivalとStageを登録する
+        Festival.insartWithStage(festival, timeTable.stageList)
+        Redirect(routes.Application.indexFestival(twitterId.toLong)).flashing("success" -> "フェス %s の登録に成功しました".format(festival.festivalName))
       })
   }
   
@@ -149,28 +154,28 @@ object Application extends Controller with Secured {
     var targetTwitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(targetTwitterId)
 
     // TimeTable作成処理
-    // createTimeTable(festivalId)
+    createTimeTable(festivalId)
 
     Ok(views.html.timeTableDetail(pager, targetTwitterUser.head))
   }
 
-  // def createTimeTable(festivalId: Long): Seq[TimeTable]= {
-  //   // Stageリスト取得
-  //   var stageList: Seq[Stage] = Stage.findAll
-  //   // Performance取得
-  //   var performanceList: Seq[Performance] = Performance.findByFesticalId(festivalId)
+  /** TimeTables作成 */
+  def createTimeTable(festivalId: Long): Seq[TimeTable]= {
 
-  //   var tmpTimeTableList: Seq[TimeTable] = Seq.empty
-  //   var timeTableList: Seq[TimeTable] = Seq.empty
+    // Stageリスト取得
+    var stageList: Seq[Stage] = Stage.findAll
 
-  //   stageList.map {
-  //     x => timeTableList = timeTableList :+ TimeTable(x)
-  //   }
-  //   performanceList.map {
-  //     x => println(x)
-  //   }
-  //   timeTableList
-  // }
+    // Performance取得
+    var performanceList: Seq[Performance] = Performance.findByFesticalId(festivalId)
+
+    // 返却用
+    var tmpTimeTableList: Seq[TimeTable] = Seq.empty
+    var timeTableList: Seq[TimeTable] = Seq.empty
+
+
+
+    timeTableList
+  }
 
   // /**
   //  * Time Table List作成
@@ -244,7 +249,7 @@ object Application extends Controller with Secured {
 trait Secured {
   
   /**
-   * Retrieve the connected twitterId email.
+   * Retrieve the connected twitterId.
    */
   private def twitterId(request: RequestHeader) = request.session.get("twitterId")
 

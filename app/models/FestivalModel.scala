@@ -122,4 +122,66 @@ object Festival {
       ).executeUpdate()
     }
   }
+
+  /**
+   * Festival Insert処理
+   */
+  def insartWithStage(festival: Festival, stageNameList: Seq[String]) {
+    DB.withTransaction { implicit connection =>
+
+      // --- Festival作成処理 --- //
+      val createId = SQL(
+        """
+          insert into festival(
+             twitter_id
+            ,festival_name
+            ,create_date
+            ,update_date
+          ) values (
+             {twitter_id}
+            ,{festival_name}
+            ,{create_date}
+            ,{update_date}
+          ) on duplicate key update id = LAST_INSERT_ID(id)
+        """
+      ).on(
+         'id            -> festival.id
+        ,'twitter_id    -> festival.twitterId
+        ,'festival_name -> festival.festivalName
+        ,'create_date   -> festival.createDate
+        ,'update_date   -> festival.updateDate
+      ).executeInsert()
+
+      // --- Stage作成処理 --- //
+      var index: Int = 1
+      for (stageName <- stageNameList) {
+        SQL(
+          """
+            insert into stage(
+               festival_id
+              ,stage_name
+              ,sort
+              ,color
+              ,create_date
+              ,update_date
+            ) values (
+               {festival_id}
+              ,{stage_name}
+              ,{sort}
+              ,{color}
+              ,{create_date}
+              ,{update_date}
+            )
+          """
+        ).on(
+           'festival_id -> createId.get
+          ,'stage_name  -> stageName
+          ,'sort        -> index.toString.padTo(3, '0')
+          ,'color       -> "white"
+          ,'create_date -> festival.createDate
+          ,'update_date -> festival.updateDate
+        ).executeInsert()
+      }
+    }
+  }
 }

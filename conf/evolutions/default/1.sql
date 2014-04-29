@@ -17,6 +17,7 @@ create table performance (
 
 create table stage (
   id                        bigint auto_increment not null,
+  festival_id               bigint,
   stage_name                varchar(255),
   sort                      varchar(255),
   color                     varchar(255),
@@ -52,8 +53,10 @@ alter table performance add constraint fk_performance_timeTable_1 foreign key (f
 create index ix_performance_timeTable_1 on performance (festival_id);
 alter table performance add constraint fk_performance_stage_2 foreign key (stage_id) references stage (id) on delete restrict on update restrict;
 create index ix_performance_stage_2 on performance (stage_id);
-alter table festival add constraint fk_festival_twitterUser_3 foreign key (twitter_id) references twitter_user (twitter_id) on delete restrict on update restrict;
-create index ix_festival_twitterUser_3 on festival (twitter_id);
+alter table stage add constraint fk_stage_festival_3 foreign key (festival_id) references festival (id) on delete restrict on update restrict;
+create index fk_stage_festival_3 on stage (festival_id);
+alter table festival add constraint fk_festival_twitterUser_4 foreign key (twitter_id) references twitter_user (twitter_id) on delete restrict on update restrict;
+create index ix_festival_twitterUser_4 on festival (twitter_id);
 
 # --- !Downs
 
