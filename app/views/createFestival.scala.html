@@ -5,29 +5,53 @@
 
   <!-- +++++ First Post +++++ -->
   <div id="grey">
-      <div class="container">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-lg-offset-2">
+          <p>
+            <img src="@pager.twitterUser.get.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded">
+            <ba><a href="https://twitter.com/@pager.twitterUser.get.twitterScreenName">&#64;@pager.twitterUser.get.twitterScreenName</a>
+          </p>
+          <p>ステージは５つまで登録できます</p>
+        </div>
+      </div><!-- /row -->
+    </div> <!-- /container -->
+  </div><!-- /grey -->
+
+  <!-- +++++ Projects Section +++++ -->
+  <div class="container-fluid">
+      @helper.form(action = routes.Application.insertFestival()) {
+      <fieldset>
         <div class="row">
           <div class="col-lg-8 col-lg-offset-2">
-            <p>
-              <img src="@pager.twitterUser.get.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded">
-              <ba><a href="https://twitter.com/@pager.twitterUser.get.twitterScreenName">&#64;@pager.twitterUser.get.twitterScreenName</a>
-            </p>
-            <p><bd>January 18, 2014</bd></p>
-            <h4>@pager.twitterUser.get.twitterName</h4>
-            <p>@pager.twitterUser.get.twitterDescription</p>
+            @inputText(timeTableForm("festivalName"), '_label -> "フェスの名前")
           </div>
         </div><!-- /row -->
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>@inputText(timeTableForm("stageName[0]"), '_label -> "ステージ名")</th>
+                  <th>@inputText(timeTableForm("stageName[1]"), '_label -> "ステージ名")</th>
+                  <th>@inputText(timeTableForm("stageName[2]"), '_label -> "ステージ名")</th>
+                  <th>@inputText(timeTableForm("stageName[3]"), '_label -> "ステージ名")</th>
+                  <th>@inputText(timeTableForm("stageName[4]"), '_label -> "ステージ名")</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div><!-- /row -->
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2">
+            <input type="submit" class="btn primary" value="保存">
+            <a href="@routes.Application.indexFestival(pager.twitterUser.get.twitterId)" class="btn">Cancel</a>
+          </div>
+        </div><!-- /row -->
+      </fieldset>
+      }
+  </div><!-- /container -->
 
-        @helper.form(action = routes.Application.insertFestival()) {
-          <fieldset>
-          @inputText(timeTableForm("festivalName"), '_label -> "フェスの名前")
-          @inputText(timeTableForm("stageName[0]"), '_label -> "ステージ名")
-          </fieldset>
-          <input type="submit" class="btn primary" value="保存">
-        }
-
-      </div> <!-- /container -->
-  </div><!-- /grey -->
 
 
 }
