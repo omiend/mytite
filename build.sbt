@@ -1,14 +1,14 @@
-name := "tite_scala"
+// name := "tite_scala"
 
-version := "1.0-SNAPSHOT"
+// version := "1.0-SNAPSHOT"
 
-libraryDependencies ++= Seq(
-  jdbc,
-  anorm,
-  cache,
-  "org.twitter4j" % "twitter4j" % "3.0.5",
-  "mysql" % "mysql-connector-java" % "5.1.20",
-  "org.twitter4j" % "twitter4j-core" % "3.0.3"
-)     
+// libraryDependencies ++= Seq(
+//    jdbc
+//   ,anorm
+//   ,cache
+//   ,"mysql" % "mysql-connector-java" % "5.1.20"
+//   ,"org.twitter4j" % "twitter4j-core" % "3.0.3"
+//   ,"org.twitter4j" % "twitter4j" % "3.0.5"
+// )     
 
-play.Project.playScalaSettings
+// play.Project.playScalaSettings
