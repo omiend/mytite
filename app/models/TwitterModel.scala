@@ -5,10 +5,6 @@ import twitter4j.auth._
 
 class TwitterModel() {
 
-  /** コンシューマーキー */
-  val consumer_key   : String = "lfOA43naUNLSqAjgpL0Q"
-  /** コンシューマーシークレット */
-  val consumer_secret: String = "e0A39VEr1ICgUtD7sO5nCW1diCvqQRuTRqANMj6g6E"
   /** Twitterオブジェクト */
   var requestToken: RequestToken = null
 
@@ -22,7 +18,6 @@ class TwitterModel() {
   def getNewTwitter(): Twitter = {
     shutdown;
     twitter = (new TwitterFactory()).getInstance()
-    twitter.setOAuthConsumer(consumer_key, consumer_secret)
     twitter
   }
 
