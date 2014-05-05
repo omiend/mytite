@@ -33,7 +33,7 @@ object Application extends Controller with Secured {
       "stageName"    -> seq(text)
     )(TimeTable.apply)(TimeTable.unapply)
   )
-
+  
   /**
    * トップページ
    */
@@ -154,7 +154,7 @@ object Application extends Controller with Secured {
     var targetTwitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(targetTwitterId)
 
     // TimeTable作成処理
-    createTimeTable(festivalId)
+    // createTimeTable(festivalId)
 
     Ok(views.html.timeTableDetail(pager, targetTwitterUser.head))
   }
@@ -171,8 +171,6 @@ object Application extends Controller with Secured {
     // 返却用
     var tmpTimeTableList: Seq[TimeTable] = Seq.empty
     var timeTableList: Seq[TimeTable] = Seq.empty
-
-
 
     timeTableList
   }

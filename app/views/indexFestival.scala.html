@@ -17,15 +17,6 @@
           <h4>@targetTwitterUser.twitterName</h4>
           <p>
             @targetTwitterUser.twitterDescription
-            @pager.twitterUser match {
-              case Some(user) => {
-                @if(user.twitterId==targetTwitterUser.twitterId){
-                  <br />
-                  <p><a class="btn btn-success btn-lg" href="@routes.Application.createFestival(targetTwitterUser.twitterId)" role="button">フェスを新しく作る</a></p>
-                }
-              }
-              case _ => {}
-            }
           </p>
         </div>
       </div><!-- /row -->
@@ -34,6 +25,15 @@
 
   <!-- +++++ Projects Section +++++ -->
   <div class="container pt">
+    @pager.twitterUser match {
+      case Some(user) => {
+        @if(user.twitterId==targetTwitterUser.twitterId){
+          <br />
+          <p><a class="btn primary" href="@routes.Application.createFestival(targetTwitterUser.twitterId)" role="button">フェスを新しく作る</a></p>
+        }
+      }
+      case _ => {}
+    }
     <div class="row mt centered">
     @for(fes <- pager.dataList){
       <div class="col-lg-4">
