@@ -1,6 +1,6 @@
-// name := "tite_scala"
+name := "tite_scala"
 
-// version := "1.0-SNAPSHOT"
+version := "1.0-SNAPSHOT"
 
 // libraryDependencies ++= Seq(
 //    jdbc
@@ -11,4 +11,4 @@
 //   ,"org.twitter4j" % "twitter4j" % "3.0.5"
 // )     
 
-// play.Project.playScalaSettings
+play.Project.playScalaSettings
