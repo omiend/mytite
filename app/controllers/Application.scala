@@ -227,40 +227,112 @@ object Application extends Controller with Secured {
     }
 
     // Pagerを初期化
-    val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス一覧", 1, 0, twitterUser, Seq.empty)
+    val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス", 1, 0, twitterUser, Seq.empty)
     
     // Festivalを表示するユーザーを取得する
     var targetTwitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(targetTwitterId)
 
     // TimeTable作成処理
-    // createTimeTable(festivalId)
+    createTimeTable(festivalId)
 
     Ok(views.html.timeTableDetail(pager, targetTwitterUser.head, festivalId))
   }
 
-  // /** TimeTables作成 */
-  // def createTimeTable(festivalId: Long): Seq[TimeTable]= {
+  /** TimeTables作成 */
+  def createTimeTable(festivalId: Long): Seq[TimeTable]= {
 
-  //   // Stageリスト取得
-  //   var stageList: Seq[Stage] = Stage.findByFestivalId(festivalId)
-  //   stageList.map { stage =>
-  //     println("stage : " + stage)
-  //   }
+    // Stageリスト取得
+    val stageList: Seq[Stage] = Stage.findByFestivalId(festivalId)
+    // Stageの名前リスト
+    var stageNameList: Seq[String] = Seq.empty
+    stageList.map { stage =>
+      stageNameList = stageNameList :+ stage.stageName
+    }
 
-  //   // Performance取得
-  //   var performanceList: Seq[Performance] = Performance.findByFesticalId(festivalId)
+    // Performance取得
+    var performanceList: Seq[Performance] = Performance.findByFesticalId(festivalId)
+    // performanceList.map { performance =>
+    //   println("performance : " + performance)
+    // }
 
-  //   // 返却用
-  //   var tmpTimeTableList: Seq[TimeTable] = Seq.empty
-  //   var timeTableList: Seq[TimeTable] = Seq.empty
+    // 返却用
+    var tmpTimeTableList: Seq[TimeTable] = Seq.empty
+    var timeTableList: Seq[TimeTable] = Seq.empty
 
-  //   TimeTable.TIME_LABEL_LIST map { timeLabel =>
-  //     tmpTimeTableList = tmpTimeTableList :+ TimeTable(timeLabel, stageList)
+    // 初期化
+    TimeTable.TIME_LABEL_LIST map { timeLabel =>
+      tmpTimeTableList = tmpTimeTableList :+ TimeTable(timeLabel, stageNameList)
+    }
 
-  //   }
+    // 時間ラベル順に処理
+    TimeTable.TIME_LABEL_LIST map { timeLabel =>
+      // ステージ順に処理
+      stageList.map { stage =>
+        // 取得したタイムテーブルごとの処理
+        performanceList.collect {
+          case performance if timeLabel == performance.time && stage.id.get == performance.stageId => {
+            tmpTimeTableList.collect {
+              case timeTable if timeLabel == timeTable.timeLabel => {
+                timeTable.performanceStageMap = timeTable.performanceStageMap + (stage.stageName -> performance)
+              }
+            }
+          }
+          case _ => {}
+        }
+      }
+    }
 
-  //   timeTableList
-  // }
+
+
+    // --- 時間枠を表上で結合する処理 --- //
+    // コピー
+    timeTableList = tmpTimeTableList
+    tmpTimeTableList.map { tmpTimeTable =>
+      stageList.map { stage =>
+        tmpTimeTable.performanceStageMap.get(stage.stageName) match {
+          case Some(tmpPerformance) => {
+            if (tmpPerformance.getTableRowSpanNumber > 1) {
+              val deleteTimeLabel: Seq[String] = TimeTable.getTimeLabelByTargetRange(tmpPerformance.getTableRowSpanNumber, tmpPerformance.time)
+              timeTableList.collect { 
+                case timeTable if deleteTimeLabel.contains(timeTable.timeLabel) => {
+                  // 削除
+                  timeTable.performanceStageMap = timeTable.performanceStageMap - stage.stageName
+                }
+                case _ => {} // 何もしない
+              }
+            }
+          }
+          case _ => {} // 何もしない
+        }
+      }
+    }
+
+    tmpTimeTableList.map { tmp =>
+      println("TimeTable : " + tmp.performanceStageMap)
+    }
+
+                    //     // --- 時間枠を表上で結合する処理 --- //
+                    //     // コピー
+                    //     timeTableDtoList.addAll(tmpTimeTableDtoList);
+                    //     for (int i = 0; i < tmpTimeTableDtoList.size(); i++) {
+                    //         TimeTableDto dto = tmpTimeTableDtoList.get(i);
+                    //         // TimeTableをステージ順に取得
+                    //         for (Stage stage : stageList) {
+                    //             TimeTable timeTable = dto.getTimeTableStageMap(stage.getName());
+                    //             // 当該ステージがRowspan設定されている場合、以後のTimeTableDtoのステージリストから、RowSpan設定の件数分削除
+                    //             if (timeTable.getTableRowSpanNumber() > 1) {
+                    //                 for (int j = i + 1; j < i + timeTable.getTableRowSpanNumber(); j++) {
+                    //                     TimeTableDto tmpDto = timeTableDtoList.get(j);
+                    //                     tmpDto.deleteStageName(stage.getName());
+                    //                     // 座標に再度格納
+                    //                     timeTableDtoList.set(j, tmpDto);
+                    //                 }
+                    //             }
+                    //         }
+                    //     }
+
+    timeTableList
+  }
 
   // /**
   //  * Time Table List作成

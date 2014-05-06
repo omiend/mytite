@@ -20,35 +20,39 @@
   </div><!-- /grey -->
 
   <!-- +++++ Projects Section +++++ -->
-  <a class="btn primary" href="@routes.Application.createPerformance(festivalId)" role="button">アーティストを登録する</a>
+
+  
   <div class="container pt">
+    @pager.twitterUser match {
+      case Some(user) => {
+        @if(user.twitterId==targetTwitterUser.twitterId){
+          <br />
+          <a class="btn primary" href="@routes.Application.createPerformance(festivalId)" role="button">アーティストを登録する</a>
+        }
+      }
+      case _ => {}
+    }
     <div class="row mt centered"> 
-      <div class="col-lg-4">
-        <a class="zoom green" href="work01.html"><img class="img-responsive" src="assets/img/portfolio/port01.jpg" alt="" /></a>
-        <p>APE</p>
-      </div>
-      <div class="col-lg-4">
-        <a class="zoom green" href="work01.html"><img class="img-responsive" src="assets/img/portfolio/port02.jpg" alt="" /></a>
-        <p>RAIDERS</p>
-      </div>
-      <div class="col-lg-4">
-        <a class="zoom green" href="work01.html"><img class="img-responsive" src="assets/img/portfolio/port03.jpg" alt="" /></a>
-        <p>VIKINGS</p>
-      </div>
-    </div><!-- /row -->
-    <div class="row mt centered"> 
-      <div class="col-lg-4">
-        <a class="zoom green" href="work01.html"><img class="img-responsive" src="assets/img/portfolio/port04.jpg" alt="" /></a>
-        <p>YODA</p>
-      </div>
-      <div class="col-lg-4">
-        <a class="zoom green" href="work01.html"><img class="img-responsive" src="assets/img/portfolio/port05.jpg" alt="" /></a>
-        <p>EMPERORS</p>
-      </div>
-      <div class="col-lg-4">
-        <a class="zoom green" href="work01.html"><img class="img-responsive" src="assets/img/portfolio/port06.jpg" alt="" /></a>
-        <p>CHIEFS</p>
-      </div>
+      <table class="table table-bordered">
+@*
+          <tr>
+              <th></th>
+              <c:forEach items="${stageList}" var="stage">
+                  <th>${f:h(stage.name)}</th>
+              </c:forEach>
+              <th></th>
+          </tr>
+          <c:forEach items="${timeTableDtoList}" var="timeTableDto">
+              <tr>
+                  <td>${f:h(timeTableDto.timeLabel)}</td>
+                  <c:forEach items="${timeTableDto.timeTableList}" var="timeTable">
+                      <td rowspan="${timeTable.tableRowSpanNumber}">${timeTable.artist}</td>
+                  </c:forEach>
+                  <td>${f:h(timeTableDto.timeLabel)}</td>
+              </tr>
+          </c:forEach>
+*@
+      </table>
     </div><!-- /row -->
   </div><!-- /container -->
 

@@ -4,11 +4,16 @@ import java.util.Date
 import play.api.Play.current
 
 /** TimeTable Structure */
-case class TimeTable (
+case class TimeTable(
+   val timeLabel: String
+  ,val stageList: Seq[String]
 ) {
+  // キーはStage.stageName
+  var performanceStageMap: Map[String, Performance] = Map()
 }
 
 object TimeTable {
+
   /** 時間 */
   val TIME_LABEL_1000: String = "10:00"
   val TIME_LABEL_1030: String = "10:30"
@@ -34,8 +39,9 @@ object TimeTable {
   val TIME_LABEL_2030: String = "20:30"
   val TIME_LABEL_2100: String = "21:00"
   val TIME_LABEL_2130: String = "21:30"
+
   /** 時間リスト */
-  val TIME_LABEL_LIST: Seq[String] = Seq[String](
+  lazy val TIME_LABEL_LIST: Seq[String] = Seq[String](
      TIME_LABEL_1000
     ,TIME_LABEL_1030
     ,TIME_LABEL_1100
@@ -61,32 +67,79 @@ object TimeTable {
     ,TIME_LABEL_2100
     ,TIME_LABEL_2130
   )
+
+  // /** TIME_LABELの値を数値に変換したMap */
+  // lazy val TIME_LABEL_CONVERT_INTEGER: Map[String, Int] = Map(
+  //    (TIME_LABEL_1000, 1000)
+  //   ,(TIME_LABEL_1030, 1030)
+  //   ,(TIME_LABEL_1100, 1100)
+  //   ,(TIME_LABEL_1130, 1130)
+  //   ,(TIME_LABEL_1200, 1200)
+  //   ,(TIME_LABEL_1230, 1230)
+  //   ,(TIME_LABEL_1300, 1300)
+  //   ,(TIME_LABEL_1330, 1330)
+  //   ,(TIME_LABEL_1400, 1400)
+  //   ,(TIME_LABEL_1430, 1430)
+  //   ,(TIME_LABEL_1500, 1500)
+  //   ,(TIME_LABEL_1530, 1530)
+  //   ,(TIME_LABEL_1600, 1600)
+  //   ,(TIME_LABEL_1630, 1630)
+  //   ,(TIME_LABEL_1700, 1700)
+  //   ,(TIME_LABEL_1730, 1730)
+  //   ,(TIME_LABEL_1800, 1800)
+  //   ,(TIME_LABEL_1830, 1830)
+  //   ,(TIME_LABEL_1900, 1900)
+  //   ,(TIME_LABEL_1930, 1930)
+  //   ,(TIME_LABEL_2000, 2000)
+  //   ,(TIME_LABEL_2030, 2030)
+  //   ,(TIME_LABEL_2100, 2100)
+  //   ,(TIME_LABEL_2130, 2130)
+  // )
+  
   /** 時間リストのSelectOptions */
-  val TIME_LABEL_SELECTOPTIONS: Seq[(String, String)] = {
+  lazy val TIME_LABEL_SELECTOPTIONS: Seq[(String, String)] = {
     var returnData: Seq[(String, String)] = Seq.empty
     TIME_LABEL_LIST.map { timeLabel =>
       returnData = returnData :+ (timeLabel, timeLabel)
     }
     returnData
   }
+
   /** 時間枠 */
-  val TIME_LABEL_FRAME_030: String = "30"
-  val TIME_LABEL_FRAME_060: String = "60"
-  val TIME_LABEL_FRAME_090: String = "90"
-  val TIME_LABEL_FRAME_120: String = "120"
+  val TIME_FRAME_030: String = "30"
+  val TIME_FRAME_060: String = "60"
+  val TIME_FRAME_090: String = "90"
+  val TIME_FRAME_120: String = "120"
   /** 時間枠リスト */
-  val TIME_LABEL_FRAME_LIST: Seq[String] = Seq[String](
-     TIME_LABEL_FRAME_030
-    ,TIME_LABEL_FRAME_060
-    ,TIME_LABEL_FRAME_090
-    ,TIME_LABEL_FRAME_120
+  lazy val TIME_FRAME_LIST: Seq[String] = Seq[String](
+     TIME_FRAME_030
+    ,TIME_FRAME_060
+    ,TIME_FRAME_090
+    ,TIME_FRAME_120
   )
+
   /** 時間リストのSelectOptions */
-  val TIME_LABEL_FRAME_SELECTOPTIONS: Seq[(String, String)] = {
+  lazy val TIME_FRAME_SELECTOPTIONS: Seq[(String, String)] = {
     var returnData: Seq[(String, String)] = Seq.empty
-    TIME_LABEL_FRAME_LIST.map { timeLabel =>
+    TIME_FRAME_LIST.map { timeLabel =>
       returnData = returnData :+ (timeLabel, timeLabel + "分")
     }
     returnData
+  }
+
+  /** 指定した数字の数だけ、指定したTIME_LABEL＋１件目の値を取得する */
+  def getTimeLabelByTargetRange(targetRange: Int, timeLabel: String): Seq[String] = {
+    var returnSet: Seq[String] = Seq.empty
+    var targetIndex: Int = 0
+    println("timeLabel : " + timeLabel)
+    TIME_LABEL_LIST.zipWithIndex.collect {
+      case timeLabelCollect if timeLabel == timeLabelCollect._1 => {
+        targetIndex = timeLabelCollect._2
+      }
+      case _ => 
+    }
+
+    returnSet = TIME_LABEL_LIST.slice(targetIndex + 1, targetIndex + targetRange)
+    returnSet
   }
 }
