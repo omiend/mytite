@@ -18,7 +18,7 @@ object Application extends Controller with Secured {
   /*****************************************************************************
    * Form
    *****************************************************************************/
-  // Performance form
+  // Performance登録処理用 Form
   val performanceForm = Form(
     tuple(
       "stageId"   -> text,
@@ -27,12 +27,12 @@ object Application extends Controller with Secured {
       "timeFrame" -> text
     )
   )
-  // FestivalAndStageFormModel
+  // Festival/Stage登録処理用 Form
   val festivalAndStageForm = Form(
-    mapping(
+    tuple(
       "festivalName" -> nonEmptyText,
       "stageName"    -> seq(text)
-    )(FestivalAndStageFormModel.apply)(FestivalAndStageFormModel.unapply)
+    )
   )
   
   /*****************************************************************************
@@ -119,7 +119,7 @@ object Application extends Controller with Secured {
       formWithErrors => {
         BadRequest(html.createFestival(pager, formWithErrors)).flashing("error" -> "登録に失敗しました")
       },
-      timeTable => {
+      festivalAndStage => {
         // 現在日付作成（timestamp）
         def date(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd hh:MM:dd:ss.000").parse(str)
         def nowDate: java.util.Date = new java.util.Date
@@ -127,12 +127,12 @@ object Application extends Controller with Secured {
         var festival: Festival = Festival(
            null
           ,twitterId.toLong
-          ,timeTable.festivalName
+          ,festivalAndStage._1  // Festival Name
           ,Some(nowDate)
           ,Some(nowDate)
         )
         // FestivalとStageを登録する
-        Festival.insartWithStage(festival, timeTable.stageList)
+        Festival.insartWithStage(festival, festivalAndStage._2)
         Redirect(routes.Application.indexFestival(twitterId.toLong)).flashing("success" -> "フェス %s の登録に成功しました".format(festival.festivalName))
       }
     )

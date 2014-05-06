@@ -1,4 +1,4 @@
-@(pager: Pager[TwitterUser], festivalAndStageForm: Form[FestivalAndStageFormModel])(implicit flash: play.api.mvc.Flash)
+@(pager: Pager[TwitterUser], festivalAndStageForm: Form[(String, Seq[String])])(implicit flash: play.api.mvc.Flash)
 @import helper._
 
 @main(pager.title, pager.twitterUser)(flash) {
