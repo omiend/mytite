@@ -15,18 +15,19 @@ import views._
  */
 object Application extends Controller with Secured {
 
-  /** Festival form */
-  val festivalForm = Form(
-    mapping(
-      "id"           -> ignored(NotAssigned: Pk[Long]),
-      "twitterId"    -> of[Long],
-      "festivalName" -> nonEmptyText,
-      "createDate"   -> optional(date("yyyy-MM-dd")),
-      "updateDate"   -> optional(date("yyyy-MM-dd"))
-    )(Festival.apply)(Festival.unapply)
+  /*****************************************************************************
+   * Form
+   *****************************************************************************/
+  // Performance form
+  val performanceForm = Form(
+    tuple(
+      "stageId"   -> text,
+      "artist"    -> nonEmptyText,
+      "time"      -> text,
+      "timeFrame" -> text
+    )
   )
-  
-  /** TimeTable Form */
+  // TimeTable Form
   val timeTableForm = Form(
     mapping(
       "festivalName" -> nonEmptyText,
@@ -34,9 +35,9 @@ object Application extends Controller with Secured {
     )(TimeTable.apply)(TimeTable.unapply)
   )
   
-  /**
+  /*****************************************************************************
    * トップページ
-   */
+   *****************************************************************************/
   def index(pageNum: Int) = Action { implicit request =>
 
     // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する（直接Cookieから取得するのはここだけで、あとはIsAuthenticatedを使う）
@@ -60,9 +61,9 @@ object Application extends Controller with Secured {
     Ok(views.html.index(pager))
   }
 
-  /**
-   * フェス一覧画面起動
-   */
+  /*****************************************************************************
+   * Festival一覧ページ
+   *****************************************************************************/
   def indexFestival(targetTwitterId: Long) = Action { implicit request =>
 
     // IsAuthenticatedからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
@@ -89,9 +90,9 @@ object Application extends Controller with Secured {
     Ok(views.html.indexFestival(pager, targetTwitterUser.head))
   }
   
-  /**
-   * フェス登録画面起動
-   */
+  /*****************************************************************************
+   *** Festival／Stage登録ページ
+   *****************************************************************************/
   def createFestival(targetTwitterId: Long) = IsAuthenticated { twitterId => implicit request =>
 
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
@@ -103,9 +104,9 @@ object Application extends Controller with Secured {
     Ok(views.html.createFestival(pager, timeTableForm))
   }
 
-  /**
-   * フェス新規登録処理
-   */
+  /*****************************************************************************
+   *** Festival／Stage登録処理
+   *****************************************************************************/
   def insertFestival = IsAuthenticated { twitterId => implicit request =>
 
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
@@ -133,9 +134,87 @@ object Application extends Controller with Secured {
         // FestivalとStageを登録する
         Festival.insartWithStage(festival, timeTable.stageList)
         Redirect(routes.Application.indexFestival(twitterId.toLong)).flashing("success" -> "フェス %s の登録に成功しました".format(festival.festivalName))
-      })
+      }
+    )
   }
   
+  /*****************************************************************************
+   *** Performance登録ページ
+   *****************************************************************************/
+  def createPerformance(festivalId: Long) = IsAuthenticated { twitterId => implicit request =>
+
+    // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
+    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
+    
+    // Pagerを初期化
+    val pager: Pager[TwitterUser] = Pager[TwitterUser]("パフォーマンス新規登録画面", 1, 0, twitterUser, Seq.empty)
+
+    // Stageを取得
+    var stageSelectOptions: Seq[(String, String)] = Seq.empty
+    Stage.findByFestivalId(festivalId).map { stage =>
+      stageSelectOptions = stageSelectOptions :+ (stage.id.toString, stage.stageName)
+    }
+
+    Ok(views.html.createPerformance(pager, festivalId, stageSelectOptions, performanceForm))
+  }
+
+  /*****************************************************************************
+   *** Performance登録処理
+   *****************************************************************************/
+  def insertPerformance(festivalId: Long) = IsAuthenticated { twitterId => implicit request =>
+    // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
+    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
+    // Pagerを初期化
+    val pager: Pager[TwitterUser] = Pager[TwitterUser]("パフォーマンス新規登録画面", 1, 0, twitterUser, Seq.empty)
+    // Stageを取得
+    var stageSelectOptions: Seq[(String, String)] = Seq.empty
+    Stage.findByFestivalId(festivalId).map { stage =>
+      stageSelectOptions = stageSelectOptions :+ (stage.id.toString, stage.stageName)
+    }
+
+    performanceForm.bindFromRequest.fold(
+      formWithErrors => {
+        println(formWithErrors)
+        BadRequest(html.createPerformance(pager, festivalId, stageSelectOptions, formWithErrors)).flashing("error" -> "登録に失敗しました")
+      },
+      performanceForm => {
+        // 現在日付作成（timestamp）
+        def date(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd hh:MM:dd:ss.000").parse(str)
+        def nowDate: java.util.Date = new java.util.Date
+        // --- Performance作成処理 --- //
+        var performance: Performance = Performance(
+           null
+          ,festivalId
+          ,performanceForm._1.toLong // stageId
+          ,performanceForm._2        // artist
+          ,performanceForm._3        // time
+          ,performanceForm._4        // timeLabel
+          ,Some(nowDate)
+          ,Some(nowDate)
+        )
+        // FestivalとStageを登録する
+        Performance.insart(performance)
+        Redirect(routes.Application.timeTableDetail(twitterId.toLong, festivalId)).flashing("success" -> "アーティスト %s の登録に成功しました".format(performanceForm._2))
+      }
+    )
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   /**
    * タイムテーブル参照起動処理
    */
@@ -156,7 +235,7 @@ object Application extends Controller with Secured {
     // TimeTable作成処理
     // createTimeTable(festivalId)
 
-    Ok(views.html.timeTableDetail(pager, targetTwitterUser.head))
+    Ok(views.html.timeTableDetail(pager, targetTwitterUser.head, festivalId))
   }
 
   /** TimeTables作成 */

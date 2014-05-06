@@ -10,7 +10,7 @@ import anorm.SqlParser._
 case class Performance (
 	 id: Pk[Long]
 	,festivalId: Long
-	,performanceId: Long
+	,stageId: Long
 	,artist: String
 	,time: String
 	,timeFrame: String
@@ -66,6 +66,43 @@ object Performance {
         Performance.simple *
       )
       resultList
+    }
+  }
+
+  /**
+   * Performance Insert処理
+   */
+  def insart(performance: Performance) {
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+          insert into performance(
+             festival_id
+            ,stage_id
+            ,artist
+            ,time
+            ,time_frame
+            ,create_date
+            ,update_date
+          ) values (
+             {festival_id}
+            ,{stage_id}
+            ,{artist}
+            ,{time}
+            ,{time_frame}
+            ,{create_date}
+            ,{update_date}
+          )
+        """
+      ).on(
+         'festival_id -> performance.festivalId
+        ,'stage_id    -> performance.stageId
+        ,'artist      -> performance.artist
+        ,'time        -> performance.time
+        ,'time_frame  -> performance.timeFrame
+        ,'create_date -> performance.createDate
+        ,'update_date -> performance.updateDate
+      ).executeInsert()
     }
   }
 }

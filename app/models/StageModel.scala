@@ -63,6 +63,29 @@ object Stage {
     }
   }
 
+
+  /**
+   * Stage from-toで件数を指定して取得
+   */
+  def findByFestivalId(festivalId: Long): Seq[Stage] = {
+    DB.withConnection { implicit connection =>
+      // 親テーブル取得
+      val resultList: Seq[Stage] = SQL(
+        """
+        select *
+          from stage
+         where festival_id = {festival_id}
+         order by sort
+        """
+      ).on(
+        'festival_id -> festivalId
+      ).as(
+        Stage.simple *
+      )
+      resultList
+    }
+  }
+
   /**
    * Stage Insert処理
    */

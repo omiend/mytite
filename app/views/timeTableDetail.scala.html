@@ -1,4 +1,4 @@
-@(pager: Pager[TwitterUser], targetTwitterUser: TwitterUser)(implicit flash: play.api.mvc.Flash)
+@(pager: Pager[TwitterUser], targetTwitterUser: TwitterUser, festivalId: Long)(implicit flash: play.api.mvc.Flash)
 
 @main(pager.title, pager.twitterUser)(flash) {
 
@@ -20,7 +20,7 @@
   </div><!-- /grey -->
 
   <!-- +++++ Projects Section +++++ -->
-  
+  <a class="btn primary" href="@routes.Application.createPerformance(festivalId)" role="button">アーティストを登録する</a>
   <div class="container pt">
     <div class="row mt centered"> 
       <div class="col-lg-4">
