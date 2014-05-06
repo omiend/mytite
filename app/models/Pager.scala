@@ -13,6 +13,7 @@ case class Pager[A](var title: String, var pageNum: Int, var totalRows: Int, var
   lazy val maxPageRowCount: Int = {
     // ページ数を取得
     var maxPageRowCount: Int = totalRows / maxListCount
+    // 割り切れない場合、+1ページする
     if (totalRows % maxListCount > 0) {
       maxPageRowCount = maxPageRowCount + 1
     }
