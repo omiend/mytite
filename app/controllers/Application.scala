@@ -27,12 +27,12 @@ object Application extends Controller with Secured {
       "timeFrame" -> text
     )
   )
-  // TimeTable Form
-  val timeTableForm = Form(
+  // FestivalAndStageFormModel
+  val festivalAndStageForm = Form(
     mapping(
       "festivalName" -> nonEmptyText,
       "stageName"    -> seq(text)
-    )(TimeTable.apply)(TimeTable.unapply)
+    )(FestivalAndStageFormModel.apply)(FestivalAndStageFormModel.unapply)
   )
   
   /*****************************************************************************
@@ -101,7 +101,7 @@ object Application extends Controller with Secured {
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス新規登録画面", 1, 0, twitterUser, Seq.empty)
 
-    Ok(views.html.createFestival(pager, timeTableForm))
+    Ok(views.html.createFestival(pager, festivalAndStageForm))
   }
 
   /*****************************************************************************
@@ -115,7 +115,7 @@ object Application extends Controller with Secured {
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス新規登録画面", 1, 0, twitterUser, Seq.empty)
     
-    timeTableForm.bindFromRequest.fold(
+    festivalAndStageForm.bindFromRequest.fold(
       formWithErrors => {
         BadRequest(html.createFestival(pager, formWithErrors)).flashing("error" -> "登録に失敗しました")
       },
@@ -227,7 +227,7 @@ object Application extends Controller with Secured {
     }
 
     // Pagerを初期化
-    val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス新規登録画面", 1, 0, twitterUser, Seq.empty)
+    val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス一覧", 1, 0, twitterUser, Seq.empty)
     
     // Festivalを表示するユーザーを取得する
     var targetTwitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(targetTwitterId)
@@ -238,21 +238,29 @@ object Application extends Controller with Secured {
     Ok(views.html.timeTableDetail(pager, targetTwitterUser.head, festivalId))
   }
 
-  /** TimeTables作成 */
-  def createTimeTable(festivalId: Long): Seq[TimeTable]= {
+  // /** TimeTables作成 */
+  // def createTimeTable(festivalId: Long): Seq[TimeTable]= {
 
-    // Stageリスト取得
-    var stageList: Seq[Stage] = Stage.findAll
+  //   // Stageリスト取得
+  //   var stageList: Seq[Stage] = Stage.findByFestivalId(festivalId)
+  //   stageList.map { stage =>
+  //     println("stage : " + stage)
+  //   }
 
-    // Performance取得
-    var performanceList: Seq[Performance] = Performance.findByFesticalId(festivalId)
+  //   // Performance取得
+  //   var performanceList: Seq[Performance] = Performance.findByFesticalId(festivalId)
 
-    // 返却用
-    var tmpTimeTableList: Seq[TimeTable] = Seq.empty
-    var timeTableList: Seq[TimeTable] = Seq.empty
+  //   // 返却用
+  //   var tmpTimeTableList: Seq[TimeTable] = Seq.empty
+  //   var timeTableList: Seq[TimeTable] = Seq.empty
 
-    timeTableList
-  }
+  //   TimeTable.TIME_LABEL_LIST map { timeLabel =>
+  //     tmpTimeTableList = tmpTimeTableList :+ TimeTable(timeLabel, stageList)
+
+  //   }
+
+  //   timeTableList
+  // }
 
   // /**
   //  * Time Table List作成
