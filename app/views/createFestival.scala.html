@@ -1,4 +1,4 @@
-@(pager: Pager[TwitterUser], timeTableForm: Form[TimeTable])(implicit flash: play.api.mvc.Flash)
+@(pager: Pager[TwitterUser], festivalAndStageForm: Form[FestivalAndStageFormModel])(implicit flash: play.api.mvc.Flash)
 @import helper._
 
 @main(pager.title, pager.twitterUser)(flash) {
@@ -24,7 +24,7 @@
       <fieldset>
         <div class="row">
           <div class="col-lg-8 col-lg-offset-2">
-            @inputText(timeTableForm("festivalName"), '_label -> "フェスの名前")
+            @inputText(festivalAndStageForm("festivalName"), '_label -> "フェスの名前")
           </div>
         </div><!-- /row -->
         <div class="row">
@@ -32,11 +32,11 @@
             <table class="table table-bordered">
               <thead>
                 <tr>
-                  <th>@inputText(timeTableForm("stageName[0]"), '_label -> "ステージ名")</th>
-                  <th>@inputText(timeTableForm("stageName[1]"), '_label -> "ステージ名")</th>
-                  <th>@inputText(timeTableForm("stageName[2]"), '_label -> "ステージ名")</th>
-                  <th>@inputText(timeTableForm("stageName[3]"), '_label -> "ステージ名")</th>
-                  <th>@inputText(timeTableForm("stageName[4]"), '_label -> "ステージ名")</th>
+                  <th>@inputText(festivalAndStageForm("stageName[0]"), '_label -> "ステージ名")</th>
+                  <th>@inputText(festivalAndStageForm("stageName[1]"), '_label -> "ステージ名")</th>
+                  <th>@inputText(festivalAndStageForm("stageName[2]"), '_label -> "ステージ名")</th>
+                  <th>@inputText(festivalAndStageForm("stageName[3]"), '_label -> "ステージ名")</th>
+                  <th>@inputText(festivalAndStageForm("stageName[4]"), '_label -> "ステージ名")</th>
                 </tr>
               </thead>
             </table>
