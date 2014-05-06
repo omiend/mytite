@@ -17,6 +17,16 @@ case class Performance (
 	,createDate: Option[Date]
 	,updateDate: Option[Date]
 ) {
+  /** TimeFrameに付随するRowSpan数を取得する */
+  def getTableRowSpanNumber: Int = {
+    timeFrame match {
+      case TimeTable.TIME_FRAME_030 => 1
+      case TimeTable.TIME_FRAME_060 => 2
+      case TimeTable.TIME_FRAME_090 => 3
+      case TimeTable.TIME_FRAME_120 => 4
+      case _ => 0
+    }
+  }
 }
 
 object Performance {
@@ -58,7 +68,7 @@ object Performance {
         select *
           from performance
          where festival_id = {festival_id}
-         order by festival_id, stage_id, time, Id
+         order by stage_id, time, Id
         """
       ).on(
         'festival_id -> festivalId
