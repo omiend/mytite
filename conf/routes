@@ -7,7 +7,10 @@ GET     /                           controllers.Application.index(p: Int ?= 1)
 
 GET     /indexFestival              controllers.Application.indexFestival(targetTwitterId: Long)
 GET     /createFestival             controllers.Application.createFestival(targetTwitterId: Long)
-POST    /insertFestival             controllers.Application.insertFestival()
+POST    /insertFestival             controllers.Application.insertFestival
+
+GET     /createPerformance          controllers.Application.createPerformance(festivalId: Long)
+POST    /insertPerformance          controllers.Application.insertPerformance(festivalId: Long)
 
 GET     /timeTableDetail            controllers.Application.timeTableDetail(targetTwitterId: Long, festivalId: Long)
 
