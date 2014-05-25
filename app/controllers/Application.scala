@@ -199,14 +199,20 @@ object Application extends Controller with Secured {
     )
   }
 
-
-
-
-
-
-
-
-
+  /*****************************************************************************
+   *** Performance更新処理
+   *****************************************************************************/
+  def updatePerformance(performanceId: Long) = IsAuthenticated { twitterId => implicit request =>
+    // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
+    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
+    // Pagerを初期化
+    val pager: Pager[TwitterUser] = Pager[TwitterUser]("パフォーマンス更新画面", 1, 0, twitterUser, Seq.empty)
+    // Stageを取得
+    var stageSelectOptions: Seq[(String, String)] = Seq.empty
+    Performance.findById(performanceId).map { performance =>
+      Ok(views.html.editPerformance(pager, performanceId, stageSelectOptions, performanceForm.fill((performance.stageId.toString, performance.artist, performance.time, performance.timeFrame))))
+    }.getOrElse(NotFound)
+  }
 
 
 
@@ -232,17 +238,15 @@ object Application extends Controller with Secured {
     // Festivalを表示するユーザーを取得する
     var targetTwitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(targetTwitterId)
 
-    // TimeTable作成処理
-    createTimeTable(festivalId)
+    // Stageリスト取得
+    val stageList: Seq[Stage] = Stage.findByFestivalId(festivalId)
 
-    Ok(views.html.timeTableDetail(pager, targetTwitterUser.head, festivalId))
+    Ok(views.html.timeTableDetail(pager, targetTwitterUser.head, festivalId, stageList, createTimeTable(festivalId, stageList)))
   }
 
   /** TimeTables作成 */
-  def createTimeTable(festivalId: Long): Seq[TimeTable]= {
+  def createTimeTable(festivalId: Long, stageList: Seq[Stage]): Seq[TimeTable] = {
 
-    // Stageリスト取得
-    val stageList: Seq[Stage] = Stage.findByFestivalId(festivalId)
     // Stageの名前リスト
     var stageNameList: Seq[String] = Seq.empty
     stageList.map { stage =>
@@ -251,27 +255,25 @@ object Application extends Controller with Secured {
 
     // Performance取得
     var performanceList: Seq[Performance] = Performance.findByFesticalId(festivalId)
-    // performanceList.map { performance =>
-    //   println("performance : " + performance)
-    // }
 
     // 返却用
-    var tmpTimeTableList: Seq[TimeTable] = Seq.empty
     var timeTableList: Seq[TimeTable] = Seq.empty
 
     // 初期化
     TimeTable.TIME_LABEL_LIST map { timeLabel =>
-      tmpTimeTableList = tmpTimeTableList :+ TimeTable(timeLabel, stageNameList)
+      timeTableList = timeTableList :+ TimeTable(timeLabel, stageNameList)
     }
 
     // 時間ラベル順に処理
-    TimeTable.TIME_LABEL_LIST map { timeLabel =>
-      // ステージ順に処理
+    TimeTable.TIME_LABEL_LIST.map { timeLabel =>
+      // ステージごとの処理
       stageList.map { stage =>
-        // 取得したタイムテーブルごとの処理
+        // 取得したパフォーマンスごとの処理
         performanceList.collect {
+          // パフォーマンスの時間ラベルとステージIDを指定
           case performance if timeLabel == performance.time && stage.id.get == performance.stageId => {
-            tmpTimeTableList.collect {
+            // 
+            timeTableList.collect {
               case timeTable if timeLabel == timeTable.timeLabel => {
                 timeTable.performanceStageMap = timeTable.performanceStageMap + (stage.stageName -> performance)
               }
@@ -282,19 +284,17 @@ object Application extends Controller with Secured {
       }
     }
 
-
-
     // --- 時間枠を表上で結合する処理 --- //
-    // コピー
-    timeTableList = tmpTimeTableList
-    tmpTimeTableList.map { tmpTimeTable =>
+    timeTableList.map { tmpTimeTable =>
       stageList.map { stage =>
         tmpTimeTable.performanceStageMap.get(stage.stageName) match {
           case Some(tmpPerformance) => {
             if (tmpPerformance.getTableRowSpanNumber > 1) {
               val deleteTimeLabel: Seq[String] = TimeTable.getTimeLabelByTargetRange(tmpPerformance.getTableRowSpanNumber, tmpPerformance.time)
-              timeTableList.collect { 
+              timeTableList.collect {
                 case timeTable if deleteTimeLabel.contains(timeTable.timeLabel) => {
+                  // Stageを削除
+                  timeTable.stageList = timeTable.stageList.filter { _ != stage.stageName }
                   // 削除
                   timeTable.performanceStageMap = timeTable.performanceStageMap - stage.stageName
                 }
@@ -307,30 +307,7 @@ object Application extends Controller with Secured {
       }
     }
 
-    tmpTimeTableList.map { tmp =>
-      println("TimeTable : " + tmp.performanceStageMap)
-    }
-
-                    //     // --- 時間枠を表上で結合する処理 --- //
-                    //     // コピー
-                    //     timeTableDtoList.addAll(tmpTimeTableDtoList);
-                    //     for (int i = 0; i < tmpTimeTableDtoList.size(); i++) {
-                    //         TimeTableDto dto = tmpTimeTableDtoList.get(i);
-                    //         // TimeTableをステージ順に取得
-                    //         for (Stage stage : stageList) {
-                    //             TimeTable timeTable = dto.getTimeTableStageMap(stage.getName());
-                    //             // 当該ステージがRowspan設定されている場合、以後のTimeTableDtoのステージリストから、RowSpan設定の件数分削除
-                    //             if (timeTable.getTableRowSpanNumber() > 1) {
-                    //                 for (int j = i + 1; j < i + timeTable.getTableRowSpanNumber(); j++) {
-                    //                     TimeTableDto tmpDto = timeTableDtoList.get(j);
-                    //                     tmpDto.deleteStageName(stage.getName());
-                    //                     // 座標に再度格納
-                    //                     timeTableDtoList.set(j, tmpDto);
-                    //                 }
-                    //             }
-                    //         }
-                    //     }
-
+    // 返却
     timeTableList
   }
 

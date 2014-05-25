@@ -11,6 +11,7 @@ POST    /insertFestival             controllers.Application.insertFestival
 
 GET     /createPerformance          controllers.Application.createPerformance(festivalId: Long)
 POST    /insertPerformance          controllers.Application.insertPerformance(festivalId: Long)
+GET     /editPerformance            controllers.Application.insertPerformance(performanceId: Long)
 
 GET     /timeTableDetail            controllers.Application.timeTableDetail(targetTwitterId: Long, festivalId: Long)
 

@@ -1,0 +1,44 @@
+@(pager: Pager[TwitterUser], performanceId: Long, stageSelectOptions: Seq[(String, String)], performanceForm: Form[(String, String, String, String)])(implicit flash: play.api.mvc.Flash)
+@import helper._
+@import models.TimeTable
+
+@main(pager.title, pager.twitterUser)(flash) {
+
+  <!-- +++++ First Post +++++ -->
+  <div id="grey">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-lg-offset-2">
+          <p>
+            <img src="@pager.twitterUser.get.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded">
+            <ba><a href="https://twitter.com/@pager.twitterUser.get.twitterScreenName">&#64;@pager.twitterUser.get.twitterScreenName</a>
+          </p>
+          <p>アーティストと、開演時間、パフォーマンス時間の長さを入力して下さい</p>
+        </div>
+      </div><!-- /row -->
+    </div> <!-- /container -->
+  </div><!-- /grey -->
+
+  <!-- +++++ Projects Section +++++ -->
+  <div class="container-fluid">
+      @helper.form(action = routes.Application.insertPerformance(festivalId)) {
+      <fieldset>
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2">
+            @inputText(performanceForm("artist"), '_label -> "アーティスト名")
+            @select(performanceForm("stageId"), options = stageSelectOptions, '_label -> "ステージ")
+            @select(performanceForm("time"), options = TimeTable.TIME_LABEL_SELECTOPTIONS, '_label -> "開演時間")
+            @select(performanceForm("timeFrame"), options = TimeTable.TIME_FRAME_SELECTOPTIONS, '_label -> "パフォーマンス時間の長さ")
+          </div>
+        </div><!-- /row -->
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2">
+            <input type="submit" class="btn primary" value="保存">
+            <a href="@routes.Application.indexFestival(pager.twitterUser.get.twitterId)" class="btn">Cancel</a>
+          </div>
+        </div><!-- /row -->
+      </fieldset>
+      }
+  </div><!-- /container -->
+
+}

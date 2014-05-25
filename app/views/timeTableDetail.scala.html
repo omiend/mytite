@@ -1,4 +1,4 @@
-@(pager: Pager[TwitterUser], targetTwitterUser: TwitterUser, festivalId: Long)(implicit flash: play.api.mvc.Flash)
+@(pager: Pager[TwitterUser], targetTwitterUser: TwitterUser, festivalId: Long, stageList: Seq[Stage], timeTableList: Seq[TimeTable])(implicit flash: play.api.mvc.Flash)
 
 @main(pager.title, pager.twitterUser)(flash) {
 
@@ -20,8 +20,6 @@
   </div><!-- /grey -->
 
   <!-- +++++ Projects Section +++++ -->
-
-  
   <div class="container pt">
     @pager.twitterUser match {
       case Some(user) => {
@@ -34,24 +32,24 @@
     }
     <div class="row mt centered"> 
       <table class="table table-bordered">
-@*
+
+        <tr>
+          <th></th>
+            @for(stage <- stageList){
+              <th>@stage.stageName</th>
+            }
+          <th></th>
+          @for(timeTable <- timeTableList){
           <tr>
-              <th></th>
-              <c:forEach items="${stageList}" var="stage">
-                  <th>${f:h(stage.name)}</th>
-              </c:forEach>
-              <th></th>
+            <td>@timeTable.timeLabel</td>
+              @for(performance <- timeTable.getTimeTableList){
+              <td rowspan="@performance.getTableRowSpanNumber">@performance.artist</td>
+              }
+            <td>@timeTable.timeLabel</td>
           </tr>
-          <c:forEach items="${timeTableDtoList}" var="timeTableDto">
-              <tr>
-                  <td>${f:h(timeTableDto.timeLabel)}</td>
-                  <c:forEach items="${timeTableDto.timeTableList}" var="timeTable">
-                      <td rowspan="${timeTable.tableRowSpanNumber}">${timeTable.artist}</td>
-                  </c:forEach>
-                  <td>${f:h(timeTableDto.timeLabel)}</td>
-              </tr>
-          </c:forEach>
-*@
+          }
+        </tr>
+
       </table>
     </div><!-- /row -->
   </div><!-- /container -->

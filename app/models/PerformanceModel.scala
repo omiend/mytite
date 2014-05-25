@@ -58,6 +58,28 @@ object Performance {
   }
 
   /**
+   * Performance Idを指定して取得
+   */
+  def findById(id: Long): Seq[Performance] = {
+    DB.withConnection { implicit connection =>
+      // 親テーブル取得
+      val resultList: Seq[Performance] = SQL(
+        """
+        select *
+          from performance
+         where id = {id}
+         order by stage_id, time, Id
+        """
+      ).on(
+        'id -> id
+      ).as(
+        Performance.simple.singleOpt
+      )
+      resultList
+    }
+  }
+
+  /**
    * Performance FestivalIdを指定して取得
    */
   def findByFesticalId(festivalId: Long): Seq[Performance] = {
@@ -113,6 +135,45 @@ object Performance {
         ,'create_date -> performance.createDate
         ,'update_date -> performance.updateDate
       ).executeInsert()
+    }
+  }
+
+  /**
+   * Performance Insert処理
+   */
+  def update(performance: Performance) {
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+          update performance
+          set  artist     = {artist}
+              ,time       = {time}
+              ,time_frame = {time_frame}
+          where id = {id}
+        """
+      ).on(
+         'id         -> performance.id
+        ,'artist     -> performance.artist
+        ,'time       -> performance.time
+        ,'time_frame -> performance.time_frame
+        ,'updateDate -> performance.updateDate
+      ).executeUpdate()
+    }
+  }
+  
+  /**
+   * Performance Insert処理
+   */
+  def delete(performance: Performance) {
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+          delete from performance
+          where id = {id}
+        """
+      ).on(
+        'id -> performance.id
+      ).executeUpdate()
     }
   }
 }

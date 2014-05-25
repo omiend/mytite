@@ -6,10 +6,22 @@ import play.api.Play.current
 /** TimeTable Structure */
 case class TimeTable(
    val timeLabel: String
-  ,val stageList: Seq[String]
+  ,var stageList: Seq[String]
 ) {
+
   // キーはStage.stageName
   var performanceStageMap: Map[String, Performance] = Map()
+
+  def getTimeTableList: Seq[Performance] = {
+    var returnList: Seq[Performance] = Seq.empty
+    for (stage <- stageList) {
+      performanceStageMap.get(stage) match {
+        case Some(perfor) => returnList = returnList :+ perfor
+        case _            => returnList = returnList :+ Performance(null, 0, 0, "", this.timeLabel, TimeTable.TIME_FRAME_030, Some(null), Some(null))
+      }
+    }
+    returnList
+  }
 }
 
 object TimeTable {
@@ -131,14 +143,12 @@ object TimeTable {
   def getTimeLabelByTargetRange(targetRange: Int, timeLabel: String): Seq[String] = {
     var returnSet: Seq[String] = Seq.empty
     var targetIndex: Int = 0
-    println("timeLabel : " + timeLabel)
     TIME_LABEL_LIST.zipWithIndex.collect {
       case timeLabelCollect if timeLabel == timeLabelCollect._1 => {
         targetIndex = timeLabelCollect._2
       }
       case _ => 
     }
-
     returnSet = TIME_LABEL_LIST.slice(targetIndex + 1, targetIndex + targetRange)
     returnSet
   }
