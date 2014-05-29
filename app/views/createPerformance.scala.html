@@ -1,44 +1,53 @@
-@(pager: Pager[TwitterUser], festivalId: Long, stageSelectOptions: Seq[(String, String)], performanceForm: Form[(String, String, String, String)])(implicit flash: play.api.mvc.Flash)
+@(pager: Pager[TwitterUser], festivalId: Long, stageSelectOptions: Seq[(String, String)], performanceForm: Form[Performance])(implicit flash: play.api.mvc.Flash)
 @import helper._
 @import models.TimeTable
 
 @main(pager.title, pager.twitterUser)(flash) {
 
-  <!-- +++++ First Post +++++ -->
-  <div id="grey">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 col-lg-offset-2">
-          <p>
-            <img src="@pager.twitterUser.get.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded">
-            <ba><a href="https://twitter.com/@pager.twitterUser.get.twitterScreenName">&#64;@pager.twitterUser.get.twitterScreenName</a>
-          </p>
-          <p>アーティストと、開演時間、パフォーマンス時間の長さを入力して下さい</p>
+  <div class="row-fluid">
+    <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+      <div class="col-xs-6 col-md-6 col-sm-6 col-lg-6">
+        <H4>アーティスト登録</H4>
+        <p>アーティストと、開演時間、パフォーマンス時間の長さを入力して下さい</p>
+      </div><!--/span-->
+      <div class="col-xs-6 col-md-6 col-sm-6 col-lg-6">
+        <div class="row-fluid">
+          <div class="col-xs-2 col-md-2 col-sm-2 col-lg-2"><img src="@pager.twitterUser.get.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded"></div>
+          <div class="col-xs-10 col-md-10 col-sm-10 col-lg-10">
+            @pager.twitterUser.get.twitterName<br />
+            <a href="https://twitter.com/@pager.twitterUser.get.twitterScreenName" target=”_blank”>&#64;@pager.twitterUser.get.twitterScreenName</a>
+          </div>
         </div>
-      </div><!-- /row -->
-    </div> <!-- /container -->
-  </div><!-- /grey -->
+      </div><!--/span-->
+    </div><!--/span-->
+  </div><!--/row-->
 
-  <!-- +++++ Projects Section +++++ -->
-  <div class="container-fluid">
-      @helper.form(action = routes.Application.insertPerformance(festivalId)) {
-      <fieldset>
-        <div class="row">
-          <div class="col-lg-8 col-lg-offset-2">
-            @inputText(performanceForm("artist"), '_label -> "アーティスト名")
-            @select(performanceForm("stageId"), options = stageSelectOptions, '_label -> "ステージ")
-            @select(performanceForm("time"), options = TimeTable.TIME_LABEL_SELECTOPTIONS, '_label -> "開演時間")
-            @select(performanceForm("timeFrame"), options = TimeTable.TIME_FRAME_SELECTOPTIONS, '_label -> "パフォーマンス時間の長さ")
-          </div>
-        </div><!-- /row -->
-        <div class="row">
-          <div class="col-lg-8 col-lg-offset-2">
-            <input type="submit" class="btn primary" value="保存">
-            <a href="@routes.Application.indexFestival(pager.twitterUser.get.twitterId)" class="btn">Cancel</a>
-          </div>
-        </div><!-- /row -->
-      </fieldset>
-      }
-  </div><!-- /container -->
+  @helper.form(action = routes.Application.insertPerformance(festivalId)) {
+    <div class="row">
+      <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+        <div class="col-md-12 col-sm-12 col-lg-12">
+          @inputText(performanceForm("artist"), 'class -> "form-control", '_label -> "アーティスト名", 'placeholder -> "アーティスト名を入力" )
+        </div><!--/span-->
+        <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12"><br /></div><!--/span-->
+        <div class=" col-sm-4 col-md-4 col-lg-4">
+          @select(performanceForm("stageId"), options = stageSelectOptions, 'class -> "select-block", '_label -> "ステージ")
+        </div><!--/span-->
+        <div class=" col-sm-4 col-md-4 col-lg-4">
+          @select(performanceForm("time"), options = TimeTable.TIME_LABEL_SELECTOPTIONS, 'class -> "select-block", '_label -> "開演時間")
+        </div><!--/span-->
+        <div class=" col-sm-4 col-md-4 col-lg-4">
+          @select(performanceForm("timeFrame"), options = TimeTable.TIME_FRAME_SELECTOPTIONS, 'class -> "select-block", '_label -> "パフォーマンス時間の長さ")
+        </div><!--/span-->
+      </div>
+    </div><!--/row-->
 
+    <div class="row-fluid">
+      <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+        <div class="col-md-3 col-sm-3 col-lg-3"></div>
+        <div class="col-md-3 col-sm-3 col-lg-3"><p><input type="submit" class="btn btn-primary btn-xs btn-block" value="保存"></p></div>
+        <div class="col-md-3 col-sm-3 col-lg-3"><p><a href="@routes.Application.timeTableDetail(pager.twitterUser.get.twitterId, festivalId)" class="btn btn-default btn-xs btn-block">キャンセル</a></p></div>
+        <div class="col-md-3 col-sm-3 col-lg-3"></div>
+      </div><!--/span-->
+    </div><!--/row-->
+  }
 }

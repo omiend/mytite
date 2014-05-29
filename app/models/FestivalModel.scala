@@ -38,6 +38,25 @@ object Festival {
   }
 
   /**
+   * Festival Idを指定して取得
+   */
+  def findById(id: Long):Option[Festival] = {
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+        select *
+          from festival
+         where id = {id}
+        """
+      ).on(
+        'id -> id
+      ).as(
+        Festival.simple.singleOpt
+      )
+    }
+  }
+  
+  /**
    * Festival from-toで件数を指定して取得
    */
   def findFromTo(twitterId: Long, offset: Int, maxPageCount: Int) = {
@@ -111,8 +130,8 @@ object Festival {
       SQL(
         """
           update festival
-          set  festival_name        = {festival_name}
-              ,update_date = {update_date}
+          set  festival_name = {festival_name}
+              ,update_date   = {update_date}
           where id = {id}
         """
       ).on(

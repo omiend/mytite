@@ -4,14 +4,18 @@
 
 # Home page
 GET     /                           controllers.Application.index(p: Int ?= 1)
+GET     /about                      controllers.Application.about
 
-GET     /indexFestival              controllers.Application.indexFestival(targetTwitterId: Long)
+GET     /indexFestival              controllers.Application.indexFestival(p: Int ?= 1, targetTwitterId: Long)
 GET     /createFestival             controllers.Application.createFestival(targetTwitterId: Long)
 POST    /insertFestival             controllers.Application.insertFestival
+GET     /editFestival               controllers.Application.editFestival(festivalId: Long)
+POST    /updateeditFestival         controllers.Application.updateFestival(festivalId: Long)
 
 GET     /createPerformance          controllers.Application.createPerformance(festivalId: Long)
 POST    /insertPerformance          controllers.Application.insertPerformance(festivalId: Long)
-GET     /editPerformance            controllers.Application.insertPerformance(performanceId: Long)
+GET     /editPerformance            controllers.Application.editPerformance(festivalId: Long, performanceId: Long)
+POST    /updatePerformance          controllers.Application.updatePerformance(festivalId: Long, performanceId: Long)
 
 GET     /timeTableDetail            controllers.Application.timeTableDetail(targetTwitterId: Long, festivalId: Long)
 

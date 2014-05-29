@@ -2,24 +2,35 @@
 
 @main(pager.title, pager.twitterUser)(flash) {
 
-<div class="col-xs-12 col-sm-12">
+  <div class="row-fluid">
+    <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+      <div class="jumbotron">
+        <h1>マイタイテ！</h1>
+        <p>自分だけのタイムテーブルを作って、友達と共有しよう！</p>
+      </div>
+    </div>
+  </div>
 
-  @pageNation(pager)
-
-  <div class="row">
-
-    @for(user <- pager.dataList){
-      <div class="col-6 col-sm-6 col-lg-4">
-        <h2><img src="@user.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded"><a href="https://twitter.com/@user.twitterScreenName" target=”_blank”>&#64;@user.twitterScreenName</a></h2>
-        <p>@user.twitterDescription</p>
-        <p><a class="btn btn-default" href="@routes.Application.indexFestival(user.twitterId)" role="button">&#64;@user.twitterScreenName のタイムテーブルをみる &raquo;</a></p>
-      </div><!--/span-->
-    }
-
-  </div><!--/row-->
-
-  @pageNation(pager)
-
-</div><!--/span-->
+  <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+    @pageNation(pager)
+     <div class="row-fluid">
+       @for(user <- pager.dataList){
+       <div class="col-md-4 col-sm-4 col-lg-4">
+           <div class="row-fluid">
+             <div class="col-xs-2 col-md-2 col-sm-2 col-lg-2"><img src="@user.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded"></div>
+             <div class="col-xs-10 col-md-10 col-sm-10 col-lg-10">
+               @user.twitterName<br />
+               <a href="https://twitter.com/@user.twitterScreenName" target=”_blank”>&#64;@user.twitterScreenName</a>
+             </div>
+           </div>
+           <p>
+             @user.twitterDescription
+             <a class="btn btn-primary btn-large btn-block" href="@routes.Application.indexFestival(1, user.twitterId)">&#64;@user.twitterScreenName のフェスをみる &raquo;</a>
+         </p>
+       </div><!--/span-->
+       }
+     </div><!--/row-->
+    @pageNation(pager)
+  </div><!--/span-->
 
 }

@@ -1,7 +1,14 @@
 @(pager: Pager[_])
-
-<ul class="pagination pagination-right">
-	<li class="@if(pager.pageNum==1){active}"><a href="@routes.Application.index(1)">&laquo;</a></li>
-		@for(page <- pager.pageNumList){<li class="@if(pager.pageNum==page){active}"><a href="@routes.Application.index(page)">@page</a></li>}
-	<li class="@if(pager.pageNum==pager.maxPageRowCount){active}"><a href="@routes.Application.index(pager.maxPageRowCount)">&raquo;</a></li>
-</ul>
+<div class="row-fluid">
+  <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+    <div class="text-center">
+      <div class="pagination">
+        <ul class="pager">
+          <li class="previous"><a href="@routes.Application.index(1)">最初</a></li>
+          @for(page <- pager.pageNumList){<li class="@if(pager.pageNum==page){active}"><a href="@routes.Application.index(page)">@page</a></li>}
+          <li class="next"><a href="@routes.Application.index(pager.maxPageRowCount)">最後</a></li>
+        </ul>
+      </div> <!-- /pagination -->
+    </div>
+  </div>
+</div>
