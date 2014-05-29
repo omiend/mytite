@@ -1,50 +1,61 @@
 @(title: String, twitteUser: Option[TwitterUser])(flash: play.api.mvc.Flash)(content: Html)
-
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
   <head>
-    <title>@title - Twitter</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
-    <link rel="stylesheet" media="screen" href="@routes.Assets.at("bootstrap/css/bootstrap.css")">
+    <title>@title - Twitter</title>
+    <meta name="description" content="Flat UI Kit Free is a Twitter Bootstrap Framework design and Theme, this responsive framework includes a PSD and HTML version."/>
+    <meta name="viewport" content="width=1000, initial-scale=1.0, maximum-scale=1.0">
+    <!-- Loading Bootstrap -->
+    <link href="@routes.Assets.at("bootstrap/css/bootstrap.css")" rel="stylesheet">
+    <!-- Loading Flat UI -->
+    <link href="@routes.Assets.at("css/main.css")" rel="stylesheet">
+    <link href="@routes.Assets.at("css/flat-ui.css")" rel="stylesheet">
+    <link rel="shortcut icon" href="@routes.Assets.at("images/favicon.ico")">
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
+    <!--[if lt IE 9]>
+      <script src="@routes.Assets.at("js/html5shiv.js")"></script>
+      <script src="@routes.Assets.at("js/respond.min.js")"></script>
+    <![endif]-->
   </head>
   <body>
 
-    <!-- Static navbar -->
-    <div class="navbar navbar-inverse navbar-static-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="/">マイタイテ！</a>
-        </div>
-        <div class="navbar-collapse collapse">
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">Work</a></li>
-            <li><a href="#">About</a></li>
-            @twitteUser match {
-              case Some(user) => {
-                <li><a href="https://twitter.com/@user.twitterScreenName" target=”_blank”>&#64;@user.twitterScreenName</a></li>
-                <li><a href="/twitterLogout">Logout</a></li>
-              }
-              case _ => {
-                <li><a href="/twitterLogin">Login</a></li>
-              }
-            }
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div>
-    </div>
+   <div class="container-fluid">
 
-    <div class="container">
+      <div class="row-fluid">
+        <nav class="navbar navbar-inverse navbar-embossed navbar-fixed-top" role="navigation">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-01">
+              <span class="sr-only">Toggle navigation</span>
+            </button>
+            <a class="navbar-brand" href="/">マイタイテ！</a>
+          </div>
+          <div class="collapse navbar-collapse" id="navbar-collapse-01">
+            <ul class="nav navbar-nav navbar-right">           
+              <li><a href="@routes.Application.about">アバウト</a></li>
+              @twitteUser match {
+                case Some(user) => {
+                  <li class="dropdown">
+                    <a href="top.html" class="dropdown-toggle" data-toggle="dropdown">アカウント<b class="caret"></b></a>
+                    <span class="dropdown-arrow"></span>
+                    <ul class="dropdown-menu">
+                      <li><a href="@routes.Application.indexFestival(1, user.twitterId)">自分のタイムテーブル</a></li>
+                      <!-- <li><a href="https://twitter.com/@user.twitterScreenName" target=”_blank”>&#64;@user.twitterScreenName</a></li> -->
+                      <li class="divider"></li>
+                      <li><a href="/twitterLogout">ログアウト</a></li>
+                    </ul>
+                  </li>
+                }
+                case _ => {
+                  <li><a href="/twitterLogin">ログイン</a></li>
+                }
+              }
+              <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
+             </ul>
+          </div><!-- /.navbar-collapse -->
+        </nav><!-- /navbar -->
+      </div> <!-- /row -->
+
       <div class="row row-offcanvas row-offcanvas-right">
         <div class="col-xs-12 col-sm-12">
             @flash.get("success").map { message => <div class="alert alert-success"><strong>Success!</strong>@message</div> }
@@ -53,30 +64,34 @@
             @content
         </div><!--/span-->
       </div><!--/row-->
-    </div><!--/.container-->
 
-    <!-- +++++ Footer Section +++++ -->
-    <div id="footer">
+    </div> <!-- /container -->
+
+    <footer>
       <div class="container">
         <div class="row">
-          <div class="col-lg-4">
-            <h4>My Links</h4>
-            <p>
-              <a href="https://twitter.com/omiend" target="_blank">Twitter</a><br/>
+          <div class="col-xs-7 col-md-7 col-sm-7 col-lg-7">
+            <h3 class="footer-title">H3テキストテキストテキストテキスト</h3>
+            <p>テキストテキストテキストテキストテキストテキストテキスト</p>
+            <p class="pvl">
+              <a href="https://twitter.com/share" class="twitter-share-button" data-url="#-free/" data-text="Flat UI Free - PSD&amp;amp;HTML User Interface Kit" data-via="designmodo">Tweet</a>
+              <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://localhost:8080/';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
             </p>
-            <p>&copy; omiend 2013</p>
-          </div><!-- /col-lg-4 -->
+          </div>
         </div>
       </div>
-    </div>
-
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script type="text/javascript" src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")"></script>
-    <script type="text/javascript" src="@routes.Assets.at("bootstrap/js/bootstrap.min.js")"></script>
-    <script type="text/javascript" src="@routes.Assets.at("javascripts/hover.zoom.js")"></script>
-    <script type="text/javascript" src="@routes.Assets.at("javascripts/hover.zoom.conf.js")"></script>
+    </footer>
+    
+    <!-- Load JS here for greater good =============================-->
+    <script src="@routes.Assets.at("js/jquery-1.8.3.min.js")"></script>
+    <script src="@routes.Assets.at("js/bootstrap.min.js")"></script>
+    <script src="@routes.Assets.at("js/bootstrap-select.js")"></script>
+    <script src="@routes.Assets.at("js/bootstrap-switch.js")"></script>
+    <script src="@routes.Assets.at("js/flatui-checkbox.js")"></script>
+    <script src="@routes.Assets.at("js/flatui-radio.js")"></script>
+    <script src="@routes.Assets.at("js/jquery.tagsinput.js")"></script>
+    <script src="@routes.Assets.at("js/jquery.placeholder.js")"></script>
+    <script src="@routes.Assets.at("js/application.js")"></script>
 
   </body>
 </html>

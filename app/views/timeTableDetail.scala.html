@@ -1,57 +1,97 @@
-@(pager: Pager[TwitterUser], targetTwitterUser: TwitterUser, festivalId: Long, stageList: Seq[Stage], timeTableList: Seq[TimeTable])(implicit flash: play.api.mvc.Flash)
+@(pager: Pager[TwitterUser], targetTwitterUser: TwitterUser, festival: Festival, stageList: Seq[Stage], timeTableList: Seq[TimeTable])(implicit flash: play.api.mvc.Flash)
 
 @main(pager.title, pager.twitterUser)(flash) {
 
-  <!-- +++++ First Post +++++ -->
-  <div id="grey">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-8 col-lg-offset-2">
-            <p>
-              <img src="@targetTwitterUser.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded">
-              <ba><a href="https://twitter.com/@targetTwitterUser.twitterScreenName">&#64;@targetTwitterUser.twitterScreenName</a>
-            </p>
-            <p><bd>January 18, 2014</bd></p>
-            <h4>@targetTwitterUser.twitterName</h4>
-            <p>@targetTwitterUser.twitterDescription</p>
-          </div>
-        </div><!-- /row -->
-      </div> <!-- /container -->
-  </div><!-- /grey -->
+  <div class="row-fluid">
+    <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+      <div class="col-xs-6 col-md-6 col-sm-6 col-lg-6">
+        <H4>@festival.festivalName</H4>
+        <p>夏に行きたいフェスティバル</p>
+      </div><!--/span-->
+      <div class="col-xs-6 col-md-6 col-sm-6 col-lg-6">
+        <p>
+          <img src="@targetTwitterUser.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded">
+          <ba><a href="https://twitter.com/@targetTwitterUser.twitterScreenName">&#64;@targetTwitterUser.twitterScreenName</a></ba>
+        </p>
+        <h4>@targetTwitterUser.twitterName</h4>
+      </div><!--/span-->
+    </div><!--/span-->
+  </div><!--/row-->
 
-  <!-- +++++ Projects Section +++++ -->
-  <div class="container pt">
-    @pager.twitterUser match {
-      case Some(user) => {
-        @if(user.twitterId==targetTwitterUser.twitterId){
-          <br />
-          <a class="btn primary" href="@routes.Application.createPerformance(festivalId)" role="button">アーティストを登録する</a>
-        }
-      }
-      case _ => {}
-    }
-    <div class="row mt centered"> 
-      <table class="table table-bordered">
-
-        <tr>
-          <th></th>
-            @for(stage <- stageList){
-              <th>@stage.stageName</th>
-            }
-          <th></th>
-          @for(timeTable <- timeTableList){
-          <tr>
-            <td>@timeTable.timeLabel</td>
-              @for(performance <- timeTable.getTimeTableList){
-              <td rowspan="@performance.getTableRowSpanNumber">@performance.artist</td>
-              }
-            <td>@timeTable.timeLabel</td>
-          </tr>
+  <div class="row-fluid">
+    <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+      <div class="col-md-3 col-sm-3 col-lg-3"><p><a class="btn btn-default btn-xs btn-block" href="@routes.Application.indexFestival(pager.pageNum, targetTwitterUser.twitterId)">フェス一覧に戻る</a></p></div>
+      @pager.twitterUser match {
+        case Some(user) => {
+          @if(user.twitterId==targetTwitterUser.twitterId){
+                <div class="col-md-3 col-sm-3 col-lg-3"><p><a class="btn btn-primary btn-xs btn-block" href="@routes.Application.createPerformance(festival.id.get)">アーティストを登録する</a></p></div>
+                <div class="col-md-3 col-sm-3 col-lg-3"><p><a class="btn btn-primary btn-xs btn-block" href="@routes.Application.editFestival(festival.id.get)">このフェスを更新する</a></p></div>
+                <div class="col-md-3 col-sm-3 col-lg-3"><p><a class="btn btn-danger btn-xs btn-block" href="#">このフェスを削除する</a></p></div>
           }
-        </tr>
+        }
+        case _ => {}
+      }
+    </div><!--/span-->
+  </div><!--/row-->
 
+  <div class="row-fluid">
+    <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+      <div class="col-1 col-md-1 col-sm-1 col-lg-1">
+        <span class="glyphicon glyphicon-retweet"></span>
+      </div>
+      <div class="col-1 col-md-1 col-sm-1 col-lg-1">
+        <span class="glyphicon glyphicon-heart-empty"></span>
+        <span class="glyphicon glyphicon-heart"></span>
+      </div>
+    </div><!--/span-->
+  </div><!--/row-->
+
+  <div class="row-fluid">
+    <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th></th>
+              @for(stage <- stageList){
+                <th>@stage.stageName</th>
+              }
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(timeTable <- timeTableList){
+            <tr>
+              <td>@timeTable.timeLabel</td>
+                @for(performance <- timeTable.getTimeTableList){
+                  @if(performance.id != null){
+                    <td rowspan="@performance.getTableRowSpanNumber"><a href="@routes.Application.editPerformance(festival.id.get, performance.id.get)">@performance.artist</a></td>
+                  }else{
+                    <td rowspan="@performance.getTableRowSpanNumber"></td>
+                  }
+                }
+              <td>@timeTable.timeLabel</td>
+            </tr>
+            }
+          </tr>
+        </tbody>
       </table>
-    </div><!-- /row -->
-  </div><!-- /container -->
+    </div><!--/span-->
+  </div><!--/row-->
+
+  <div class="row-fluid">
+    <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+      <div class="col-md-3 col-sm-3 col-lg-3"><p><a class="btn btn-default btn-xs btn-block" href="@routes.Application.indexFestival(pager.pageNum, targetTwitterUser.twitterId)">フェス一覧に戻る</a></p></div>
+      @pager.twitterUser match {
+        case Some(user) => {
+          @if(user.twitterId==targetTwitterUser.twitterId){
+                <div class="col-md-3 col-sm-3 col-lg-3"><p><a class="btn btn-primary btn-xs btn-block" href="@routes.Application.createPerformance(festival.id.get)">アーティストを登録する</a></p></div>
+                <div class="col-md-3 col-sm-3 col-lg-3"><p><a class="btn btn-primary btn-xs btn-block" href="@routes.Application.editFestival(festival.id.get)">このフェスを更新する</a></p></div>
+                <div class="col-md-3 col-sm-3 col-lg-3"><p><a class="btn btn-danger btn-xs btn-block" href="#">このフェスを削除する</a></p></div>
+          }
+        }
+        case _ => {}
+      }
+    </div><!--/span-->
+  </div><!--/row-->
 
 }

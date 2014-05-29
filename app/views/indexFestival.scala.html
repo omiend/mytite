@@ -2,45 +2,76 @@
 
 @main(pager.title, pager.twitterUser)(flash) {
 
-  <!-- +++++ First Post +++++ -->
-  <div id="grey">
-      <div class="container">
-      <div class="row">
-        <div class="col-lg-8 col-lg-offset-2">
-          <p>
-            <img src="@targetTwitterUser.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded">
-            <br />
-            <ba>
-              <a href="https://twitter.com/@targetTwitterUser.twitterScreenName">&#64;@targetTwitterUser.twitterScreenName</a> &nbsp; @targetTwitterUser.twitterName
-            </ba>
-          </p>
-          <h4>@targetTwitterUser.twitterName</h4>
-          <p>
-            @targetTwitterUser.twitterDescription
-          </p>
-        </div>
-      </div><!-- /row -->
-      </div> <!-- /container -->
+    <div class="row-fluid">
+      <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+         <div class="row-fluid">
+           <div class="col-xs-2 col-md-2 col-sm-2 col-lg-2"><img src="@targetTwitterUser.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded"></div>
+           <div class="col-xs-10 col-md-10 col-sm-10 col-lg-10">
+             @targetTwitterUser.twitterName<br />
+             <a href="https://twitter.com/@targetTwitterUser.twitterScreenName" target=”_blank”>&#64;@targetTwitterUser.twitterScreenName</a>
+           </div>
+         </div>
+         <p>
+           @targetTwitterUser.twitterDescription
+       </p>
+     </div><!--/span-->
   </div><!-- /grey -->
 
-  <!-- +++++ Projects Section +++++ -->
-  <div class="container pt">
-    @pager.twitterUser match {
-      case Some(user) => {
-        @if(user.twitterId==targetTwitterUser.twitterId){
-          <br />
-          <p><a class="btn primary" href="@routes.Application.createFestival(targetTwitterUser.twitterId)" role="button">フェスを新しく作る</a></p>
-        }
+  @pager.twitterUser match {
+    case Some(user) => {
+      @if(user.twitterId==targetTwitterUser.twitterId){
+        <div class="row-fluid">
+	      <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+		    <div class="col-md-3 col-sm-3 col-lg-3">
+		      <p><a class="btn btn-primary btn-xs btn-block" href="@routes.Application.createFestival(targetTwitterUser.twitterId)" role="button">新しくフェスを登録する</a></p>
+		    </div>
+		  </div><!--/span-->
+		</div><!--/row-->
       }
-      case _ => {}
     }
-    <div class="row mt centered">
-    @for(fes <- pager.dataList){
-      <div class="col-lg-4">
-        <p><a href="@routes.Application.timeTableDetail(targetTwitterUser.twitterId, fes.id.get)">@fes.festivalName</a></p>
-      </div>
-    }
-    </div><!-- /row -->
-  </div><!-- /container -->
+    case _ => {}
+  }
 
+  <div class="row-fluid">
+    <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+      <div class="text-center">
+        <div class="pagination">
+          <ul class="pager">
+            <li class="previous"><a href="@routes.Application.indexFestival(1, targetTwitterUser.twitterId)">最初</a></li>
+            @for(page <- pager.pageNumList){<li class="@if(pager.pageNum==page){active}"><a href="@routes.Application.indexFestival(page, targetTwitterUser.twitterId)">@page</a></li>}
+            <li class="next"><a href="@routes.Application.indexFestival(pager.maxPageRowCount, targetTwitterUser.twitterId)">最後</a></li>
+          </ul>
+        </div> <!-- /pagination -->
+      </div>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+      @pager.dataList.map { fes =>
+	      <div class="col-sm-4 col-md-4 col-lg-4">
+	        <h3 class="tile-title">@fes.festivalName</h3>
+	        <p>
+	          夏に行きたいフェス<br />
+	          10<span class="glyphicon glyphicon-heart"></span>
+	          <a class="btn btn-primary  btn-block" href="@routes.Application.timeTableDetail(targetTwitterUser.twitterId, fes.id.get)">タイムテーブルを見る</a>
+	        </p>
+	      </div><!--/span-->
+      }
+    </div><!--/span-->
+  </div><!--/row-->
+  
+  <div class="row-fluid">
+	<div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+	  <div class="text-center">
+	    <div class="pagination">
+	      <ul class="pager">
+	        <li class="previous"><a href="@routes.Application.indexFestival(1, targetTwitterUser.twitterId)">最初</a></li>
+	        @for(page <- pager.pageNumList){<li class="@if(pager.pageNum==page){active}"><a href="@routes.Application.indexFestival(page, targetTwitterUser.twitterId)">@page</a></li>}
+	        <li class="next"><a href="@routes.Application.indexFestival(pager.maxPageRowCount, targetTwitterUser.twitterId)">最後</a></li>
+	      </ul>
+	    </div> <!-- /pagination -->
+	  </div>
+	</div>
+  </div>
 }

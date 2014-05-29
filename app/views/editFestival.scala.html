@@ -1,0 +1,48 @@
+@(pager: Pager[TwitterUser], festivalId: Long, festivalAndStageForm: Form[(String, Seq[String])])(implicit flash: play.api.mvc.Flash)
+@import helper._
+
+@main(pager.title, pager.twitterUser)(flash) {
+
+  <div class="row-fluid">
+    <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+      <div class="col-xs-6 col-md-6 col-sm-6 col-lg-6">
+        <H4>フェス登録</H4>
+        <p>ステージは４つまで登録できます</p>
+      </div><!--/span-->
+      <div class="col-xs-6 col-md-6 col-sm-6 col-lg-6">
+        <div class="row-fluid">
+          <div class="col-xs-2 col-md-2 col-sm-2 col-lg-2"><img src="@pager.twitterUser.get.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded"></div>
+          <div class="col-xs-10 col-md-10 col-sm-10 col-lg-10">
+            @pager.twitterUser.get.twitterName<br />
+            <a href="https://twitter.com/@pager.twitterUser.get.twitterScreenName" target=”_blank”>&#64;@pager.twitterUser.get.twitterScreenName</a>
+          </div>
+        </div>
+      </div><!--/span-->
+    </div><!--/span-->
+  </div><!--/row-->
+
+  @helper.form(action = routes.Application.updateFestival(festivalId)) {
+    <div class="row-fluid">
+      <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+        <div class="col-md-12 col-sm-12 col-lg-12">
+          @inputText(festivalAndStageForm("festivalName"), 'class -> "form-control", '_label -> "フェスの名前", 'placeholder -> "Summer Fes")
+          <input type="text" value="" placeholder="夏に行きたいフェス" class="form-control">
+        </div><!--/span-->
+      </div><!--/span-->
+    </div><!--/row-->
+
+    <div class="row-fluid">
+      <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12"><br /></div><!--/span-->
+    </div><!--/row-->
+
+    <div class="row-fluid">
+      <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+        <div class="col-md-3 col-sm-3 col-lg-3"></div>
+        <div class="col-md-3 col-sm-3 col-lg-3"><p><input type="submit" class="btn btn-primary btn-xs btn-block" value="更新"></p></div>
+        <div class="col-md-3 col-sm-3 col-lg-3"><p><a href="@routes.Application.timeTableDetail(pager.twitterUser.get.twitterId, festivalId)" class="btn btn-default btn-xs btn-block">キャンセル</a></p></div>
+        <div class="col-md-3 col-sm-3 col-lg-3"></div>
+      </div><!--/span-->
+    </div><!--/row-->
+  }
+
+}

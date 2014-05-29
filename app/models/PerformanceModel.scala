@@ -8,14 +8,14 @@ import anorm.SqlParser._
 
 /** Performance Table */
 case class Performance (
-	 id: Pk[Long]
+	 id        : Pk[Long]
 	,festivalId: Long
-	,stageId: Long
-	,artist: String
-	,time: String
-	,timeFrame: String
-	,createDate: Option[Date]
-	,updateDate: Option[Date]
+	,stageId   : Long
+	,var artist    : String
+	,var time      : String
+	,var timeFrame : String
+	,var createDate: Option[Date]
+	,var updateDate: Option[Date]
 ) {
   /** TimeFrameに付随するRowSpan数を取得する */
   def getTableRowSpanNumber: Int = {
@@ -60,10 +60,9 @@ object Performance {
   /**
    * Performance Idを指定して取得
    */
-  def findById(id: Long): Seq[Performance] = {
+  def findById(id: Long): Option[Performance] = {
     DB.withConnection { implicit connection =>
-      // 親テーブル取得
-      val resultList: Seq[Performance] = SQL(
+      SQL(
         """
         select *
           from performance
@@ -75,7 +74,6 @@ object Performance {
       ).as(
         Performance.simple.singleOpt
       )
-      resultList
     }
   }
 
@@ -141,21 +139,23 @@ object Performance {
   /**
    * Performance Insert処理
    */
-  def update(performance: Performance) {
+  def update(performanceId: Long, performance: Performance) {
     DB.withConnection { implicit connection =>
       SQL(
         """
           update performance
-          set  artist     = {artist}
+          set  stage_id   = {stage_id}
+              ,artist     = {artist}
               ,time       = {time}
               ,time_frame = {time_frame}
           where id = {id}
         """
       ).on(
-         'id         -> performance.id
+         'id         -> performanceId
+        ,'stage_id   -> performance.stageId
         ,'artist     -> performance.artist
         ,'time       -> performance.time
-        ,'time_frame -> performance.time_frame
+        ,'time_frame -> performance.timeFrame
         ,'updateDate -> performance.updateDate
       ).executeUpdate()
     }
