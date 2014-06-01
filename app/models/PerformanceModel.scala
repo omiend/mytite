@@ -80,7 +80,7 @@ object Performance {
   /**
    * Performance FestivalIdを指定して取得
    */
-  def findByFesticalId(festivalId: Long): Seq[Performance] = {
+  def findByFestivalId(festivalId: Long): Seq[Performance] = {
     DB.withConnection { implicit connection =>
       // 親テーブル取得
       val resultList: Seq[Performance] = SQL(

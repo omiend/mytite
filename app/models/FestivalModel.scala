@@ -206,4 +206,38 @@ object Festival {
       }
     }
   }
+
+  /**
+   * Festival delete処理
+   */
+  def delete(festival: Festival) {
+    DB.withConnection { implicit connection =>
+      // Performance削除処理
+      SQL(
+        """
+          delete from Performance where festival_id = {festival_id}
+        """
+      ).on(
+        'festival_id -> festival.id
+      ).executeUpdate()
+
+      // Stage削除処理
+      SQL(
+        """
+          delete from Stage where festival_id = {festival_id}
+        """
+      ).on(
+        'festival_id -> festival.id
+      ).executeUpdate()
+
+      // Performance削除処理
+      SQL(
+        """
+          delete from Festival where id = {id}
+        """
+      ).on(
+        'id -> festival.id
+      ).executeUpdate()
+    }
+  }
 }

@@ -26,7 +26,7 @@
           @if(user.twitterId==targetTwitterUser.twitterId){
                 <div class="col-md-3 col-sm-3 col-lg-3"><p><a class="btn btn-primary btn-xs btn-block" href="@routes.Application.createPerformance(festival.id.get)">アーティストを登録する</a></p></div>
                 <div class="col-md-3 col-sm-3 col-lg-3"><p><a class="btn btn-primary btn-xs btn-block" href="@routes.Application.editFestival(festival.id.get)">このフェスを更新する</a></p></div>
-                <div class="col-md-3 col-sm-3 col-lg-3"><p><a class="btn btn-danger btn-xs btn-block" href="#">このフェスを削除する</a></p></div>
+                <div class="col-md-3 col-sm-3 col-lg-3"><p><a class="btn btn-danger btn-xs btn-block" href="@routes.Application.deleteFestival(festival.id.get)">このフェスを削除する</a></p></div>
           }
         }
         case _ => {}
@@ -58,22 +58,44 @@
             <th></th>
           </tr>
         </thead>
-        <tbody>
-          @for(timeTable <- timeTableList){
-            <tr>
-              <td>@timeTable.timeLabel</td>
-                @for(performance <- timeTable.getTimeTableList){
-                  @if(performance.id != null){
-                    <td rowspan="@performance.getTableRowSpanNumber"><a href="@routes.Application.editPerformance(festival.id.get, performance.id.get)">@performance.artist</a></td>
-                  }else{
-                    <td rowspan="@performance.getTableRowSpanNumber"></td>
-                  }
+        @pager.twitterUser match {
+          case Some(user) => {
+            <tbody>
+              @for(timeTable <- timeTableList){
+                <tr>
+                  <td>@timeTable.timeLabel</td>
+                    @for(performance <- timeTable.getTimeTableList){
+                      @if(performance.id != null){
+                        <td rowspan="@performance.getTableRowSpanNumber"><a href="@routes.Application.editPerformance(festival.id.get, performance.id.get)">@performance.artist</a></td>
+                      }else{
+                        <td rowspan="@performance.getTableRowSpanNumber"></td>
+                      }
+                    }
+                  <td>@timeTable.timeLabel</td>
+                </tr>
                 }
-              <td>@timeTable.timeLabel</td>
-            </tr>
-            }
-          </tr>
-        </tbody>
+              </tr>
+            </tbody>
+          }
+          case _ =>{
+            <tbody>
+              @for(timeTable <- timeTableList){
+                <tr>
+                  <td>@timeTable.timeLabel</td>
+                    @for(performance <- timeTable.getTimeTableList){
+                      @if(performance.id != null){
+                        <td rowspan="@performance.getTableRowSpanNumber">@performance.artist</td>
+                      }else{
+                        <td rowspan="@performance.getTableRowSpanNumber"></td>
+                      }
+                    }
+                  <td>@timeTable.timeLabel</td>
+                </tr>
+                }
+              </tr>
+            </tbody>
+          }
+        }
       </table>
     </div><!--/span-->
   </div><!--/row-->
@@ -86,7 +108,7 @@
           @if(user.twitterId==targetTwitterUser.twitterId){
                 <div class="col-md-3 col-sm-3 col-lg-3"><p><a class="btn btn-primary btn-xs btn-block" href="@routes.Application.createPerformance(festival.id.get)">アーティストを登録する</a></p></div>
                 <div class="col-md-3 col-sm-3 col-lg-3"><p><a class="btn btn-primary btn-xs btn-block" href="@routes.Application.editFestival(festival.id.get)">このフェスを更新する</a></p></div>
-                <div class="col-md-3 col-sm-3 col-lg-3"><p><a class="btn btn-danger btn-xs btn-block" href="#">このフェスを削除する</a></p></div>
+                <div class="col-md-3 col-sm-3 col-lg-3"><p><a class="btn btn-danger btn-xs btn-block" href="@routes.Application.deleteFestival(festival.id.get)">このフェスを削除する</a></p></div>
           }
         }
         case _ => {}
