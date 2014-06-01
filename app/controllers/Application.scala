@@ -185,6 +185,25 @@ object Application extends Controller with Secured {
   }
   
   /*****************************************************************************
+   *** Festival削除処理
+   *****************************************************************************/
+  def deleteFestival(festivalId: Long) = IsAuthenticated { twitterId => implicit request =>
+    // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
+    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
+    // Pagerを初期化
+    val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス", 1, 0, twitterUser, Seq.empty)
+    // 削除対象のFestivalを取得
+    Festival.findById(festivalId) match {
+      case Some(festival) if festival.twitterId == twitterId.toLong => {
+        // 削除処理実行
+        Festival.delete(festival)
+        Redirect(routes.Application.indexFestival(1, twitterId.toLong)).flashing("success" -> "フェス %s を削除しました".format(festival.festivalName))
+      }
+      case _ => Redirect(routes.Application.indexFestival(1, twitterId.toLong)).flashing("error" -> "削除に失敗しました1")
+    }
+  }
+
+  /*****************************************************************************
    *** Performance登録画面起動
    *****************************************************************************/
   def createPerformance(festivalId: Long) = IsAuthenticated { twitterId => implicit request =>
@@ -280,6 +299,30 @@ object Application extends Controller with Secured {
   }
   
   /*****************************************************************************
+   *** Performance削除処理
+   *****************************************************************************/
+  def deletePerformance(festivalId: Long, performanceId: Long) = IsAuthenticated { twitterId => implicit request =>
+    // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
+    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
+    // Pagerを初期化
+    val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス", 1, 0, twitterUser, Seq.empty)
+    // 削除対象のPerformanceを取得
+    Performance.findById(performanceId) match {
+      case Some(performance) => {
+        Festival.findById(performance.festivalId) match {
+          case Some(festival) if festival.twitterId == twitterId.toLong => {
+            // 削除処理実行
+            Performance.delete(performance)
+            Redirect(routes.Application.timeTableDetail(twitterId.toLong, festivalId)).flashing("success" -> "アーティスト %s を削除しました".format(performance.artist))
+          }
+          case _ => Redirect(routes.Application.timeTableDetail(twitterId.toLong, festivalId)).flashing("error" -> "削除に失敗しました1")
+        }
+      }
+      case _ => Redirect(routes.Application.timeTableDetail(twitterId.toLong, festivalId)).flashing("error" -> "削除に失敗しました2")
+    }
+  }
+
+  /*****************************************************************************
    *** TimeTable画面起動
    *****************************************************************************/
   def timeTableDetail(targetTwitterId: Long, festivalId: Long) = Action { implicit request =>
@@ -309,7 +352,7 @@ object Application extends Controller with Secured {
     }
 
     // Performance取得
-    var performanceList: Seq[Performance] = Performance.findByFesticalId(festivalId)
+    var performanceList: Seq[Performance] = Performance.findByFestivalId(festivalId)
 
     // 返却用
     var timeTableList: Seq[TimeTable] = Seq.empty
