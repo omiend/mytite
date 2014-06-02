@@ -61,14 +61,15 @@
         @pager.twitterUser match {
           case Some(user) => {
             <tbody>
+              <tr></tr>
               @for(timeTable <- timeTableList){
                 <tr>
                   <td>@timeTable.timeLabel</td>
                     @for(performance <- timeTable.getTimeTableList){
                       @if(performance.id != null){
-                        <td rowspan="@performance.getTableRowSpanNumber"><a href="@routes.Application.editPerformance(festival.id.get, performance.id.get)">@performance.artist</a></td>
+                        <td style="border: medium solid #1abc9c" class="td_class" id="@performance.id" rowspan="@performance.getTableRowSpanNumber"><a href="@routes.Application.editPerformance(festival.id.get, performance.id.get)">@performance.artist</a></td>
                       }else{
-                        <td rowspan="@performance.getTableRowSpanNumber"></td>
+                        <td rowspan="@performance.getTableRowSpanNumber">&nbsp;</td>
                       }
                     }
                   <td>@timeTable.timeLabel</td>
@@ -84,9 +85,9 @@
                   <td>@timeTable.timeLabel</td>
                     @for(performance <- timeTable.getTimeTableList){
                       @if(performance.id != null){
-                        <td rowspan="@performance.getTableRowSpanNumber">@performance.artist</td>
+                        <td style="border: medium solid #1abc9c" class="td_class" rowspan="@performance.getTableRowSpanNumber">@performance.artist</td>
                       }else{
-                        <td rowspan="@performance.getTableRowSpanNumber"></td>
+                        <td rowspan="@performance.getTableRowSpanNumber">&nbsp;</td>
                       }
                     }
                   <td>@timeTable.timeLabel</td>
@@ -115,5 +116,15 @@
       }
     </div><!--/span-->
   </div><!--/row-->
+
+  <script type="text/javascript">
+  $(function() {
+    $('.td_class').click(function(event){
+      // console.log(event)
+      // console.log(event.target.id)
+      // $('#' + event.target.id).html("METALLICAが好きだ―！")
+    })
+  })
+  </script>
 
 }

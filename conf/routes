@@ -7,11 +7,11 @@ GET     /                           controllers.Application.index(p: Int ?= 1)
 GET     /about                      controllers.Application.about
 
 GET     /indexFestival              controllers.Application.indexFestival(p: Int ?= 1, targetTwitterId: Long)
-GET     /createFestival             controllers.Application.createFestival(targetTwitterId: Long)
+GET     /createFestival             controllers.Application.createFestival
 POST    /insertFestival             controllers.Application.insertFestival
 GET     /editFestival               controllers.Application.editFestival(festivalId: Long)
-POST    /updateFestival         controllers.Application.updateFestival(festivalId: Long)
-GET     /deleteFestival         controllers.Application.deleteFestival(festivalId: Long)
+POST    /updateFestival             controllers.Application.updateFestival(festivalId: Long)
+GET     /deleteFestival             controllers.Application.deleteFestival(festivalId: Long)
 
 GET     /createPerformance          controllers.Application.createPerformance(festivalId: Long)
 POST    /insertPerformance          controllers.Application.insertPerformance(festivalId: Long)
