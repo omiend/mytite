@@ -85,7 +85,7 @@ object Application extends Controller with Secured {
       case _ => null
     }
     // Pagerを初期化
-    val pager: Pager[Festival] = Pager[Festival]("フェス一覧", pageNum, 0, twitterUser, Seq.empty)
+    val pager: Pager[Festival] = Pager[Festival]("@" + twitterUser.get.twitterScreenName + "のフェス一覧", pageNum, 0, twitterUser, Seq.empty)
     // Festivalを表示するユーザーを取得する
     TwitterUser.getByTwitterId(targetTwitterId) match {
       case Some(targetTwitterUser) => {
@@ -198,7 +198,7 @@ object Application extends Controller with Secured {
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
     // Pagerを初期化
-    val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス一覧", 1, 0, twitterUser, Seq.empty)
+    val pager: Pager[TwitterUser] = Pager[TwitterUser]("@" + twitterUser.get.twitterScreenName + "のフェス一覧", 1, 0, twitterUser, Seq.empty)
     // 削除対象のFestivalを取得
     Festival.findById(festivalId) match {
       case Some(festival) if festival.twitterId == twitterId.toLong => {
@@ -219,7 +219,7 @@ object Application extends Controller with Secured {
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("ステージ新規登録画面", 1, 0, twitterUser, Seq.empty)
     Stage.countByFestivalId(festivalId) match {
-      case count if count == 4  =>  Redirect(routes.Application.timeTableDetail(twitterId.toLong, festivalId)).flashing("error" -> " ステージは４件以上登録できません")
+      case count if count == 4  =>  Redirect(routes.Application.timeTableDetail(twitterId.toLong, festivalId)).flashing("error" -> " ステージは４件までしか登録できません")
       case _ => Ok(views.html.createStage(pager, festivalId, stageForm))
     }
   }
@@ -342,7 +342,7 @@ object Application extends Controller with Secured {
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
     // Pagerを初期化
-    val pager: Pager[TwitterUser] = Pager[TwitterUser]("パフォーマンス新規登録画面", 1, 0, twitterUser, Seq.empty)
+    val pager: Pager[TwitterUser] = Pager[TwitterUser]("アーティスト新規登録画面", 1, 0, twitterUser, Seq.empty)
     // Stageを取得
     var stageSelectOptions: Seq[(String, String)] = Seq.empty
     Stage.findByFestivalId(festivalId).map { stage =>
@@ -372,7 +372,7 @@ object Application extends Controller with Secured {
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
     // Pagerを初期化
-    val pager: Pager[TwitterUser] = Pager[TwitterUser]("パフォーマンス更新画面", 1, 0, twitterUser, Seq.empty)
+    val pager: Pager[TwitterUser] = Pager[TwitterUser]("アーティスト更新画面", 1, 0, twitterUser, Seq.empty)
     Performance.findById(performanceId) match {
       case Some(performance) => {
         // Stageを取得
@@ -393,7 +393,7 @@ object Application extends Controller with Secured {
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
     // Pagerを初期化
-    val pager: Pager[TwitterUser] = Pager[TwitterUser]("パフォーマンス更新画面", 1, 0, twitterUser, Seq.empty)
+    val pager: Pager[TwitterUser] = Pager[TwitterUser]("アーティスト更新画面", 1, 0, twitterUser, Seq.empty)
     // Stageを取得
     var stageSelectOptions: Seq[(String, String)] = Seq.empty
     Stage.findByFestivalId(festivalId).map { stage =>
