@@ -137,32 +137,33 @@ object Performance {
   }
 
   /**
-   * Performance Insert処理
+   * Performance Update処理
    */
   def update(performanceId: Long, performance: Performance) {
     DB.withConnection { implicit connection =>
       SQL(
         """
           update performance
-          set  stage_id   = {stage_id}
-              ,artist     = {artist}
-              ,time       = {time}
-              ,time_frame = {time_frame}
+          set  stage_id    = {stage_id}
+              ,artist      = {artist}
+              ,time        = {time}
+              ,time_frame  = {time_frame}
+              ,update_date = {update_date}
           where id = {id}
         """
       ).on(
-         'id         -> performanceId
-        ,'stage_id   -> performance.stageId
-        ,'artist     -> performance.artist
-        ,'time       -> performance.time
-        ,'time_frame -> performance.timeFrame
-        ,'updateDate -> performance.updateDate
+         'id          -> performanceId
+        ,'stage_id    -> performance.stageId
+        ,'artist      -> performance.artist
+        ,'time        -> performance.time
+        ,'time_frame  -> performance.timeFrame
+        ,'update_date -> performance.updateDate
       ).executeUpdate()
     }
   }
   
   /**
-   * Performance Insert処理
+   * Performance Delete処理
    */
   def delete(performance: Performance) {
     DB.withConnection { implicit connection =>

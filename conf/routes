@@ -13,6 +13,12 @@ GET     /editFestival               controllers.Application.editFestival(festiva
 POST    /updateFestival             controllers.Application.updateFestival(festivalId: Long)
 GET     /deleteFestival             controllers.Application.deleteFestival(festivalId: Long)
 
+GET     /createStage                controllers.Application.createStage(festivalId: Long)
+POST    /insertStage                controllers.Application.insertStage(festivalId: Long)
+GET     /editStage                  controllers.Application.editStage(festivalId: Long, stageId: Long)
+POST    /updateStage                controllers.Application.updateStage(festivalId: Long, stageId: Long)
+GET     /deleteStage                controllers.Application.deleteStage(festivalId: Long, stageId: Long)
+
 GET     /createPerformance          controllers.Application.createPerformance(festivalId: Long)
 POST    /insertPerformance          controllers.Application.insertPerformance(festivalId: Long)
 GET     /editPerformance            controllers.Application.editPerformance(festivalId: Long, performanceId: Long)
@@ -25,5 +31,14 @@ GET     /twitterLogin               controllers.TwitterController.twitterLogin
 GET     /twitterOAuthCallback       controllers.TwitterController.twitterOAuthCallback
 GET     /twitterLogout              controllers.TwitterController.twitterLogout
 
+# javascriptRoutes
+GET     /javascriptRoutes           controllers.Application.javascriptRoutes
+
+# Ajax
+POST    /ajaxUpdateStage            controllers.Application.ajaxUpdateStage(stageId: Long, stageName: String)
+POST    /ajaxUpdatePerformance      controllers.Application.ajaxUpdatePerformance(performanceId: Long, artist: String)
+
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
+
