@@ -456,6 +456,7 @@ object Application extends Controller with Secured {
           case Some(festival) => {
             // Stageリスト取得
             val stageList: Seq[Stage] = Stage.findByFestivalId(festivalId)
+            pager.title = festival.festivalName
             Ok(views.html.timeTableDetail(pager, targetTwitterUser, festival, stageList, TimeTable.createTimeTable(festivalId, stageList)))
           }
           case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : timeTableDetail 02")

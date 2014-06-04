@@ -26,6 +26,7 @@ POST    /updatePerformance          controllers.Application.updatePerformance(fe
 GET     /deletePerformance          controllers.Application.deletePerformance(festivalId: Long, performanceId: Long)
 
 GET     /timeTableDetail            controllers.Application.timeTableDetail(targetTwitterId: Long, festivalId: Long)
+GET     /timeTableDetail/:targetTwitterId/:festivalId            controllers.Application.timeTableDetail(targetTwitterId: Long, festivalId: Long)
 
 GET     /twitterLogin               controllers.TwitterController.twitterLogin
 GET     /twitterOAuthCallback       controllers.TwitterController.twitterOAuthCallback
