@@ -11,6 +11,7 @@ case class Festival  (
    id: Pk[Long]
   ,var twitterId: Long
   ,var festivalName: String
+  ,var description: String
   ,var createDate: Option[Date]
   ,var updateDate: Option[Date]
 ) {
@@ -24,13 +25,15 @@ object Festival {
     get[Pk[Long]]("id") ~
     get[Long]("twitter_id") ~
     get[String]("festival_name") ~
+    get[String]("description") ~
     get[Date]("create_date") ~
     get[Date]("update_date") map {
-      case id~twitterId~festivalName~createDate~updateDate => 
+      case id~twitterId~festivalName~description~createDate~updateDate => 
       Festival(
          id
         ,twitterId
         ,festivalName
+        ,description
         ,Option(createDate)
         ,Option(updateDate)
       )
@@ -103,11 +106,13 @@ object Festival {
           insert into festival(
              twitter_id
             ,festival_name
+            ,description
             ,create_date
             ,update_date
           ) values (
              {twitter_id}
             ,{festival_name}
+            ,{description}
             ,{create_date}
             ,{update_date}
           )
@@ -116,6 +121,7 @@ object Festival {
          'id            -> festival.id
         ,'twitter_id    -> festival.twitterId
         ,'festival_name -> festival.festivalName
+        ,'description   -> festival.description
         ,'create_date   -> festival.createDate
         ,'update_date   -> festival.updateDate
       ).executeUpdate()
@@ -131,19 +137,21 @@ object Festival {
         """
           update festival
           set  festival_name = {festival_name}
+              ,description   = {description}
               ,update_date   = {update_date}
           where id = {id}
         """
       ).on(
          'id            -> festival.id
         ,'festival_name -> festival.festivalName
+        ,'description   -> festival.description
         ,'update_date   -> festival.updateDate
       ).executeUpdate()
     }
   }
 
   /**
-   * Festival Insert処理
+   * Festival／Stag Insert処理
    */
   def insartWithStage(festival: Festival, stageNameList: Seq[String]) {
     DB.withTransaction { implicit connection =>
@@ -154,11 +162,13 @@ object Festival {
           insert into festival(
              twitter_id
             ,festival_name
+            ,description
             ,create_date
             ,update_date
           ) values (
              {twitter_id}
             ,{festival_name}
+            ,{description}
             ,{create_date}
             ,{update_date}
           ) on duplicate key update id = LAST_INSERT_ID(id)
@@ -167,6 +177,7 @@ object Festival {
          'id            -> festival.id
         ,'twitter_id    -> festival.twitterId
         ,'festival_name -> festival.festivalName
+        ,'description   -> festival.description
         ,'create_date   -> festival.createDate
         ,'update_date   -> festival.updateDate
       ).executeInsert()
@@ -206,7 +217,7 @@ object Festival {
       }
     }
   }
-
+  
   /**
    * Festival delete処理
    */
@@ -230,7 +241,7 @@ object Festival {
         'festival_id -> festival.id
       ).executeUpdate()
 
-      // Performance削除処理
+      // Festival削除処理
       SQL(
         """
           delete from Festival where id = {id}

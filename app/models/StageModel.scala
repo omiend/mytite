@@ -5,16 +5,17 @@ import play.api.db._
 import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
+import play.api.data.Mapping
 
 /** Stage Master */
 case class Stage (
-	 id: Pk[Long]
-  ,festivalId: Long
-	,stageName:String
-	,sort:String
-	,color:String
-	,createDate: Option[Date]
-	,updateDate: Option[Date]
+	 id             : Pk[Long]
+    ,festivalId     : Long
+	,var stageName : String
+	,var sort      : Option[String]
+	,var color     : Option[String]
+	,var createDate: Option[Date]
+	,var updateDate: Option[Date]
 ) {
 }
 
@@ -36,8 +37,8 @@ object Stage {
          id
         ,festivalId
         ,stageName
-        ,sort
-        ,color
+        ,Option(sort)
+        ,Option(color)
         ,Option(createDate)
         ,Option(updateDate)
       )
@@ -63,7 +64,26 @@ object Stage {
     }
   }
 
-
+  /**
+   * Stage Idを指定して取得
+   */
+  def findById(id: Long): Option[Stage] = {
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+        select *
+          from stage
+         where id = {id}
+         order by id
+        """
+      ).on(
+        'id -> id
+      ).as(
+        Stage.simple.singleOpt
+      )
+    }
+  }
+  
   /**
    * Stage from-toで件数を指定して取得
    */
@@ -86,6 +106,45 @@ object Stage {
     }
   }
 
+  /**
+   * Stageの件数を取得する
+   */
+  def countByFestivalId(festivalId: Long): Long = {
+    DB.withConnection { implicit connection =>
+      // 件数取得
+      SQL(
+        """
+        select count(*)
+          from stage
+         where festival_id = {festival_id}
+        """
+      ).on(
+        'festival_id -> festivalId
+      ).as(scalar[Long].single)
+    }
+  }
+  
+  /**
+   * 同じ名前のステージが登録されているかチェックする
+   */
+  def countByFestivalIdAndStageName(festivalId: Long, stageName: String): Boolean = {
+    DB.withConnection { implicit connection =>
+      // 件数取得
+      val count = SQL(
+        """
+        select count(*)
+          from stage
+         where festival_id = {festival_id}
+           and stage_name  = {stage_name}
+        """
+      ).on(
+         'festival_id -> festivalId
+        ,'stage_name  -> stageName
+      ).as(scalar[Long].single)
+      count > 0
+    }
+  }
+  
   /**
    * Stage Insert処理
    */
@@ -118,6 +177,54 @@ object Stage {
         ,'update_date -> stage.updateDate
       ).executeInsert()
 
+    }
+  }
+
+  /**
+   * Stage Update処理
+   */
+  def update(stageId: Long, stage: Stage) {
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+          update stage
+          set  stage_name  = {stage_name}
+              ,update_date = {update_date}
+          where id = {id}
+        """
+      ).on(
+         'id          -> stageId
+        ,'stage_name  -> stage.stageName
+        ,'update_date -> stage.updateDate
+      ).executeUpdate()
+    }
+  }
+  
+  /**
+   * Stage Delete処理
+   */
+  def delete(stage: Stage) {
+    DB.withConnection { implicit connection =>
+
+      // Performanceを削除する
+      SQL(
+        """
+          delete from performance
+          where stage_id = {stage_id}
+        """
+      ).on(
+        'stage_id -> stage.id
+      ).executeUpdate()
+
+      // Stageを削除する
+      SQL(
+        """
+          delete from stage
+          where id = {id}
+        """
+      ).on(
+        'id -> stage.id
+      ).executeUpdate()
     }
   }
 }

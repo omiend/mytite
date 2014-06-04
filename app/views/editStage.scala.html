@@ -1,13 +1,14 @@
-@(pager: Pager[TwitterUser], festivalId: Long, festivalAndStageForm: Form[(String, String, Seq[String])])(implicit flash: play.api.mvc.Flash)
+@(pager: Pager[TwitterUser], festivalId: Long, stageId: Long, stageForm: Form[Stage])(implicit flash: play.api.mvc.Flash)
 @import helper._
+@import models.TimeTable
 
 @main(pager.title, pager.twitterUser)(flash) {
 
   <div class="row-fluid">
     <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
       <div class="col-xs-6 col-md-6 col-sm-6 col-lg-6">
-        <H4>フェス登録</H4>
-        <p>ステージは４つまで登録できます</p>
+        <H4>ステージ更新</H4>
+        <p>ステージの名前を入力してください</p>
       </div><!--/span-->
       <div class="col-xs-6 col-md-6 col-sm-6 col-lg-6">
         <div class="row-fluid">
@@ -21,28 +22,22 @@
     </div><!--/span-->
   </div><!--/row-->
 
-  @helper.form(action = routes.Application.updateFestival(festivalId)) {
-    <div class="row-fluid">
+  @helper.form(action = routes.Application.updateStage(festivalId, stageId)) {
+    <div class="row">
       <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
         <div class="col-md-12 col-sm-12 col-lg-12">
-          @inputText(festivalAndStageForm("festivalName"), 'class -> "form-control", '_label -> "フェスの名前", 'placeholder -> "Summer Fes")
-          @textarea(festivalAndStageForm("description"), 'class -> "form-control", '_label -> "コメント", 'placeholder -> "夏に行きたいフェス！")
+          @inputText(stageForm("stageName"), 'class -> "form-control", '_label -> "ステージ名", 'placeholder -> "EARTH STAGE" )
         </div><!--/span-->
-      </div><!--/span-->
-    </div><!--/row-->
-
-    <div class="row-fluid">
-      <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12"><br /></div><!--/span-->
+      </div>
     </div><!--/row-->
 
     <div class="row-fluid">
       <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
-        <div class="col-md-3 col-sm-3 col-lg-3"><p><input type="submit" class="btn btn-primary btn-xs btn-block" value="更新"></p></div>
+        <div class="col-md-3 col-sm-3 col-lg-3"><p><input type="submit" class="btn btn-primary btn-xs btn-block" value="保存"></p></div>
         <div class="col-md-3 col-sm-3 col-lg-3"><p><a href="@routes.Application.timeTableDetail(pager.twitterUser.get.twitterId, festivalId)" class="btn btn-default btn-xs btn-block">キャンセル</a></p></div>
         <div class="col-md-3 col-sm-3 col-lg-3"></div>
-        <div class="col-md-3 col-sm-3 col-lg-3"><p><a class="btn btn-danger btn-xs btn-block" href="@routes.Application.deleteFestival(festivalId)">このフェスを削除する</a></p></div>
+        <div class="col-md-3 col-sm-3 col-lg-3"><p><a href="@routes.Application.deleteStage(festivalId, stageId)" class="btn btn-danger btn-xs btn-block"">削除</a></p></div>
       </div><!--/span-->
     </div><!--/row-->
   }
-
 }
