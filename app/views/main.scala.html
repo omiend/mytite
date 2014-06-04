@@ -60,9 +60,9 @@
 
       <div class="row row-offcanvas row-offcanvas-right">
         <div class="col-xs-12 col-sm-12">
-            @flash.get("success").map { message => <div class="alert alert-success"><strong>Success</strong>@message</div> }
-            @flash.get("warning").map { message => <div class="alert alert-warning"><strong>Warning</strong>@message</div> }
-            @flash.get("error").map { message => <div class="alert alert-danger"><strong>Error</strong>@message</div> }
+            @flash.get("success").map { message => <div class="alert alert-success">@message</div> }
+            @flash.get("warning").map { message => <div class="alert alert-warning">@message</div> }
+            @flash.get("error").map { message => <div class="alert alert-danger">@message</div> }
             @content
         </div><!--/span-->
       </div><!--/row-->
@@ -73,8 +73,8 @@
       <div class="container">
         <div class="row">
           <div class="col-xs-7 col-md-7 col-sm-7 col-lg-7">
-            <h3 class="footer-title">H3テキストテキストテキストテキスト</h3>
-            <p>テキストテキストテキストテキストテキストテキストテキスト</p>
+            <h3 class="footer-title">自分だけのタイムテーブルを作って遊ぼう！マイタイテ！</h3>
+            <p>Copyright © 2014 <a href="https://twitter.com/omiend" target="_blank">&#64;omiend</a> All Rights Reserved.</p>
           </div>
         </div>
       </div>
