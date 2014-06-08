@@ -24,8 +24,10 @@ class TwitterModel() {
   def getOAuthUrl(): String = {
     // ローカル環境
     // requestToken = getTwitter.getOAuthRequestToken("http://localhost:9000/twitterOAuthCallback")
-    // Heroku
+    // Heroku tite_scala
     requestToken = getTwitter.getOAuthRequestToken("http://tite-scala.herokuapp.com/twitterOAuthCallback")
+    // Heroku mytite
+    requestToken = getTwitter.getOAuthRequestToken("http://mytite.herokuapp.com/twitterOAuthCallback")
     requestToken.getAuthorizationURL()
   }
 
