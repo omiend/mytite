@@ -27,7 +27,7 @@ class TwitterModel() {
     // Heroku tite_scala
     requestToken = getTwitter.getOAuthRequestToken("http://tite-scala.herokuapp.com/twitterOAuthCallback")
     // Heroku mytite
-    requestToken = getTwitter.getOAuthRequestToken("http://mytite.herokuapp.com/twitterOAuthCallback")
+    // requestToken = getTwitter.getOAuthRequestToken("http://mytite.herokuapp.com/twitterOAuthCallback")
     requestToken.getAuthorizationURL()
   }
 
