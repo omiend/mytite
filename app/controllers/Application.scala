@@ -438,9 +438,13 @@ object Application extends Controller with Secured {
    *** TimeTable画面起動
    *****************************************************************************/
   def timeTableDetail(targetTwitterId: Long, festivalId: Long) = Action { implicit request =>
+    var isExists: (Long, Boolean) = (0, false)
     // IsAuthenticatedからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = session.get("twitterId") match {
-      case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
+      case Some(twitterId) => {
+        isExists = Heart.findByFestivalAndTwitterId(festivalId, twitterId.toLong)
+        TwitterUser.getByTwitterId(twitterId.toLong)
+      }
       case _ => null
     }
     // Pagerを初期化
@@ -454,7 +458,7 @@ object Application extends Controller with Secured {
             // Stageリスト取得
             val stageList: Seq[Stage] = Stage.findByFestivalId(festivalId)
             pager.title = festival.festivalName
-            Ok(views.html.timeTableDetail(pager, targetTwitterUser, festival, stageList, TimeTable.createTimeTable(festivalId, stageList)))
+            Ok(views.html.timeTableDetail(pager, targetTwitterUser, festival, stageList, TimeTable.createTimeTable(festivalId, stageList), isExists))
           }
           case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : timeTableDetail 02")
         }
@@ -486,6 +490,8 @@ object Application extends Controller with Secured {
         Routes.javascriptRouter("jsRoutes")(
            routes.javascript.Application.ajaxUpdateStage
           ,routes.javascript.Application.ajaxUpdatePerformance
+          ,routes.javascript.Application.ajaxInsertHeart
+          ,routes.javascript.Application.ajaxDeleteHeart
         )
       ).as("text/javascript")
   }
@@ -526,4 +532,28 @@ object Application extends Controller with Secured {
     }
   }
 
+  /*****************************************************************************
+   *** Ajax用 Heart処理
+   *****************************************************************************/
+  def ajaxInsertHeart(festivalId: Long) = IsAuthenticated { twitterId => implicit request =>
+    Festival.findById(festivalId) match {
+      case Some(festival) => {
+        def nowDate: java.util.Date = new java.util.Date
+        var heart: Heart = Heart(
+           null
+          ,festivalId
+          ,twitterId.toLong
+          ,Some(nowDate)
+          ,Some(nowDate)
+        )
+        Heart.insert(heart)
+        Ok
+      }
+      case _ => BadRequest
+    }
+  }
+  def ajaxDeleteHeart(festivalId: Long) = IsAuthenticated { twitterId => implicit request =>
+    Heart.delete(festivalId, twitterId.toLong)
+    Ok
+  }
 }

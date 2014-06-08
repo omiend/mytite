@@ -34,26 +34,12 @@
 
   <div class="row-fluid">
     <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
-      <div class="text-center">
-        <div class="pagination">
-          <ul class="pager">
-            <li class="previous"><a href="@routes.Application.indexFestival(1, targetTwitterUser.twitterId)">最初</a></li>
-            @for(page <- pager.pageNumList){<li class="@if(pager.pageNum==page){active}"><a href="@routes.Application.indexFestival(page, targetTwitterUser.twitterId)">@page</a></li>}
-            <li class="next"><a href="@routes.Application.indexFestival(pager.maxPageRowCount, targetTwitterUser.twitterId)">最後</a></li>
-          </ul>
-        </div> <!-- /pagination -->
-      </div>
-    </div>
-  </div>
-
-  <div class="row-fluid">
-    <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
       @pager.dataList.map { fes =>
 	      <div class="col-sm-4 col-md-4 col-lg-4">
 	        <h3 class="tile-title">@fes.festivalName</h3>
 	        <p>
-	          夏に行きたいフェス<br />
-	          10<span class="glyphicon glyphicon-heart"></span>
+	          @fes.description<br />
+	          <!-- 10<span class="glyphicon glyphicon-heart"></span> -->
 	          <a class="btn btn-primary  btn-block" href="/timeTableDetail/@targetTwitterUser.twitterId/@fes.id.get">タイムテーブルを見る</a>
 	        </p>
 	      </div><!--/span-->
@@ -61,17 +47,4 @@
     </div><!--/span-->
   </div><!--/row-->
   
-  <div class="row-fluid">
-	<div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
-	  <div class="text-center">
-	    <div class="pagination">
-	      <ul class="pager">
-	        <li class="previous"><a href="@routes.Application.indexFestival(1, targetTwitterUser.twitterId)">最初</a></li>
-	        @for(page <- pager.pageNumList){<li class="@if(pager.pageNum==page){active}"><a href="@routes.Application.indexFestival(page, targetTwitterUser.twitterId)">@page</a></li>}
-	        <li class="next"><a href="@routes.Application.indexFestival(pager.maxPageRowCount, targetTwitterUser.twitterId)">最後</a></li>
-	      </ul>
-	    </div> <!-- /pagination -->
-	  </div>
-	</div>
-  </div>
 }

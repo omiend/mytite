@@ -1,4 +1,4 @@
-@(pager: Pager[TwitterUser], targetTwitterUser: TwitterUser, festival: Festival, stageList: Seq[Stage], timeTableList: Seq[TimeTable])(implicit flash: play.api.mvc.Flash)
+@(pager: Pager[TwitterUser], targetTwitterUser: TwitterUser, festival: Festival, stageList: Seq[Stage], timeTableList: Seq[TimeTable], isExists: (Long, Boolean))(implicit flash: play.api.mvc.Flash)
 
 @main(pager.title, pager.twitterUser)(flash) {
 
@@ -38,17 +38,20 @@
     </div><!--/span-->
   </div><!--/row-->
 
+  <!--
   <div class="row-fluid">
     <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
       <div class="col-1 col-md-1 col-sm-1 col-lg-1">
         <a href="https://twitter.com/share" class="twitter-share-button" data-lang="ja" data-related="omiend" data-hashtags="mytite">ツイート</a>
       </div>
-      <div class="col-1 col-md-1 col-sm-1 col-lg-1">
-        <span class="glyphicon glyphicon-heart-empty"></span>
-        <span class="glyphicon glyphicon-heart"></span>
+      <div id="hearts" class="col-1 col-md-1 col-sm-1 col-lg-1">
+        <span id="delHeart" class="glyphicon glyphicon-heart" style="@if(!isExists._2){display:none}"></span>
+        <span id="addHeart" class="glyphicon glyphicon-heart-empty" style="@if(isExists._2){display:none}"></span>
       </div>
-    </div><!--/span-->
-  </div><!--/row-->
+      <input id="festivalId" type="hidden" value="@festival.id.get" />
+    </div>
+  </div>
+   -->
 
   <div class="row-fluid">
     <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
