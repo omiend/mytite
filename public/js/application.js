@@ -35,25 +35,50 @@
     $(function() {
       $(".performanceEditable").each(function(){
         $('#' + this.id).editable({trigger : $("#span_" + this.id), action : "click"}, function(e){
-        jsRoutes.controllers.Application.ajaxUpdatePerformance(e.target.selector.replace("#performanceId", ""), e.value).ajax({
-            beforeSend: function() {console.log("beforeSend")},
-            complete: function() {console.log("complete")},
-            success: function(datetime) {console.log("success")},
-            error: function() {console.log("error")}
+          jsRoutes.controllers.Application.ajaxUpdatePerformance(e.target.selector.replace("#performanceId", ""), e.value).ajax({
+            beforeSend: function() {},
+            complete: function() {},
+            success: function() {},
+            error: function() {}
           })
         });
       });
       $(".stageEditable").each(function(){
         $('#' + this.id).editable({trigger : $("#span_" + this.id), action : "click"}, function(e){
-        jsRoutes.controllers.Application.ajaxUpdateStage(e.target.selector.replace("#stageId", ""), e.value).ajax({
-            beforeSend: function() {console.log("beforeSend")},
-            complete: function() {console.log("complete")},
-            success: function(datetime) {console.log("success")},
-            error: function() {console.log("error")}
+          jsRoutes.controllers.Application.ajaxUpdateStage(e.target.selector.replace("#stageId", ""), e.value).ajax({
+            beforeSend: function() {},
+            complete: function() {},
+            success: function() {},
+            error: function() {}
           })
         });
       });
+      $("#addHeart").on("click", function(){
+        jsRoutes.controllers.Application.ajaxInsertHeart($("#festivalId").val()).ajax({
+          beforeSend: function() {},
+          complete: function() {},
+          success: function() {
+            $("#addHeart").css('display','none')
+            $("#delHeart").css('display','block')
+          },
+          error: function() {}
+        })
+      })
+      $("#delHeart").on("click", function(){
+        jsRoutes.controllers.Application.ajaxDeleteHeart($("#festivalId").val()).ajax({
+          beforeSend: function() {},
+          complete: function() {},
+          success: function(returnData) {
+            $("#addHeart").css('display','block')
+            $("#delHeart").css('display','none')
+          },
+          error: function() {}
+        })
+      })
     })
+  });
+})(jQuery);
+
 
 //     // Todo list
 //     $(".todo").on('click', 'li', function() {
@@ -131,8 +156,4 @@
 //     }  
 // 
 //     // make code pretty
-//     window.prettyPrint && prettyPrint();
-    
-  });
-  
-})(jQuery);
+//     window.prettyPrint && prettyPrint();    

@@ -9,8 +9,8 @@ import play.api.data.Mapping
 
 /** Stage Master */
 case class Stage (
-	 id             : Pk[Long]
-    ,festivalId     : Long
+	 id            : Pk[Long]
+  ,festivalId    : Long
 	,var stageName : String
 	,var sort      : Option[String]
 	,var color     : Option[String]

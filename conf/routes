@@ -39,6 +39,8 @@ GET     /javascriptRoutes           controllers.Application.javascriptRoutes
 POST    /ajaxUpdateStage            controllers.Application.ajaxUpdateStage(stageId: Long, stageName: String)
 POST    /ajaxUpdatePerformance      controllers.Application.ajaxUpdatePerformance(performanceId: Long, artist: String)
 
+POST    /ajaxInsertHeart            controllers.Application.ajaxInsertHeart(festivalId: Long)
+POST    /ajaxDeleteHeart            controllers.Application.ajaxDeleteHeart(festivalId: Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

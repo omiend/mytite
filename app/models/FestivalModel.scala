@@ -241,6 +241,15 @@ object Festival {
         'festival_id -> festival.id
       ).executeUpdate()
 
+      // Heartを削除する
+      SQL(
+        """
+          delete from Heart where festival_id = {festival_id}
+        """
+      ).on(
+        'festival_id -> festival.id
+      ).executeUpdate()
+
       // Festival削除処理
       SQL(
         """
