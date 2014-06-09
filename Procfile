@@ -1,1 +1,1 @@
-web: target/universal/stage/bin/tite_scala -Dhttp.port=${PORT} -Ddb.default.url=${DATABASE_URL}
+web: target/universal/stage/bin/mytite -Dhttp.port=${PORT} -Ddb.default.url=${DATABASE_URL}
