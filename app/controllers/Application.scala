@@ -79,10 +79,15 @@ object Application extends Controller with Secured {
    * Festival一覧画面起動
    *****************************************************************************/
   def indexFestival(pageNum: Int, targetTwitterId: Long) = Action { implicit request =>
-    // // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(targetTwitterId)
+    // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
+    var twitterUser: Option[TwitterUser] = session.get("twitterId") match {
+      case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
+      case _ => null
+    }
+    // 参照対象のTwitterUserを取得する
+    var targetTwitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(targetTwitterId)
     // Pagerを初期化
-    val pager: Pager[Festival] = Pager[Festival]("@" + twitterUser.get.twitterScreenName + "のフェス一覧", pageNum, 0, twitterUser, Seq.empty)
+    val pager: Pager[Festival] = Pager[Festival]("@" + targetTwitterUser.get.twitterScreenName + "のフェス一覧", pageNum, 0, twitterUser, Seq.empty)
     // Festivalを表示するユーザーを取得する
     TwitterUser.getByTwitterId(targetTwitterId) match {
       case Some(targetTwitterUser) => {
