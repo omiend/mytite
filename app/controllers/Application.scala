@@ -352,7 +352,6 @@ object Application extends Controller with Secured {
     }
     performanceForm.bindFromRequest.fold(
       formWithErrors => {
-        println(formWithErrors)
         BadRequest(html.createPerformance(pager, festivalId, stageSelectOptions, formWithErrors))
       },
       performance => {
