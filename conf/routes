@@ -6,42 +6,47 @@
 GET     /                           controllers.Application.index(p: Int ?= 1)
 GET     /about                      controllers.Application.about
 
-GET     /indexFestival              controllers.Application.indexFestival(p: Int ?= 1, targetTwitterId: Long)
-GET     /createFestival             controllers.Application.createFestival
-POST    /insertFestival             controllers.Application.insertFestival
-GET     /editFestival               controllers.Application.editFestival(festivalId: Long)
-POST    /updateFestival             controllers.Application.updateFestival(festivalId: Long)
-GET     /deleteFestival             controllers.Application.deleteFestival(festivalId: Long)
+# Festival
+GET     /indexFestival/:targetTwitterId               controllers.Application.indexFestival(p: Int ?= 1, targetTwitterId: Long)
+GET     /createFestival                               controllers.Application.createFestival
+POST    /insertFestival                               controllers.Application.insertFestival
+GET     /editFestival/:festivalId                     controllers.Application.editFestival(festivalId: Long)
+POST    /updateFestival                               controllers.Application.updateFestival(festivalId: Long)
+GET     /deleteFestival/:festivalId                   controllers.Application.deleteFestival(festivalId: Long)
 
-GET     /createStage                controllers.Application.createStage(festivalId: Long)
-POST    /insertStage                controllers.Application.insertStage(festivalId: Long)
-GET     /editStage                  controllers.Application.editStage(festivalId: Long, stageId: Long)
-POST    /updateStage                controllers.Application.updateStage(festivalId: Long, stageId: Long)
-GET     /deleteStage                controllers.Application.deleteStage(festivalId: Long, stageId: Long)
+# Stage
+GET     /createStage/:festivalId                      controllers.Application.createStage(festivalId: Long)
+POST    /insertStage                                  controllers.Application.insertStage(festivalId: Long)
+GET     /editStage/:festivalId/:stageId               controllers.Application.editStage(festivalId: Long, stageId: Long)
+POST    /updateStage                                  controllers.Application.updateStage(festivalId: Long, stageId: Long)
+GET     /deleteStage/:festivalId/:stageId             controllers.Application.deleteStage(festivalId: Long, stageId: Long)
 
-GET     /createPerformance          controllers.Application.createPerformance(festivalId: Long)
-POST    /insertPerformance          controllers.Application.insertPerformance(festivalId: Long)
-GET     /editPerformance            controllers.Application.editPerformance(festivalId: Long, performanceId: Long)
-POST    /updatePerformance          controllers.Application.updatePerformance(festivalId: Long, performanceId: Long)
-GET     /deletePerformance          controllers.Application.deletePerformance(festivalId: Long, performanceId: Long)
+# Performance
+GET     /createPerformance/:festivalId                controllers.Application.createPerformance(festivalId: Long)
+POST    /insertPerformance                            controllers.Application.insertPerformance(festivalId: Long)
+GET     /editPerformance/:festivalId/:performanceId   controllers.Application.editPerformance(festivalId: Long, performanceId: Long)
+POST    /updatePerformance                            controllers.Application.updatePerformance(festivalId: Long, performanceId: Long)
+GET     /deletePerformance/:festivalId/:performanceId controllers.Application.deletePerformance(festivalId: Long, performanceId: Long)
 
-GET     /timeTableDetail            controllers.Application.timeTableDetail(targetTwitterId: Long, festivalId: Long)
-GET     /timeTableDetail/:targetTwitterId/:festivalId            controllers.Application.timeTableDetail(targetTwitterId: Long, festivalId: Long)
+# TimeTable
+GET     /timeTableDetail/:targetTwitterId/:festivalId controllers.Application.timeTableDetail(targetTwitterId: Long, festivalId: Long)
 
-GET     /twitterLogin               controllers.TwitterController.twitterLogin
-GET     /twitterOAuthCallback       controllers.TwitterController.twitterOAuthCallback
-GET     /twitterLogout              controllers.TwitterController.twitterLogout
+# Twitter
+GET     /twitterLogin                                 controllers.TwitterController.twitterLogin
+GET     /twitterOAuthCallback                         controllers.TwitterController.twitterOAuthCallback
+GET     /twitterLogout                                controllers.TwitterController.twitterLogout
 
 # javascriptRoutes
-GET     /javascriptRoutes           controllers.Application.javascriptRoutes
+GET     /javascriptRoutes                             controllers.Application.javascriptRoutes
 
-# Ajax
-POST    /ajaxUpdateStage            controllers.Application.ajaxUpdateStage(stageId: Long, stageName: String)
-POST    /ajaxUpdatePerformance      controllers.Application.ajaxUpdatePerformance(performanceId: Long, artist: String)
+# Ajax Stage
+POST    /ajaxUpdateStage                              controllers.Application.ajaxUpdateStage(stageId: Long, stageName: String)
+POST    /ajaxUpdatePerformance                        controllers.Application.ajaxUpdatePerformance(performanceId: Long, artist: String)
 
-POST    /ajaxInsertHeart            controllers.Application.ajaxInsertHeart(festivalId: Long)
-POST    /ajaxDeleteHeart            controllers.Application.ajaxDeleteHeart(festivalId: Long)
+# Ajax Heart
+POST    /ajaxInsertHeart                              controllers.Application.ajaxInsertHeart(festivalId: Long)
+POST    /ajaxDeleteHeart                              controllers.Application.ajaxDeleteHeart(festivalId: Long)
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET     /assets/*file                                 controllers.Assets.at(path="/public", file)
 
