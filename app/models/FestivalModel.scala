@@ -5,6 +5,7 @@ import play.api.db._
 import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
+import scala.collection.immutable.Map
 
 /** Festival Table */
 case class Festival  (
@@ -15,6 +16,7 @@ case class Festival  (
   ,var createDate: Option[Date]
   ,var updateDate: Option[Date]
 ) {
+  var heartCount:Long = 0
 }
 object Festival {
 
@@ -40,6 +42,16 @@ object Festival {
     }
   }
 
+  /**
+   * Heart Count
+   */
+  val heartCount = {
+    get[Pk[Long]]("id") ~
+    get[Long]("heartCount") map {
+      case id~heartCount => (id, heartCount)
+    }
+  }
+  
   /**
    * Festival Idを指定して取得
    */
@@ -91,6 +103,29 @@ object Festival {
       ).on(
         'twitter_id -> twitterId
       ).as(scalar[Long].single)
+
+      // ハートの件数を取得
+      SQL(
+        """
+        select id
+               ,(select count(id) from heart where festival.id = heart.festival_id) as heartCount
+          from festival
+         where twitter_id = {twitter_id}
+         limit {maxPageCount} offset {offset}
+        """
+      ).on(
+        'twitter_id   -> twitterId,
+        'offset       -> offset,
+        'maxPageCount -> maxPageCount
+      ).as(
+        Festival.heartCount *
+      ) map { countHeart =>
+        for (festival <- resultList) {
+          if (festival.id == countHeart._1) {
+            festival.heartCount = countHeart._2
+          }
+        }
+      }
 
       (resultList, totalRows)
     }

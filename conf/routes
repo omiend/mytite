@@ -7,7 +7,7 @@ GET     /                           controllers.Application.index(p: Int ?= 1)
 GET     /about                      controllers.Application.about
 
 # Festival
-GET     /indexFestival/:targetTwitterId               controllers.Application.indexFestival(p: Int ?= 1, targetTwitterId: Long)
+GET     /festival/:targetTwitterId                    controllers.Application.festival(p: Int ?= 1, targetTwitterId: Long)
 GET     /createFestival                               controllers.Application.createFestival
 POST    /insertFestival                               controllers.Application.insertFestival
 GET     /editFestival/:festivalId                     controllers.Application.editFestival(festivalId: Long)
@@ -29,7 +29,7 @@ POST    /updatePerformance                            controllers.Application.up
 GET     /deletePerformance/:festivalId/:performanceId controllers.Application.deletePerformance(festivalId: Long, performanceId: Long)
 
 # TimeTable
-GET     /timeTableDetail/:targetTwitterId/:festivalId controllers.Application.timeTableDetail(targetTwitterId: Long, festivalId: Long)
+GET     /timetable/:targetTwitterId/:festivalId       controllers.Application.timetable(targetTwitterId: Long, festivalId: Long)
 
 # Twitter
 GET     /twitterLogin                                 controllers.TwitterController.twitterLogin

@@ -1,0 +1,7 @@
+# --- Constraints
+constraint.required=必須
+constraint.maxLength={0}文字まで入力可能
+
+# --- Errors
+error.required=入力してください
+error.maxLength={0}文字より短くなければいけません

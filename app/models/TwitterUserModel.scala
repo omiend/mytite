@@ -19,6 +19,7 @@ case class TwitterUser (
 	,createDate              : Option[Date]
 	,updateDate              : Option[Date]
 ) {
+  var heartCount: Long = 0
 }
 
 object TwitterUser {
@@ -53,6 +54,16 @@ object TwitterUser {
   }
 
   /**
+   * Heart Count
+   */
+  val heartCount = {
+    get[Pk[Long]]("id") ~
+    get[Long]("heartCount") map {
+      case id~heartCount => (id, heartCount)
+    }
+  }
+  
+  /**
    * TwitterUser twitter_idを指定して取得
    */
   def getByTwitterId(twitterId: Long): Option[TwitterUser] = {
@@ -85,7 +96,7 @@ object TwitterUser {
           limit {maxPageCount} offset {offset}
         """
       ).on(
-        'offset -> offset,
+        'offset       -> offset,
         'maxPageCount -> maxPageCount
       ).as(
         TwitterUser.simple *
@@ -99,7 +110,33 @@ object TwitterUser {
         """
       ).as(scalar[Long].single)
 
-      (resultList, totalRows)
+      // ハートの件数を取得
+      SQL(
+        """
+        select id
+               ,(select count(h.id) 
+                   from heart h, festival f 
+                  where t.twitter_id = f.twitter_id
+                    and f.id = h.festival_id
+               ) as heartCount
+          from twitter_user t
+         order by heartCount desc
+         limit {maxPageCount} offset {offset}
+        """
+      ).on(
+        'offset       -> offset,
+        'maxPageCount -> maxPageCount
+      ).as(
+        TwitterUser.heartCount *
+      ) map { countHeart =>
+        for (twitterUser <- resultList) {
+          if (twitterUser.id == countHeart._1) {
+            twitterUser.heartCount = countHeart._2
+          }
+        }
+      }
+      
+      (resultList.sortWith(_.heartCount > _.heartCount), totalRows)
     }
   }
 
