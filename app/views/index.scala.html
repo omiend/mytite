@@ -24,8 +24,10 @@
              </div>
            </div>
            <p>
+             <span class="glyphicon glyphicon-heart">送られたハートの総数=@user.heartCount</span>
+             <br />
              @user.twitterDescription
-             <a class="btn btn-primary btn-large btn-block" href="@routes.Application.indexFestival(1, user.twitterId)">&#64;@user.twitterScreenName のフェスをみる &raquo;</a>
+             <a class="btn btn-primary btn-large btn-block" href="@routes.Application.festival(1, user.twitterId)">&#64;@user.twitterScreenName のフェスをみる &raquo;</a>
          </p>
        </div><!--/span-->
        }

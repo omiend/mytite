@@ -80,6 +80,7 @@ object Heart {
           from Heart
          where festival_id = {festival_id}
            and twitter_id = {twitter_id}
+         limit 1
         """
       ).on(
          'festival_id -> festivalId
