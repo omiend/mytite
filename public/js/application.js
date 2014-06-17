@@ -30,23 +30,6 @@
     $("select[name='stageId']").selectpicker({style: 'btn-primary', menuStyle: 'dropdown-inverse'});
     $("select[name='time']").selectpicker({style: 'btn-primary', menuStyle: 'dropdown-inverse'});
     $("select[name='timeFrame']").selectpicker({style: 'btn-primary', menuStyle: 'dropdown-inverse'});
-    $(".draggable").draggable({ 
-         snap: ".droppable"
-        ,handle: "span.glyphicon-move"
-        ,revert: "invalid"
-    });
-    
-    // TimeTable
-    $(".droppable" ).droppable({
-      drop: function( event, ui ) {
-        jsRoutes.controllers.Application.ajaxUpdatePerformanceByTimeFrame(ui.draggable[0].id.replace("droppable", ""), $(this)[0].id.split("/")[0], $(this)[0].id.split("/")[1]).ajax({
-          beforeSend: function() {},
-          complete: function() {},
-          success: function() {window.location.reload()},
-          error: function() {}
-        })
-      }
-    });
 
     // Ajax Updates
     $(".performanceEditable").each(function(){
