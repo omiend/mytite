@@ -133,7 +133,6 @@ object Application extends Controller with Secured {
       },
       festivalAndStage => {
         // 現在日付作成（timestamp）
-        def date(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd hh:MM:dd:ss.000").parse(str)
         def nowDate: java.util.Date = new java.util.Date
         // --- Festival作成処理 --- //
         var festival: Festival = Festival(
@@ -184,7 +183,6 @@ object Application extends Controller with Secured {
             BadRequest(views.html.editFestival(pager, festivalId, formWithErrors))
           },
           festivalAndStage => {
-            def date(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd hh:MM:dd:ss.000").parse(str)
             def nowDate: java.util.Date = new java.util.Date
             festival.festivalName = festivalAndStage._1  // Festival Name
             festival.description = festivalAndStage._2  // description
@@ -246,7 +244,6 @@ object Application extends Controller with Secured {
       },
       stage => {
         // 現在日付作成（timestamp）
-        def date(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd hh:MM:dd:ss.000").parse(str)
         def nowDate: java.util.Date = new java.util.Date
         stage.sort = Option("1")
         stage.color = Option("white")
@@ -293,7 +290,6 @@ object Application extends Controller with Secured {
         BadRequest(views.html.editStage(pager, festivalId, stageId, formWithErrors))
       },
       stage => {
-        def date(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd hh:MM:dd:ss.000").parse(str)
         def nowDate: java.util.Date = new java.util.Date
         stage.updateDate = Some(nowDate)
         Stage.update(stageId, stage)
@@ -363,8 +359,6 @@ object Application extends Controller with Secured {
         BadRequest(html.createPerformance(pager, festivalId, stageSelectOptions, formWithErrors))
       },
       performance => {
-        // 現在日付作成（timestamp）
-        def date(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd hh:MM:dd:ss.000").parse(str)
         def nowDate: java.util.Date = new java.util.Date
         performance.createDate = Some(nowDate)
         performance.updateDate = Some(nowDate)
@@ -413,7 +407,6 @@ object Application extends Controller with Secured {
         BadRequest(views.html.editPerformance(pager, performanceId, stageSelectOptions, formWithErrors))
       },
       performance => {
-        def date(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd hh:MM:dd:ss.000").parse(str)
         def nowDate: java.util.Date = new java.util.Date
         performance.updateDate = Some(nowDate)
         Performance.update(performanceId, performance)
@@ -451,13 +444,16 @@ object Application extends Controller with Secured {
    *****************************************************************************/
   def timetable(targetTwitterId: Long, festivalId: Long) = Action { implicit request =>
     var isExists: (Long, Boolean) = (0, false)
-    // IsAuthenticatedからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
+    // セッションからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = session.get("twitterId") match {
       case Some(twitterId) => {
         isExists = Heart.findByFestivalAndTwitterId(festivalId, twitterId.toLong)
         TwitterUser.getByTwitterId(twitterId.toLong)
       }
-      case _ => null
+      case _ => {
+        isExists = Heart.countHeartByFestivalId(festivalId)
+        null
+      }
     }
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス", 1, 0, twitterUser, Seq.empty)
@@ -502,6 +498,7 @@ object Application extends Controller with Secured {
         Routes.javascriptRouter("jsRoutes")(
            routes.javascript.Application.ajaxUpdateStage
           ,routes.javascript.Application.ajaxUpdatePerformance
+          ,routes.javascript.Application.ajaxUpdatePerformanceByTimeFrame
           ,routes.javascript.Application.ajaxInsertHeart
           ,routes.javascript.Application.ajaxDeleteHeart
         )
@@ -514,7 +511,6 @@ object Application extends Controller with Secured {
   def ajaxUpdateStage(stageId: Long, stageName: String) = IsAuthenticated { twitterId => implicit request =>
     Stage.findById(stageId) match {
       case Some(stage) if stage.stageName != stageName => {
-        def date(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd hh:MM:dd:ss.000").parse(str)
         def nowDate: java.util.Date = new java.util.Date
         stage.stageName = stageName
         stage.updateDate = Some(nowDate)
@@ -532,7 +528,6 @@ object Application extends Controller with Secured {
   def ajaxUpdatePerformance(performanceId: Long, artist: String) = IsAuthenticated { twitterId => implicit request =>
     Performance.findById(performanceId) match {
       case Some(performance) if performance.artist != artist => {
-        def date(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd hh:MM:dd:ss.000").parse(str)
         def nowDate: java.util.Date = new java.util.Date
         performance.artist = artist
         performance.updateDate = Some(nowDate)
@@ -544,6 +539,19 @@ object Application extends Controller with Secured {
     }
   }
 
+    def ajaxUpdatePerformanceByTimeFrame(performanceId: Long, stageId: Long, time: String) = IsAuthenticated { twitterId => implicit request =>
+    Performance.findById(performanceId) match {
+      case Some(performance)  => {
+        def nowDate: java.util.Date = new java.util.Date
+        performance.stageId = stageId
+        performance.time = time
+        performance.updateDate = Some(nowDate)
+        Performance.update(performanceId, performance)
+        Ok
+      }
+      case _ => BadRequest
+    }
+  }
 
   /*****************************************************************************
    *** Ajax用 Heart処理

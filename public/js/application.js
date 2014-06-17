@@ -6,7 +6,7 @@
 
 (function($) {
 
-  // Add segments to a slider
+//  // Add segments to a slider
 //  $.fn.addSliderSegments = function (amount, orientation) {    
 //    return this.each(function () {
 //      if (orientation == "vertical") {
@@ -25,57 +25,73 @@
 //  };
 
   $(function() {
-  
-    // Custom Selects
+
+    // Performance Edit
     $("select[name='stageId']").selectpicker({style: 'btn-primary', menuStyle: 'dropdown-inverse'});
     $("select[name='time']").selectpicker({style: 'btn-primary', menuStyle: 'dropdown-inverse'});
     $("select[name='timeFrame']").selectpicker({style: 'btn-primary', menuStyle: 'dropdown-inverse'});
+    $(".draggable").draggable({ 
+         snap: ".droppable"
+        ,handle: "span.glyphicon-move"
+        ,revert: "invalid"
+    });
+    
+    // TimeTable
+    $(".droppable" ).droppable({
+      drop: function( event, ui ) {
+        jsRoutes.controllers.Application.ajaxUpdatePerformanceByTimeFrame(ui.draggable[0].id.replace("droppable", ""), $(this)[0].id.split("/")[0], $(this)[0].id.split("/")[1]).ajax({
+          beforeSend: function() {},
+          complete: function() {},
+          success: function() {window.location.reload()},
+          error: function() {}
+        })
+      }
+    });
 
     // Ajax Updates
-    $(function() {
-      $(".performanceEditable").each(function(){
-        $('#' + this.id).editable({trigger : $("#span_" + this.id), action : "click"}, function(e){
-          jsRoutes.controllers.Application.ajaxUpdatePerformance(e.target.selector.replace("#performanceId", ""), e.value).ajax({
-            beforeSend: function() {},
-            complete: function() {},
-            success: function() {},
-            error: function() {}
-          })
-        });
-      });
-      $(".stageEditable").each(function(){
-        $('#' + this.id).editable({trigger : $("#span_" + this.id), action : "click"}, function(e){
-          jsRoutes.controllers.Application.ajaxUpdateStage(e.target.selector.replace("#stageId", ""), e.value).ajax({
-            beforeSend: function() {},
-            complete: function() {},
-            success: function() {},
-            error: function() {}
-          })
-        });
-      });
-      $("#addHeart").on("click", function(){
-        jsRoutes.controllers.Application.ajaxInsertHeart($("#festivalId").val()).ajax({
-          beforeSend: function() {},
-          complete: function() {},
-          success: function() {
-            $("#addHeart").css('display','none')
-            $("#delHeart").css('display','block')
-          },
-          error: function() {}
-        })
+    $(".performanceEditable").each(function(){
+    $('#' + this.id).editable({trigger : $("#span_" + this.id), action : "click"}, function(e){
+      jsRoutes.controllers.Application.ajaxUpdatePerformance(e.target.selector.replace("#performanceId", ""), e.value).ajax({
+        beforeSend: function() {},
+        complete: function() {},
+        success: function() {},
+        error: function() {}
       })
-      $("#delHeart").on("click", function(){
-        jsRoutes.controllers.Application.ajaxDeleteHeart($("#festivalId").val()).ajax({
-          beforeSend: function() {},
-          complete: function() {},
-          success: function(returnData) {
-            $("#addHeart").css('display','block')
-            $("#delHeart").css('display','none')
-          },
-          error: function() {}
-        })
+    });
+    });
+    $(".stageEditable").each(function(){
+    $('#' + this.id).editable({trigger : $("#span_" + this.id), action : "click"}, function(e){
+      jsRoutes.controllers.Application.ajaxUpdateStage(e.target.selector.replace("#stageId", ""), e.value).ajax({
+        beforeSend: function() {},
+        complete: function() {},
+        success: function() {},
+        error: function() {}
       })
+    });
+    });
+    $("#addHeart").on("click", function(){
+    jsRoutes.controllers.Application.ajaxInsertHeart($("#festivalId").val()).ajax({
+      beforeSend: function() {},
+      complete: function() {},
+      success: function() {
+        $("#addHeart").css('display','none')
+        $("#delHeart").css('display','block')
+      },
+      error: function() {}
     })
+    })
+    $("#delHeart").on("click", function(){
+    jsRoutes.controllers.Application.ajaxDeleteHeart($("#festivalId").val()).ajax({
+      beforeSend: function() {},
+      complete: function() {},
+      success: function(returnData) {
+        $("#addHeart").css('display','block')
+        $("#delHeart").css('display','none')
+      },
+      error: function() {}
+    })
+    })
+
   });
 })(jQuery);
 
