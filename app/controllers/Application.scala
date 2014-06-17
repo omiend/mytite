@@ -489,6 +489,17 @@ object Application extends Controller with Secured {
     Ok(views.html.about(pager))
   }
 
+  def usage() = Action { implicit request =>
+    // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
+    var twitterUser: Option[TwitterUser] = session.get("twitterId") match {
+      case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
+      case _ => null
+    }
+    // Pagerを初期化
+    val pager: Pager[TwitterUser] = Pager[TwitterUser]("遊び方", 1, 0, twitterUser, Seq.empty)
+    Ok(views.html.usage(pager))
+  }
+
   /*****************************************************************************
    *** Ajax用 javascriptRouter
    *****************************************************************************/

@@ -1,0 +1,122 @@
+@(pager: Pager[TwitterUser])(implicit flash: play.api.mvc.Flash)
+
+@main(pager.title, pager.twitterUser)(flash) {
+
+      <h2>遊び方</h2>
+
+      <div class="row-fluid">
+        <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+          <hr>
+          <h5>右上の「ログイン」から、Twitterアカウントでログインするよ！</h5>
+          <p>
+            <img src="@routes.Assets.at("images/usage/usage01.png")" class="img-responsive img-thumbnail" />
+            <br /><br />
+            <img src="@routes.Assets.at("images/usage/usage02.png")" class="img-responsive img-thumbnail" />
+          </p>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+          <hr>
+          <h5>ログインしたら、右上の「アカウント」→「自分のタイムテーブル」から、フェス一覧画面に移動するよ！</h5>
+          <p>
+            <img src="@routes.Assets.at("images/usage/usage03.png")" class="img-responsive img-thumbnail" />
+          </p>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+          <hr>
+          <h5>「新しくフェスを登録」するボタンから、フェスの登録画面に移動に移動するよ！</h5>
+          <p>
+            <img src="@routes.Assets.at("images/usage/usage04.png")" class="img-responsive img-thumbnail" />
+          </p>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+          <hr>
+          <h5>フェス登録画面で、「フェスの名前」「コメント」「ステージの名前」を入力するよ！入力が終わったら、「登録」ボタンを押してね！<br/>ステージは４つまで登録出来るよ！</h5>
+          <p>
+            <img src="@routes.Assets.at("images/usage/usage05.png")" class="img-responsive img-thumbnail" />
+          </p>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+          <hr>
+          <h5>フェスを登録したら、フェス一覧画面に戻るから、今登録したフェスの「タイムテーブルを見る」ボタン押すと、タイムテーブル画面に移動するよ！</h5>
+          <p>
+            <img src="@routes.Assets.at("images/usage/usage06.png")" class="img-responsive img-thumbnail" />
+          </p>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+          <hr>
+          <h5>次はアーティストを登録して行こう！<br/>タイムテーブルの「アーティストを登録する」ボタンを押して、アーティスト登録画面に移動するよ！</h5>
+          <p>
+            <img src="@routes.Assets.at("images/usage/usage07.png")" class="img-responsive img-thumbnail" />
+          </p>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+          <hr>
+          <h5>「アーティスト名」に好きなアーティストの名前を入力し、「ステージ」と「開演時間」と「パフォーマンスの長さ」を選択したら「保存」ボタンを押してね！</h5>
+          <p>
+            <img src="@routes.Assets.at("images/usage/usage08.png")" class="img-responsive img-thumbnail" />
+          </p>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+          <hr>
+          <h5>これでアーティストの登録が出来たよ！</h5>
+          <p>
+            <img src="@routes.Assets.at("images/usage/usage09.png")" class="img-responsive img-thumbnail" />
+          </p>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+          <hr>
+          <h5><img src="@routes.Assets.at("images/usage/usage10.png")" class="img-responsive img-thumbnail" />を使うとアーティストを簡単に移動出来るよ！</h5>
+          <p>
+            <img src="@routes.Assets.at("images/usage/usage11.png")" class="img-responsive img-thumbnail" /><br /><br />
+            <img src="@routes.Assets.at("images/usage/usage12.png")" class="img-responsive img-thumbnail" />
+          </p>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+          <hr>
+          <h5><img src="@routes.Assets.at("images/usage/usage13.png")" class="img-responsive img-thumbnail" />をクリックすると、ステージ名やアーティスト名を簡単に変更出来るよ！</h5>
+          <p>
+            <img src="@routes.Assets.at("images/usage/usage14.png")" class="img-responsive img-thumbnail" /><br />
+            <img src="@routes.Assets.at("images/usage/usage15.png")" class="img-responsive img-thumbnail" /><br />
+            <img src="@routes.Assets.at("images/usage/usage16.png")" class="img-responsive img-thumbnail" />
+          </p>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+          <hr>
+          <h5>自分だけのタイムテーブルが完成したら、Twitterの友達と共有しよう！</h5>
+          <p>
+            <img src="@routes.Assets.at("images/usage/usage17.png")" class="img-responsive img-thumbnail" />
+          </p>
+        </div>
+      </div>
+
+}
