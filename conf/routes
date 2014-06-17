@@ -4,6 +4,7 @@
 
 # Home page
 GET     /                           controllers.Application.index(p: Int ?= 1)
+GET     /usage                      controllers.Application.usage
 GET     /about                      controllers.Application.about
 
 # Festival
