@@ -18,7 +18,7 @@ case class TimeTable (
     for (stage <- stageList) {
       performanceStageMap.get(stage.id.get) match {
         case Some(perfor) => returnList = returnList :+ perfor
-        case _            => returnList = returnList :+ Performance(null, 0, 0, "", this.timeLabel, TimeTable.TIME_FRAME_030, Some(null), Some(null))
+        case _            => returnList = returnList :+ Performance(null, 0, stage.id.get, "", this.timeLabel, TimeTable.TIME_FRAME_030, Some(null), Some(null))
       }
     }
     returnList

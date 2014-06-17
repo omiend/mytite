@@ -60,6 +60,26 @@ object Heart {
   /**
    * Heartの件数を取得する
    */
+  def countHeartByFestivalId(festivalId: Long): (Long, Boolean) = {
+    DB.withConnection { implicit connection =>
+      // 件数取得
+      val count: Long = SQL(
+        """
+        select count(*)
+          from Heart
+         where festival_id = {festival_id}
+        """
+      ).on(
+        'festival_id -> festivalId
+      ).as(scalar[Long].single)
+      (count, false)
+    }
+  }
+
+  
+  /**
+   * Heartの件数を取得する
+   */
   def findByFestivalAndTwitterId(festivalId: Long, twitterId: Long): (Long, Boolean) = {
     DB.withConnection { implicit connection =>
       // 件数取得

@@ -42,6 +42,7 @@ GET     /javascriptRoutes                             controllers.Application.ja
 # Ajax Stage
 POST    /ajaxUpdateStage                              controllers.Application.ajaxUpdateStage(stageId: Long, stageName: String)
 POST    /ajaxUpdatePerformance                        controllers.Application.ajaxUpdatePerformance(performanceId: Long, artist: String)
+POST    /ajaxUpdatePerformanceByTimeFrame             controllers.Application.ajaxUpdatePerformanceByTimeFrame(performanceId: Long, stageId: Long, time: String)
 
 # Ajax Heart
 POST    /ajaxInsertHeart                              controllers.Application.ajaxInsertHeart(festivalId: Long)

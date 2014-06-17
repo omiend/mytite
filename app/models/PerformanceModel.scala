@@ -10,7 +10,7 @@ import anorm.SqlParser._
 case class Performance (
 	 id        : Pk[Long]
 	,festivalId: Long
-	,stageId   : Long
+	,var stageId   : Long
 	,var artist    : String
 	,var time      : String
 	,var timeFrame : String
