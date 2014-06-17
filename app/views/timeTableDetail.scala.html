@@ -38,23 +38,26 @@
     </div><!--/span-->
   </div><!--/row-->
 
-@pager.twitterUser match {
-  case Some(user) => {
   <div class="row-fluid">
     <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+      <div id="hearts" class="col-7 col-md-7 col-sm-7 col-lg-7"></div>
       <div class="col-2 col-md-2 col-sm-2 col-lg-2">
         <a href="https://twitter.com/share" class="twitter-share-button" data-lang="ja" data-related="omiend" data-hashtags="mytite">ツイート</a>
       </div>
-      <div id="hearts" class="col-10 col-md-10 col-sm-10 col-lg-10">
-        <span id="delHeart" class="glyphicon glyphicon-heart" style="@if(!isExists._2){display:none}">クリックしてハートを送る</span>
-        <span id="addHeart" class="glyphicon glyphicon-heart-empty" style="@if(isExists._2){display:none}">クリックしてハートを送る</span>
+      <div id="hearts" class="col-3 col-md-3 col-sm-3 col-lg-3">
+        @pager.twitterUser match {
+		  case Some(user) => {
+            <span id="delHeart" class="glyphicon glyphicon-heart" style="@if(!isExists._2){display:none}">ハートを送りました</span>
+            <span id="addHeart" class="glyphicon glyphicon-heart-empty" style="@if(isExists._2){display:none}">クリックしてハートを送る</span>
+            <input id="festivalId" type="hidden" value="@festival.id.get" />
+          }
+          case _ => {
+            <span class="glyphicon glyphicon-heart" >=@isExists._1</span>
+          }
+        }
       </div>
-      <input id="festivalId" type="hidden" value="@festival.id.get" />
     </div>
   </div>
-  }
-        case _ => {}
- }
 
   <div class="row-fluid">
     <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
@@ -68,7 +71,7 @@
 		                <th>
 		                  <a id="stageId@stage.id.get" class="stageEditable" href="@routes.Application.editStage(festival.id.get, stage.id.get)">@stage.stageName</a>
 		                  &nbsp;&nbsp;&nbsp;
-		                  <span id="span_stageId@stage.id.get" class="glyphicon glyphicon-pencil"></span>
+		                  <span id="span_stageId@stage.id.get" class="glyphicon glyphicon-edit"></span>
 		                </th>
 		              }
                 }
@@ -90,13 +93,16 @@
                   <td>@timeTable.timeLabel</td>
                     @for(performance <- timeTable.getTimeTableList){
                       @if(performance.id != null){
-                        <td style="border: medium solid #1abc9c" rowspan="@performance.getTableRowSpanNumber">
+                        <td id="@performance.stageId/@timeTable.timeLabel" class="droppable" style="border: medium solid #1abc9c" rowspan="@performance.getTableRowSpanNumber">
+                          <div id="droppable@performance.id.get" class="draggable" >
                           <a id="performanceId@performance.id.get" class="performanceEditable" href="@routes.Application.editPerformance(festival.id.get, performance.id.get)">@performance.artist</a>
                           &nbsp;&nbsp;&nbsp;
-                          <span id="span_performanceId@performance.id.get" class="glyphicon glyphicon-pencil"></span>
+                          <span id="span_performanceId@performance.id.get" class="glyphicon glyphicon-edit"></span>
+                          <span class="glyphicon glyphicon-move"></span>
+                          </div>
                         </td>
                       }else{
-                        <td rowspan="@performance.getTableRowSpanNumber">&nbsp;</td>
+                        <td id="@performance.stageId/@timeTable.timeLabel" class="droppable" rowspan="@performance.getTableRowSpanNumber">&nbsp;</td>
                       }
                     }
                   <td>@timeTable.timeLabel</td>
@@ -135,4 +141,5 @@
   </div><!--/row-->
 
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 }
