@@ -49,5 +49,13 @@
         <div class="col-md-3 col-sm-3 col-lg-3"><p><a href="@routes.Application.deletePerformance(performanceForm.get.festivalId, performanceId)" class="btn btn-danger btn-xs btn-block"">削除</a></p></div>
       </div><!--/span-->
     </div><!--/row-->
+    <script>
+	  $(function() {
+	    // Performance Edit
+	    $("select[name='stageId']").selectpicker({style: 'btn-primary', menuStyle: 'dropdown-inverse'});
+	    $("select[name='time']").selectpicker({style: 'btn-primary', menuStyle: 'dropdown-inverse'});
+	    $("select[name='timeFrame']").selectpicker({style: 'btn-primary', menuStyle: 'dropdown-inverse'});
+	  });
+    </script>
   }
 }

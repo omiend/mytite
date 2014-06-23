@@ -38,16 +38,19 @@ GET     /twitterOAuthCallback                         controllers.TwitterControl
 GET     /twitterLogout                                controllers.TwitterController.twitterLogout
 
 # javascriptRoutes
-GET     /javascriptRoutes                             controllers.Application.javascriptRoutes
+GET     /javascriptRoutes                             controllers.JsRouter.javascriptRoutes
+
+# Ajax Festival
+POST    /ajaxUpdateFestival                           controllers.AjaxController.ajaxUpdateFestival(festivalId: Long, festivalName: String)
 
 # Ajax Stage
-POST    /ajaxUpdateStage                              controllers.Application.ajaxUpdateStage(stageId: Long, stageName: String)
-POST    /ajaxUpdatePerformance                        controllers.Application.ajaxUpdatePerformance(performanceId: Long, artist: String)
-POST    /ajaxUpdatePerformanceByTimeFrame             controllers.Application.ajaxUpdatePerformanceByTimeFrame(performanceId: Long, stageId: Long, time: String)
+POST    /ajaxUpdateStage                              controllers.AjaxController.ajaxUpdateStage(stageId: Long, stageName: String)
+POST    /ajaxUpdatePerformance                        controllers.AjaxController.ajaxUpdatePerformance(performanceId: Long, artist: String)
+POST    /ajaxUpdatePerformanceByTimeFrame             controllers.AjaxController.ajaxUpdatePerformanceByTimeFrame(performanceId: Long, stageId: Long, time: String)
 
 # Ajax Heart
-POST    /ajaxInsertHeart                              controllers.Application.ajaxInsertHeart(festivalId: Long)
-POST    /ajaxDeleteHeart                              controllers.Application.ajaxDeleteHeart(festivalId: Long)
+POST    /ajaxInsertHeart                              controllers.AjaxController.ajaxInsertHeart(festivalId: Long)
+POST    /ajaxDeleteHeart                              controllers.AjaxController.ajaxDeleteHeart(festivalId: Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file                                 controllers.Assets.at(path="/public", file)

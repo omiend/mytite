@@ -13,7 +13,14 @@
   </div><!--/row-->
   <div class="row-fluid">
     <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
-       <H4>@festival.festivalName</H4>
+        @pager.twitterUser match {
+          case Some(user) if user.twitterId==targetTwitterUser.twitterId => {
+            <H4 id="festivalEditable">@festival.festivalName</H4><span id="span_festivalEditable" class="glyphicon glyphicon-edit"></span>
+          }
+          case _ =>{
+            <H4>@festival.festivalName</H4>
+          }
+        }
        <p>@Html(HtmlFormat.escape(festival.description).toString.replace("\n", "<br />").replace("\r", "<br />").replace("\r\n", "<br />"))</p>
     </div><!--/span-->
   </div><!--/row-->
@@ -46,7 +53,7 @@
       </div>
       <div id="hearts" class="col-3 col-md-3 col-sm-3 col-lg-3">
         @pager.twitterUser match {
-		  case Some(user) => {
+      case Some(user) => {
             <span id="delHeart" class="glyphicon glyphicon-heart" style="@if(!isExists._2){display:none}">ハートを送りました</span>
             <span id="addHeart" class="glyphicon glyphicon-heart-empty" style="@if(isExists._2){display:none}">クリックしてハートを送る</span>
             <input id="festivalId" type="hidden" value="@festival.id.get" />
@@ -67,18 +74,18 @@
             <th></th>
               @pager.twitterUser match {
                 case Some(user) if user.twitterId==targetTwitterUser.twitterId => {
-		              @for(stage <- stageList){
-		                <th>
-		                  <a id="stageId@stage.id.get" class="stageEditable" href="@routes.Application.editStage(festival.id.get, stage.id.get)">@stage.stageName</a>
-		                  &nbsp;&nbsp;&nbsp;
-		                  <span id="span_stageId@stage.id.get" class="glyphicon glyphicon-edit"></span>
-		                </th>
-		              }
+                  @for(stage <- stageList){
+                    <th>
+                      <a id="stageId@stage.id.get" class="stageEditable" href="@routes.Application.editStage(festival.id.get, stage.id.get)">@stage.stageName</a>
+                      &nbsp;&nbsp;&nbsp;
+                      <span id="span_stageId@stage.id.get" class="glyphicon glyphicon-edit"></span>
+                    </th>
+                  }
                 }
                 case _ =>{
-		              @for(stage <- stageList){
-		                <th>@stage.stageName</th>
-		              }
+                  @for(stage <- stageList){
+                    <th>@stage.stageName</th>
+                  }
                 }
               }
             <th></th>
@@ -142,22 +149,106 @@
 
   <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
   <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-  <script>
-      $(".draggable").draggable({ 
+  @pager.twitterUser match {
+    case Some(user) if user.twitterId==targetTwitterUser.twitterId => {
+      <script>
+        $(function() {
+          // Ajax Updates
+          // Festival Name更新処理
+          $('#festivalEditable').editable({trigger : $("#span_festivalEditable"), action : "click"}, function(e){
+            jsRoutes.controllers.AjaxController.ajaxUpdateFestival($("#festivalId").val(), e.value).ajax({
+              beforeSend: function() {},
+              complete: function() {},
+              success: function() {
+                $("#festivalEditable_error").remove();
+                $("#festivalEditable").css({color:"#34495e"});
+              },
+              error: function() {
+                $("#festivalEditable_error").remove();
+                $("#festivalEditable").css({color:"#ff0000"});
+                $("#span_festivalEditable").append("<div id=\"festivalEditable_error\" style=\"color:#ff0000\">文字が長すぎる様です（20文字まで）<div/>");
+            }
+          })
+        });
+        // Stage Name更新処理
+        $(".stageEditable").each(function(){
+            var id = this.id
+            $('#' + id).editable({trigger : $("#span_" + id), action : "click"}, function(e){
+              jsRoutes.controllers.AjaxController.ajaxUpdateStage(e.target.selector.replace("#stageId", ""), e.value).ajax({
+                beforeSend: function() {},
+                complete: function() {},
+                success: function() {
+                    $("#"+ id + "_error").remove();
+                    $("#" + id).css({color:"#1abc9c"});
+                },
+                error: function() {
+                    $("#"+ id + "_error").remove();
+                    $("#span_" + id).append("<div id=\"" + id + "_error\" style=\"color:#ff0000\">文字が長すぎる様です（20文字まで）<div/>");
+                    $("#" + id).css({color:"#ff0000"});
+                }
+              })
+            });
+        });
+        // Artist Name更新処理
+        $(".performanceEditable").each(function(){
+            var id = this.id
+            $('#' + id).editable({trigger : $("#span_" + id), action : "click"}, function(e){
+              jsRoutes.controllers.AjaxController.ajaxUpdatePerformance(e.target.selector.replace("#performanceId", ""), e.value).ajax({
+                beforeSend: function() {},
+                complete: function() {},
+                success: function() {
+                    $("#"+ id + "_error").remove();
+                    $("#" + id).css({color:"#1abc9c"});
+                },
+                error: function() {
+                    $("#"+ id + "_error").remove();
+                    $("#span_" + id).append("<div id=\"" + id + "_error\" style=\"color:#ff0000\">文字が長すぎる様です（20文字まで）<div/>");
+                    $("#" + id).css({color:"#ff0000"});
+                }
+              })
+            });
+        });
+        // Heart
+        $("#addHeart").on("click", function(){
+            jsRoutes.controllers.AjaxController.ajaxInsertHeart($("#festivalId").val()).ajax({
+              beforeSend: function() {},
+              complete: function() {},
+              success: function() {
+                $("#addHeart").css('display','none')
+                $("#delHeart").css('display','block')
+              },
+              error: function() {}
+            })
+        })
+        $("#delHeart").on("click", function(){
+            jsRoutes.controllers.AjaxController.ajaxDeleteHeart($("#festivalId").val()).ajax({
+              beforeSend: function() {},
+              complete: function() {},
+              success: function(returnData) {
+                $("#addHeart").css('display','block')
+                $("#delHeart").css('display','none')
+              },
+              error: function() {}
+            })
+        })
+        $(".draggable").draggable({
            snap: ".droppable"
           ,handle: "span.glyphicon-move"
           ,revert: "invalid"
+        });
+        $(".droppable").droppable({
+          drop: function( event, ui ) {
+            jsRoutes.controllers.AjaxController.ajaxUpdatePerformanceByTimeFrame(ui.draggable[0].id.replace("droppable", ""), $(this)[0].id.split("/")[0], $(this)[0].id.split("/")[1]).ajax({
+              beforeSend: function() {},
+              complete: function() {},
+              success: function() {window.location.reload()},
+              error: function() {}
+            })
+          }
+        });
       });
-      // TimeTable
-      $(".droppable").droppable({
-        drop: function( event, ui ) {
-          jsRoutes.controllers.Application.ajaxUpdatePerformanceByTimeFrame(ui.draggable[0].id.replace("droppable", ""), $(this)[0].id.split("/")[0], $(this)[0].id.split("/")[1]).ajax({
-            beforeSend: function() {},
-            complete: function() {},
-            success: function() {window.location.reload()},
-            error: function() {}
-          })
-        }
-      });
-  </script>
+    </script>
+    }
+    case _ => {}
+  }
 }

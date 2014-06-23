@@ -114,7 +114,7 @@ object Application extends Controller with Secured {
     
     // Festival一覧を取得し、既に３件登録されている場合はエラー
     Festival.findFromTo(twitterId.toLong, 1, 3) match {
-      case resultTuple if resultTuple._2.toInt >= 3 => Redirect(routes.Application.festival(1, twitterId.toLong)).flashing("error" -> " フェスは３件までしか登録できません")
+      case resultTuple if resultTuple._2.toInt >= 1 => Redirect(routes.Application.festival(1, twitterId.toLong)).flashing("error" -> "申し訳ございませんが、フェスは１件までしか登録できません！そのうち沢山登録出来るようにします！")
       case _ => Ok(views.html.createFestival(pager, festivalAndStageForm))
     }
   }
@@ -498,94 +498,5 @@ object Application extends Controller with Secured {
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("遊び方", 1, 0, twitterUser, Seq.empty)
     Ok(views.html.usage(pager))
-  }
-
-  /*****************************************************************************
-   *** Ajax用 javascriptRouter
-   *****************************************************************************/
-  def javascriptRoutes = Action { implicit request =>
-      import routes.javascript._
-      Ok(
-        Routes.javascriptRouter("jsRoutes")(
-           routes.javascript.Application.ajaxUpdateStage
-          ,routes.javascript.Application.ajaxUpdatePerformance
-          ,routes.javascript.Application.ajaxUpdatePerformanceByTimeFrame
-          ,routes.javascript.Application.ajaxInsertHeart
-          ,routes.javascript.Application.ajaxDeleteHeart
-        )
-      ).as("text/javascript")
-  }
-  
-  /*****************************************************************************
-   *** Ajax用 Stage更新処理
-   *****************************************************************************/
-  def ajaxUpdateStage(stageId: Long, stageName: String) = IsAuthenticated { twitterId => implicit request =>
-    Stage.findById(stageId) match {
-      case Some(stage) if stage.stageName != stageName => {
-        def nowDate: java.util.Date = new java.util.Date
-        stage.stageName = stageName
-        stage.updateDate = Some(nowDate)
-        Stage.update(stageId, stage)
-        Ok
-      }
-      case Some(stage) if stage.stageName == stageName => Ok
-      case _ => BadRequest
-    }
-  }
-  
-  /*****************************************************************************
-   *** Ajax用 Performance更新処理
-   *****************************************************************************/
-  def ajaxUpdatePerformance(performanceId: Long, artist: String) = IsAuthenticated { twitterId => implicit request =>
-    Performance.findById(performanceId) match {
-      case Some(performance) if performance.artist != artist => {
-        def nowDate: java.util.Date = new java.util.Date
-        performance.artist = artist
-        performance.updateDate = Some(nowDate)
-        Performance.update(performanceId, performance)
-        Ok
-      }
-      case Some(performance) if performance.artist == artist => Ok
-      case _ => BadRequest
-    }
-  }
-
-    def ajaxUpdatePerformanceByTimeFrame(performanceId: Long, stageId: Long, time: String) = IsAuthenticated { twitterId => implicit request =>
-    Performance.findById(performanceId) match {
-      case Some(performance)  => {
-        def nowDate: java.util.Date = new java.util.Date
-        performance.stageId = stageId
-        performance.time = time
-        performance.updateDate = Some(nowDate)
-        Performance.update(performanceId, performance)
-        Ok
-      }
-      case _ => BadRequest
-    }
-  }
-
-  /*****************************************************************************
-   *** Ajax用 Heart処理
-   *****************************************************************************/
-  def ajaxInsertHeart(festivalId: Long) = IsAuthenticated { twitterId => implicit request =>
-    Festival.findById(festivalId) match {
-      case Some(festival) => {
-        def nowDate: java.util.Date = new java.util.Date
-        var heart: Heart = Heart(
-           null
-          ,festivalId
-          ,twitterId.toLong
-          ,Some(nowDate)
-          ,Some(nowDate)
-        )
-        Heart.insert(heart)
-        Ok
-      }
-      case _ => BadRequest
-    }
-  }
-  def ajaxDeleteHeart(festivalId: Long) = IsAuthenticated { twitterId => implicit request =>
-    Heart.delete(festivalId, twitterId.toLong)
-    Ok
   }
 }
