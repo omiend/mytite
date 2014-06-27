@@ -55,7 +55,7 @@ object AjaxController extends Controller with Secured {
    *****************************************************************************/
   def ajaxUpdatePerformance(performanceId: Long, artist: String) = IsAuthenticated { twitterId => implicit request =>
     Performance.findById(performanceId) match {
-      case Some(performance) if artist.length > 20 => BadRequest
+      case Some(performance) if artist.length > 35 => BadRequest
       case Some(performance) if performance.artist != artist => {
         def nowDate: java.util.Date = new java.util.Date
         performance.artist = artist

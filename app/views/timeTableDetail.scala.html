@@ -53,7 +53,7 @@
       </div>
       <div id="hearts" class="col-3 col-md-3 col-sm-3 col-lg-3">
         @pager.twitterUser match {
-      case Some(user) => {
+          case Some(user) => {
             <span id="delHeart" class="glyphicon glyphicon-heart" style="@if(!isExists._2){display:none}">ハートを送りました</span>
             <span id="addHeart" class="glyphicon glyphicon-heart-empty" style="@if(isExists._2){display:none}">クリックしてハートを送る</span>
             <input id="festivalId" type="hidden" value="@festival.id.get" />
@@ -92,7 +92,7 @@
           </tr>
         </thead>
         @pager.twitterUser match {
-          case Some(user) => {
+          case Some(user) if user.twitterId==targetTwitterUser.twitterId => {
             <tbody>
               <tr></tr>
               @for(timeTable <- timeTableList){

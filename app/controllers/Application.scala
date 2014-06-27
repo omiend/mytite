@@ -25,7 +25,7 @@ object Application extends Controller with Secured {
        "id"         -> ignored(NotAssigned: Pk[Long])
       ,"festivalId" -> of[Long]
       ,"stageId"    -> of[Long]
-      ,"artist"     -> nonEmptyText(maxLength = 20)
+      ,"artist"     -> nonEmptyText(maxLength = 35)
       ,"time"       -> text
       ,"timeFrame"  -> text
       ,"createDate" -> optional(date("yyyy-MM-dd"))
