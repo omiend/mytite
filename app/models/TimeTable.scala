@@ -5,23 +5,18 @@ import play.api.Play.current
 import anorm.Pk
 
 /** TimeTable Structure */
-case class TimeTable (
-   val timeLabel: String
-  ,var stageList: Seq[Stage]
-) {
+case class TimeTable(val timeLabel: String, var stageList: Seq[Stage]) {
 
   // キーはStage.id
   var performanceStageMap: Map[Long, Performance] = Map()
 
   def getTimeTableList: Seq[Performance] = {
-    var returnList: Seq[Performance] = Seq.empty
-    for (stage <- stageList) {
+    stageList map { stage =>
       performanceStageMap.get(stage.id.get) match {
-        case Some(perfor) => returnList = returnList :+ perfor
-        case _            => returnList = returnList :+ Performance(null, 0, stage.id.get, "", this.timeLabel, TimeTable.TIME_FRAME_030, Some(null), Some(null))
+        case Some(performance) => performance
+        case _                 => Performance(null, 0, stage.id.get, "", this.timeLabel, TimeTable.TIME_FRAME_030, Some(null), Some(null))
       }
     }
-    returnList
   }
 }
 
@@ -81,39 +76,10 @@ object TimeTable {
     ,TIME_LABEL_2130
   )
 
-  // /** TIME_LABELの値を数値に変換したMap */
-  // lazy val TIME_LABEL_CONVERT_INTEGER: Map[String, Int] = Map(
-  //    (TIME_LABEL_1000, 1000)
-  //   ,(TIME_LABEL_1030, 1030)
-  //   ,(TIME_LABEL_1100, 1100)
-  //   ,(TIME_LABEL_1130, 1130)
-  //   ,(TIME_LABEL_1200, 1200)
-  //   ,(TIME_LABEL_1230, 1230)
-  //   ,(TIME_LABEL_1300, 1300)
-  //   ,(TIME_LABEL_1330, 1330)
-  //   ,(TIME_LABEL_1400, 1400)
-  //   ,(TIME_LABEL_1430, 1430)
-  //   ,(TIME_LABEL_1500, 1500)
-  //   ,(TIME_LABEL_1530, 1530)
-  //   ,(TIME_LABEL_1600, 1600)
-  //   ,(TIME_LABEL_1630, 1630)
-  //   ,(TIME_LABEL_1700, 1700)
-  //   ,(TIME_LABEL_1730, 1730)
-  //   ,(TIME_LABEL_1800, 1800)
-  //   ,(TIME_LABEL_1830, 1830)
-  //   ,(TIME_LABEL_1900, 1900)
-  //   ,(TIME_LABEL_1930, 1930)
-  //   ,(TIME_LABEL_2000, 2000)
-  //   ,(TIME_LABEL_2030, 2030)
-  //   ,(TIME_LABEL_2100, 2100)
-  //   ,(TIME_LABEL_2130, 2130)
-  // )
-  
   /** 時間リストのSelectOptions */
   lazy val TIME_LABEL_SELECTOPTIONS: Seq[(String, String)] = {
-    var returnData: Seq[(String, String)] = Seq.empty
-    TIME_LABEL_LIST.map { timeLabel =>
-      returnData = returnData :+ (timeLabel, timeLabel)
+    val returnData: Seq[(String, String)] = TIME_LABEL_LIST map { timeLabel =>
+      (timeLabel, timeLabel)
     }
     returnData
   }
@@ -123,6 +89,7 @@ object TimeTable {
   val TIME_FRAME_060: String = "60"
   val TIME_FRAME_090: String = "90"
   val TIME_FRAME_120: String = "120"
+
   /** 時間枠リスト */
   lazy val TIME_FRAME_LIST: Seq[String] = Seq[String](
      TIME_FRAME_030
@@ -133,11 +100,61 @@ object TimeTable {
 
   /** 時間リストのSelectOptions */
   lazy val TIME_FRAME_SELECTOPTIONS: Seq[(String, String)] = {
-    var returnData: Seq[(String, String)] = Seq.empty
-    TIME_FRAME_LIST.map { timeLabel =>
-      returnData = returnData :+ (timeLabel, timeLabel + "分")
+    var returnData: Seq[(String, String)] = TIME_FRAME_LIST map { timeLabel =>
+      (timeLabel, timeLabel + "分")
     }
     returnData
+  }
+
+  /** TimeTables作成 */
+  def createTimeTable(festivalId: Long, stageList: Seq[Stage]): Seq[TimeTable] = {
+
+    // 返却用 & 初期化
+    val timeTableList: Seq[TimeTable] = TimeTable.TIME_LABEL_LIST map { timeLabel =>
+      TimeTable(timeLabel, stageList)
+    }
+
+    // 時間ラベル順に処理
+    TIME_LABEL_LIST foreach { timeLabel =>
+      // ステージごとの処理
+      stageList foreach { stage =>
+        // 取得したパフォーマンスごとの処理
+        Performance.findByFestivalId(festivalId) collect {
+          // パフォーマンスの時間ラベルとステージIDを指定
+          case performance if timeLabel == performance.time && stage.id.get == performance.stageId => {
+            timeTableList collect {
+              case timeTable if timeLabel == timeTable.timeLabel => timeTable.performanceStageMap = timeTable.performanceStageMap + (stage.id.get -> performance)
+              case _ =>
+            }
+          }
+          case _ =>
+        }
+      }
+    }
+
+    // --- 時間枠を表上で結合する処理 --- //
+    timeTableList foreach { tmpTimeTable =>
+      stageList foreach { stage =>
+        tmpTimeTable.performanceStageMap.get(stage.id.get) match {
+          case Some(tmpPerformance) if tmpPerformance.getTableRowSpanNumber > 1 => {
+            val deleteTimeLabel: Seq[String] = TimeTable.getTimeLabelByTargetRange(tmpPerformance.getTableRowSpanNumber, tmpPerformance.time)
+            timeTableList collect {
+              case timeTable if deleteTimeLabel.contains(timeTable.timeLabel) => {
+                // Stageを削除
+                timeTable.stageList = timeTable.stageList.filter { _ != stage }
+                // 削除
+                timeTable.performanceStageMap = timeTable.performanceStageMap - stage.id.get
+              }
+              case _ =>
+            }
+          }
+          case _ =>
+        }
+      }
+    }
+
+    // 返却
+    timeTableList
   }
 
   /** 指定した数字の数だけ、指定したTIME_LABEL＋１件目の値を取得する */
@@ -148,73 +165,9 @@ object TimeTable {
       case timeLabelCollect if timeLabel == timeLabelCollect._1 => {
         targetIndex = timeLabelCollect._2
       }
-      case _ => 
+      case _ =>
     }
     returnSet = TIME_LABEL_LIST.slice(targetIndex + 1, targetIndex + targetRange)
     returnSet
-  }
-  
-  /** TimeTables作成 */
-  def createTimeTable(festivalId: Long, stageList: Seq[Stage]): Seq[TimeTable] = {
-
-    // Stageの名前リスト
-    var stageNameList: Seq[Stage] = Seq.empty
-    stageList.map { stage =>
-      stageNameList = stageNameList :+ stage
-    }
-
-    // Performance取得
-    var performanceList: Seq[Performance] = Performance.findByFestivalId(festivalId)
-
-    // 返却用 & 初期化
-    var timeTableList: Seq[TimeTable] = Seq.empty
-    TimeTable.TIME_LABEL_LIST map { timeLabel =>
-      timeTableList = timeTableList :+ TimeTable(timeLabel, stageNameList)
-    }
-
-    // 時間ラベル順に処理
-    TimeTable.TIME_LABEL_LIST.map { timeLabel =>
-      // ステージごとの処理
-      stageList.map { stage =>
-        // 取得したパフォーマンスごとの処理
-        performanceList.collect {
-          // パフォーマンスの時間ラベルとステージIDを指定
-          case performance if timeLabel == performance.time && stage.id.get == performance.stageId => {
-            timeTableList.collect {
-              case timeTable if timeLabel == timeTable.timeLabel => {
-                timeTable.performanceStageMap = timeTable.performanceStageMap + (stage.id.get -> performance)
-              }
-            }
-          }
-          case _ => {}
-        }
-      }
-    }
-
-    // --- 時間枠を表上で結合する処理 --- //
-    timeTableList.map { tmpTimeTable =>
-      stageList.map { stage =>
-        tmpTimeTable.performanceStageMap.get(stage.id.get) match {
-          case Some(tmpPerformance) => {
-            if (tmpPerformance.getTableRowSpanNumber > 1) {
-              val deleteTimeLabel: Seq[String] = TimeTable.getTimeLabelByTargetRange(tmpPerformance.getTableRowSpanNumber, tmpPerformance.time)
-              timeTableList.collect {
-                case timeTable if deleteTimeLabel.contains(timeTable.timeLabel) => {
-                  // Stageを削除
-                  timeTable.stageList = timeTable.stageList.filter { _ != stage }
-                  // 削除
-                  timeTable.performanceStageMap = timeTable.performanceStageMap - stage.id.get
-                }
-                case _ => {} // 何もしない
-              }
-            }
-          }
-          case _ => {} // 何もしない
-        }
-      }
-    }
-
-    // 返却
-    timeTableList
   }
 }
