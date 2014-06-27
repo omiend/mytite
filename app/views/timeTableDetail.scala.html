@@ -55,7 +55,7 @@
         @pager.twitterUser match {
           case Some(user) => {
             <span id="delHeart" class="glyphicon glyphicon-heart" style="@if(!isExists._2){display:none}">ハートを送りました</span>
-            <span id="addHeart" class="glyphicon glyphicon-heart-empty" style="@if(isExists._2){display:none}">クリックしてハートを送る</span>
+            <span id="addHeart" class="glyphicon glyphicon-heart-empty" style="@if(isExists._2){display:none}">←クリックしてハートを送る</span>
             <input id="festivalId" type="hidden" value="@festival.id.get" />
           }
           case _ => {
@@ -208,29 +208,6 @@
               })
             });
         });
-        // Heart
-        $("#addHeart").on("click", function(){
-            jsRoutes.controllers.AjaxController.ajaxInsertHeart($("#festivalId").val()).ajax({
-              beforeSend: function() {},
-              complete: function() {},
-              success: function() {
-                $("#addHeart").css('display','none')
-                $("#delHeart").css('display','block')
-              },
-              error: function() {}
-            })
-        })
-        $("#delHeart").on("click", function(){
-            jsRoutes.controllers.AjaxController.ajaxDeleteHeart($("#festivalId").val()).ajax({
-              beforeSend: function() {},
-              complete: function() {},
-              success: function(returnData) {
-                $("#addHeart").css('display','block')
-                $("#delHeart").css('display','none')
-              },
-              error: function() {}
-            })
-        })
         $(".draggable").draggable({
            snap: ".droppable"
           ,handle: "span.glyphicon-move"
@@ -251,4 +228,29 @@
     }
     case _ => {}
   }
+  <script>
+    // Heart
+    $("#addHeart").on("click", function(){
+        jsRoutes.controllers.AjaxController.ajaxInsertHeart($("#festivalId").val()).ajax({
+          beforeSend: function() {},
+          complete: function() {},
+          success: function() {
+            $("#addHeart").css('display','none')
+            $("#delHeart").css('display','block')
+          },
+          error: function() {}
+        })
+    })
+    $("#delHeart").on("click", function(){
+        jsRoutes.controllers.AjaxController.ajaxDeleteHeart($("#festivalId").val()).ajax({
+          beforeSend: function() {},
+          complete: function() {},
+          success: function(returnData) {
+            $("#addHeart").css('display','block')
+            $("#delHeart").css('display','none')
+          },
+          error: function() {}
+        })
+    })
+  </script
 }
