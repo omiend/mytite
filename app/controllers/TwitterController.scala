@@ -34,7 +34,7 @@ object TwitterController extends Controller {
       // Twitterのアプリケーション承認キャンセル時
       case Some(denied) => {
         // SessionからTwitterIdを削除し、return
-        Redirect(routes.Application.index(1)).withSession(session - "twitterId")
+        Redirect(routes.Application.index(1)).withSession(request.session - "twitterId")
       }
       // Twitterのアプリケーション承認時
       case _ => {
@@ -101,6 +101,6 @@ object TwitterController extends Controller {
     // Pager初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("とっぷ", 1, 0, null, Seq.empty)
     // SessionからTwitterIdを削除
-    Redirect(routes.Application.index(1)).withSession(session - "twitterId")
+    Redirect(routes.Application.index(1)).withSession(request.session - "twitterId")
   }
 }

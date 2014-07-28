@@ -5,6 +5,7 @@ import play.api.db._
 import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
+import anorm.features.anyToStatement
 import scala.collection.immutable.Map
 
 /** Festival Table */
@@ -157,8 +158,8 @@ object Festival {
         ,'twitter_id    -> festival.twitterId
         ,'festival_name -> festival.festivalName
         ,'description   -> festival.description
-        ,'create_date   -> festival.createDate
-        ,'update_date   -> festival.updateDate
+        ,'create_date   -> festival.createDate.get
+        ,'update_date   -> festival.updateDate.get
       ).executeUpdate()
     }
   }
@@ -180,7 +181,7 @@ object Festival {
          'id            -> festival.id
         ,'festival_name -> festival.festivalName
         ,'description   -> festival.description
-        ,'update_date   -> festival.updateDate
+        ,'update_date   -> festival.updateDate.get
       ).executeUpdate()
     }
   }
@@ -213,8 +214,8 @@ object Festival {
         ,'twitter_id    -> festival.twitterId
         ,'festival_name -> festival.festivalName
         ,'description   -> festival.description
-        ,'create_date   -> festival.createDate
-        ,'update_date   -> festival.updateDate
+        ,'create_date   -> festival.createDate.get
+        ,'update_date   -> festival.updateDate.get
       ).executeInsert()
 
       // --- Stage作成処理 --- //
@@ -244,8 +245,8 @@ object Festival {
             ,'stage_name  -> stageName
             ,'sort        -> "%03d".format(index).toString
             ,'color       -> "white"
-            ,'create_date -> festival.createDate
-            ,'update_date -> festival.updateDate
+            ,'create_date -> festival.createDate.get
+            ,'update_date -> festival.updateDate.get
           ).executeInsert()
           index = index + 1
         }

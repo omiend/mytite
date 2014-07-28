@@ -5,6 +5,7 @@ import play.api.db._
 import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
+import anorm.features.anyToStatement
 import play.api.data.Mapping
 
 /** Stage Master */
@@ -173,8 +174,8 @@ object Stage {
         ,'stage_name  -> stage.stageName
         ,'sort        -> stage.sort
         ,'color       -> stage.color
-        ,'create_date -> stage.createDate
-        ,'update_date -> stage.updateDate
+        ,'create_date -> stage.createDate.get
+        ,'update_date -> stage.updateDate.get
       ).executeInsert()
 
     }
@@ -195,7 +196,7 @@ object Stage {
       ).on(
          'id          -> stageId
         ,'stage_name  -> stage.stageName
-        ,'update_date -> stage.updateDate
+        ,'update_date -> stage.updateDate.get
       ).executeUpdate()
     }
   }

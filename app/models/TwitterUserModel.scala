@@ -5,6 +5,7 @@ import play.api.db._
 import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
+import anorm.features.anyToStatement
 
 /** Twitter Table */
 case class TwitterUser (
@@ -178,8 +179,8 @@ object TwitterUser {
         ,'twitter_description         -> twitterUser.twitterDescription
         ,'twitter_access_token        -> twitterUser.twitterAccessToken
         ,'twitter_access_token_secret -> twitterUser.twitterAccessTokenSecret
-        ,'create_date                 -> twitterUser.createDate
-        ,'update_date                 -> twitterUser.updateDate
+        ,'create_date                 -> twitterUser.createDate.get
+        ,'update_date                 -> twitterUser.updateDate.get
       ).executeUpdate()
     }
   }
@@ -209,7 +210,7 @@ object TwitterUser {
         ,'twitter_description         -> twitterUser.twitterDescription
         ,'twitter_access_token        -> twitterUser.twitterAccessToken
         ,'twitter_access_token_secret -> twitterUser.twitterAccessTokenSecret
-        ,'update_date                 -> twitterUser.updateDate
+        ,'update_date                 -> twitterUser.updateDate.get
       ).executeUpdate()
     }
   }
