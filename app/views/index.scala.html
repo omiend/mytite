@@ -16,18 +16,18 @@
      <div class="row-fluid">
        @for(user <- pager.dataList){
        <div class="col-md-4 col-sm-4 col-lg-4">
-           <div class="row-fluid">
-             <div class="col-xs-2 col-md-2 col-sm-2 col-lg-2"><img src="@user.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded"></div>
-             <div class="col-xs-10 col-md-10 col-sm-10 col-lg-10">
-               @user.twitterName<br />
-               <a href="https://twitter.com/@user.twitterScreenName" target=”_blank”>&#64;@user.twitterScreenName</a>
-             </div>
+         <div class="row-fluid">
+           <div class="col-xs-2 col-md-2 col-sm-2 col-lg-2"><img src="@user.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded"></div>
+           <div class="col-xs-10 col-md-10 col-sm-10 col-lg-10">
+             @user.twitterName<br />
+             <a href="https://twitter.com/@user.twitterScreenName" target=”_blank”>&#64;@user.twitterScreenName</a>
            </div>
-           <p>
-             <span class="glyphicon glyphicon-heart">送られたハートの総数=@user.heartCount</span>
-             <br />
-             @user.twitterDescription
-             <a class="btn btn-primary btn-large btn-block" href="@routes.Application.festival(1, user.twitterId)">&#64;@user.twitterScreenName のフェスをみる &raquo;</a>
+         </div>
+         <p>
+           <span class="glyphicon glyphicon-heart">送られたハートの総数=@user.heartCount</span>
+           <br />
+           @user.twitterDescription
+           <a class="btn btn-primary btn-large btn-block" href="@routes.Application.festival(1, user.twitterId)">&#64;@user.twitterScreenName のフェスをみる &raquo;</a>
          </p>
        </div><!--/span-->
        }

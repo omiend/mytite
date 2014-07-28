@@ -60,7 +60,7 @@ object Application extends Controller with Secured {
    *****************************************************************************/
   def index(pageNum: Int) = Action { implicit request =>
     // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = session.get("twitterId") match {
+    var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
       case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
       case _ => null
     }
@@ -80,7 +80,7 @@ object Application extends Controller with Secured {
    *****************************************************************************/
   def festival(pageNum: Int, targetTwitterId: Long) = Action { implicit request =>
     // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = session.get("twitterId") match {
+    var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
       case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
       case _ => null
     }
@@ -445,7 +445,7 @@ object Application extends Controller with Secured {
   def timetable(targetTwitterId: Long, festivalId: Long) = Action { implicit request =>
     var isExists: (Long, Boolean) = (0, false)
     // セッションからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = session.get("twitterId") match {
+    var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
       case Some(twitterId) => {
         isExists = Heart.findByFestivalAndTwitterId(festivalId, twitterId.toLong)
         TwitterUser.getByTwitterId(twitterId.toLong)
@@ -480,7 +480,7 @@ object Application extends Controller with Secured {
    *****************************************************************************/
   def about() = Action { implicit request =>
     // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = session.get("twitterId") match {
+    var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
       case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
       case _ => null
     }
@@ -491,7 +491,7 @@ object Application extends Controller with Secured {
 
   def usage() = Action { implicit request =>
     // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = session.get("twitterId") match {
+    var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
       case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
       case _ => null
     }

@@ -61,18 +61,28 @@
       </div> <!-- /row -->
 
       <div class="row row-offcanvas row-offcanvas-right">
-        <div class="col-xs-12 col-sm-12">
-            @flash.get("success").map { message => <div class="alert alert-success">@message</div> }
-            @flash.get("warning").map { message => <div class="alert alert-warning">@message</div> }
-            @flash.get("error").map { message => <div class="alert alert-danger">@message</div> }
-            <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-            <!-- mytite01 -->
-            <ins class="adsbygoogle" style="display:inline-block;width:728px;height:90px" data-ad-client="ca-pub-7320220894167788" data-ad-slot="5538078553"></ins>
-            <script>
-            (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
-            @content
-        </div><!--/span-->
+        <div class="col-xs-12 hidden-md hidden-sm hidden-lg">
+          <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+          <!-- mytite02 -->
+          <ins class="adsbygoogle" style="display:inline-block;width:300px;height:250px" data-ad-client="ca-pub-7320220894167788" data-ad-slot="7037087350"></ins>
+          <script>
+          (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </div>
+        <div class="col-md-12 col-sm-12 col-lg-12 hidden-xs">
+          <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+          <!-- mytite01 -->
+          <ins class="adsbygoogle" style="display:inline-block;width:728px;height:90px" data-ad-client="ca-pub-7320220894167788" data-ad-slot="5538078553"></ins>
+          <script>
+          (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </div>
+        <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+          @flash.get("success").map { message => <div class="alert alert-success">@message</div> }
+          @flash.get("warning").map { message => <div class="alert alert-warning">@message</div> }
+          @flash.get("error").map { message => <div class="alert alert-danger">@message</div> }
+          @content
+        </div>
       </div><!--/row-->
 
     </div> <!-- /container -->
@@ -80,7 +90,7 @@
     <footer>
       <div class="container">
         <div class="row">
-          <div class="col-xs-7 col-md-7 col-sm-7 col-lg-7">
+          <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
             <h3 class="footer-title">自分だけのタイムテーブルを作って遊ぼう！マイタイテ！</h3>
             <p>Copyright © 2014 <a href="https://twitter.com/omiend" target="_blank">&#64;omiend</a> All Rights Reserved.</p>
           </div>

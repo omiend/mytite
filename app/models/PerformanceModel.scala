@@ -5,6 +5,7 @@ import play.api.db._
 import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
+import anorm.features.anyToStatement
 
 /** Performance Table */
 case class Performance (
@@ -103,6 +104,7 @@ object Performance {
    * Performance Insert処理
    */
   def insart(performance: Performance) {
+
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -130,8 +132,8 @@ object Performance {
         ,'artist      -> performance.artist
         ,'time        -> performance.time
         ,'time_frame  -> performance.timeFrame
-        ,'create_date -> performance.createDate
-        ,'update_date -> performance.updateDate
+        ,'create_date -> performance.createDate.get
+        ,'update_date -> performance.updateDate.get
       ).executeInsert()
     }
   }
@@ -157,7 +159,7 @@ object Performance {
         ,'artist      -> performance.artist
         ,'time        -> performance.time
         ,'time_frame  -> performance.timeFrame
-        ,'update_date -> performance.updateDate
+        ,'update_date -> performance.updateDate.get
       ).executeUpdate()
     }
   }
