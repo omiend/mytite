@@ -68,6 +68,9 @@ object TwitterUser {
    * TwitterUser twitter_idを指定して取得
    */
   def getByTwitterId(twitterId: Long): Option[TwitterUser] = {
+    val params = Seq[NamedParameter](
+       'twitter_id -> twitterId
+    )
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -76,7 +79,7 @@ object TwitterUser {
            where twitter_id = {twitter_id}
         """
       ).on(
-        'twitter_id -> twitterId
+        params: _*
       ).as(
         TwitterUser.simple.singleOpt
       )
@@ -87,6 +90,10 @@ object TwitterUser {
    * TwitterUser from-toで件数を指定して取得
    */
   def findFromTo(offset: Int, maxPageCount: Int) = {
+    val params = Seq[NamedParameter](
+         'offset       -> offset
+        ,'maxPageCount -> maxPageCount
+    )
     DB.withConnection { implicit connection =>
 
       // 親テーブル取得
@@ -97,8 +104,7 @@ object TwitterUser {
           limit {maxPageCount} offset {offset}
         """
       ).on(
-        'offset       -> offset,
-        'maxPageCount -> maxPageCount
+        params: _*
       ).as(
         TwitterUser.simple *
       )
@@ -125,8 +131,7 @@ object TwitterUser {
          limit {maxPageCount} offset {offset}
         """
       ).on(
-        'offset       -> offset,
-        'maxPageCount -> maxPageCount
+        params: _*
       ).as(
         TwitterUser.heartCount *
       ) map { countHeart =>
@@ -145,6 +150,18 @@ object TwitterUser {
    * TwitterUser Insert処理
    */
   def insart(twitterUser: TwitterUser) {
+    val params = Seq[NamedParameter](
+         'id                          -> twitterUser.id.get
+        ,'twitter_id                  -> twitterUser.twitterId
+        ,'twitter_name                -> twitterUser.twitterName
+        ,'twitter_screen_name         -> twitterUser.twitterScreenName
+        ,'twitter_profiel_image_url   -> twitterUser.twitterProfielImageUrl
+        ,'twitter_description         -> twitterUser.twitterDescription
+        ,'twitter_access_token        -> twitterUser.twitterAccessToken
+        ,'twitter_access_token_secret -> twitterUser.twitterAccessTokenSecret
+        ,'create_date                 -> twitterUser.createDate.get
+        ,'update_date                 -> twitterUser.updateDate.get
+    )
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -171,16 +188,7 @@ object TwitterUser {
           )
         """
       ).on(
-         'id                          -> twitterUser.id
-        ,'twitter_id                  -> twitterUser.twitterId
-        ,'twitter_name                  -> twitterUser.twitterName
-        ,'twitter_screen_name         -> twitterUser.twitterScreenName
-        ,'twitter_profiel_image_url   -> twitterUser.twitterProfielImageUrl
-        ,'twitter_description         -> twitterUser.twitterDescription
-        ,'twitter_access_token        -> twitterUser.twitterAccessToken
-        ,'twitter_access_token_secret -> twitterUser.twitterAccessTokenSecret
-        ,'create_date                 -> twitterUser.createDate.get
-        ,'update_date                 -> twitterUser.updateDate.get
+        params: _*
       ).executeUpdate()
     }
   }
@@ -189,6 +197,17 @@ object TwitterUser {
    * TwitterUser Insert処理
    */
   def update(twitterUser: TwitterUser) {
+    println("twitter user update")
+    val params = Seq[NamedParameter](
+         'id                          -> twitterUser.id.get
+        ,'twitter_name                -> twitterUser.twitterName
+        ,'twitter_screen_name         -> twitterUser.twitterScreenName
+        ,'twitter_profiel_image_url   -> twitterUser.twitterProfielImageUrl
+        ,'twitter_description         -> twitterUser.twitterDescription
+        ,'twitter_access_token        -> twitterUser.twitterAccessToken
+        ,'twitter_access_token_secret -> twitterUser.twitterAccessTokenSecret
+        ,'update_date                 -> twitterUser.updateDate.get
+    )
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -203,14 +222,7 @@ object TwitterUser {
           where id = {id}
         """
       ).on(
-         'id                          -> twitterUser.id
-        ,'twitter_name                -> twitterUser.twitterName
-        ,'twitter_screen_name         -> twitterUser.twitterScreenName
-        ,'twitter_profiel_image_url   -> twitterUser.twitterProfielImageUrl
-        ,'twitter_description         -> twitterUser.twitterDescription
-        ,'twitter_access_token        -> twitterUser.twitterAccessToken
-        ,'twitter_access_token_secret -> twitterUser.twitterAccessTokenSecret
-        ,'update_date                 -> twitterUser.updateDate.get
+        params: _*
       ).executeUpdate()
     }
   }

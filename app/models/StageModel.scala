@@ -214,7 +214,7 @@ object Stage {
           where stage_id = {stage_id}
         """
       ).on(
-        'stage_id -> stage.id
+        'stage_id -> stage.id.get
       ).executeUpdate()
 
       // Stageを削除する
@@ -224,7 +224,7 @@ object Stage {
           where id = {id}
         """
       ).on(
-        'id -> stage.id
+        'id -> stage.id.get
       ).executeUpdate()
     }
   }

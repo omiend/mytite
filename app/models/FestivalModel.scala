@@ -154,7 +154,7 @@ object Festival {
           )
         """
       ).on(
-         'id            -> festival.id
+         'id            -> festival.id.get
         ,'twitter_id    -> festival.twitterId
         ,'festival_name -> festival.festivalName
         ,'description   -> festival.description
@@ -178,7 +178,7 @@ object Festival {
           where id = {id}
         """
       ).on(
-         'id            -> festival.id
+         'id            -> festival.id.get
         ,'festival_name -> festival.festivalName
         ,'description   -> festival.description
         ,'update_date   -> festival.updateDate.get
@@ -210,7 +210,7 @@ object Festival {
           ) on duplicate key update id = LAST_INSERT_ID(id)
         """
       ).on(
-         'id            -> festival.id
+         'id            -> festival.id.get
         ,'twitter_id    -> festival.twitterId
         ,'festival_name -> festival.festivalName
         ,'description   -> festival.description
@@ -265,7 +265,7 @@ object Festival {
           delete from Performance where festival_id = {festival_id}
         """
       ).on(
-        'festival_id -> festival.id
+        'festival_id -> festival.id.get
       ).executeUpdate()
 
       // Stage削除処理
@@ -274,7 +274,7 @@ object Festival {
           delete from Stage where festival_id = {festival_id}
         """
       ).on(
-        'festival_id -> festival.id
+        'festival_id -> festival.id.get
       ).executeUpdate()
 
       // Heartを削除する
@@ -283,7 +283,7 @@ object Festival {
           delete from Heart where festival_id = {festival_id}
         """
       ).on(
-        'festival_id -> festival.id
+        'festival_id -> festival.id.get
       ).executeUpdate()
 
       // Festival削除処理
@@ -292,7 +292,7 @@ object Festival {
           delete from Festival where id = {id}
         """
       ).on(
-        'id -> festival.id
+        'id -> festival.id.get
       ).executeUpdate()
     }
   }
