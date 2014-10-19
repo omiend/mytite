@@ -197,7 +197,6 @@ object TwitterUser {
    * TwitterUser Insert処理
    */
   def update(twitterUser: TwitterUser) {
-    println("twitter user update")
     val params = Seq[NamedParameter](
          'id                          -> twitterUser.id.get
         ,'twitter_name                -> twitterUser.twitterName
