@@ -175,7 +175,7 @@ object Performance {
           where id = {id}
         """
       ).on(
-        'id -> performance.id
+        'id -> performance.id.get
       ).executeUpdate()
     }
   }
