@@ -17,7 +17,7 @@
        @for(user <- pager.dataList){
        <div class="col-md-4 col-sm-4 col-lg-4">
          <div class="row-fluid">
-           <div class="col-xs-2 col-md-2 col-sm-2 col-lg-2"><img src="@user.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded"></div>
+           <div class="col-xs-2 col-md-2 col-sm-2 col-lg-2"><img src="@user.twitterProfielImageUrl" alt="Profiel Image" class="img-rounded" style="height:50px; width:50px"></div>
            <div class="col-xs-10 col-md-10 col-sm-10 col-lg-10">
              @user.twitterName<br />
              <a href="https://twitter.com/@user.twitterScreenName" target=”_blank”>&#64;@user.twitterScreenName</a>
