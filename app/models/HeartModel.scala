@@ -9,11 +9,11 @@ import play.api.data.Mapping
 
 /** Heart */
 case class Heart (
-   id            : Pk[Long]
+   id            : Option[Long] = None
   ,festivalId    : Long
   ,twitterId     : Long
-  ,var createDate: Option[Date]
-  ,var updateDate: Option[Date]
+  ,var createDate: Option[Date] = None
+  ,var updateDate: Option[Date] = None
 ) {
 }
 
@@ -23,7 +23,7 @@ object Heart {
    * Heart Simple
    */
   val simple = {
-    get[Pk[Long]]("id") ~
+    get[Option[Long]]("id") ~
     get[Long]("festival_id") ~
     get[Long]("twitter_id") ~
     get[Date]("create_date") ~
@@ -43,6 +43,9 @@ object Heart {
    * Heartの件数を取得する
    */
   def countByFestivalId(festivalId: Long): Long = {
+    val params = Seq[NamedParameter](
+      'festival_id -> festivalId
+    )
     DB.withConnection { implicit connection =>
       // 件数取得
       SQL(
@@ -52,7 +55,7 @@ object Heart {
          where festival_id = {festival_id}
         """
       ).on(
-        'festival_id -> festivalId
+        params: _*
       ).as(scalar[Long].single)
     }
   }
@@ -61,6 +64,9 @@ object Heart {
    * Heartの件数を取得する
    */
   def countHeartByFestivalId(festivalId: Long): (Long, Boolean) = {
+    val params = Seq[NamedParameter](
+      'festival_id -> festivalId
+    )
     DB.withConnection { implicit connection =>
       // 件数取得
       val count: Long = SQL(
@@ -70,17 +76,20 @@ object Heart {
          where festival_id = {festival_id}
         """
       ).on(
-        'festival_id -> festivalId
+        params: _*
       ).as(scalar[Long].single)
       (count, false)
     }
   }
-
   
   /**
    * Heartの件数を取得する
    */
   def findByFestivalAndTwitterId(festivalId: Long, twitterId: Long): (Long, Boolean) = {
+    val params = Seq[NamedParameter](
+         'festival_id -> festivalId
+        ,'twitter_id  -> twitterId
+    )
     DB.withConnection { implicit connection =>
       // 件数取得
       val count: Long = SQL(
@@ -90,7 +99,7 @@ object Heart {
          where festival_id = {festival_id}
         """
       ).on(
-        'festival_id -> festivalId
+        params: _*
       ).as(scalar[Long].single)
 
       // 登録済みか取得する
@@ -103,13 +112,12 @@ object Heart {
          limit 1
         """
       ).on(
-         'festival_id -> festivalId
-        ,'twitter_id -> twitterId
+        params: _*
       ).as(
         Heart.simple.singleOpt
       ) match {
         case Some(heart) => true
-        case _ => false
+        case _           => false
       }
       (count, isExists)
     }
@@ -119,6 +127,12 @@ object Heart {
    * Heart Insert処理
    */
   def insert(heart: Heart) {
+    val params = Seq[NamedParameter](
+         'festival_id -> heart.festivalId
+        ,'twitter_id  -> heart.twitterId
+        ,'create_date -> heart.createDate
+        ,'update_date -> heart.updateDate
+    )
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -158,7 +172,7 @@ object Heart {
         """
       ).on(
          'festival_id -> festivalId
-        ,'twitter_id -> twitterId
+        ,'twitter_id  -> twitterId
       ).executeUpdate()
     }
   }

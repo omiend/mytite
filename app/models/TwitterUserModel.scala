@@ -9,7 +9,7 @@ import anorm.features.anyToStatement
 
 /** Twitter Table */
 case class TwitterUser (
-	id                       : Pk[Long]
+	 id                      : Option[Long] = None
 	,twitterId               : Long
   ,twitterName             : String
 	,twitterScreenName       : String
@@ -17,8 +17,8 @@ case class TwitterUser (
   ,twitterDescription      : String
 	,twitterAccessToken      : String
 	,twitterAccessTokenSecret: String
-	,createDate              : Option[Date]
-	,updateDate              : Option[Date]
+	,createDate              : Option[Date] = None
+	,updateDate              : Option[Date] = None
 ) {
   var heartCount: Long = 0
 }
@@ -29,7 +29,7 @@ object TwitterUser {
    * TwitterUser Simple
    */
   val simple = {
-    get[Pk[Long]]("id") ~
+    get[Option[Long]]("id") ~
     get[Long]("twitter_id") ~
     get[String]("twitter_name") ~
     get[String]("twitter_screen_name") ~
@@ -58,7 +58,7 @@ object TwitterUser {
    * Heart Count
    */
   val heartCount = {
-    get[Pk[Long]]("id") ~
+    get[Option[Long]]("id") ~
     get[Long]("heartCount") map {
       case id~heartCount => (id, heartCount)
     }
@@ -151,8 +151,7 @@ object TwitterUser {
    */
   def insart(twitterUser: TwitterUser) {
     val params = Seq[NamedParameter](
-         'id                          -> twitterUser.id.get
-        ,'twitter_id                  -> twitterUser.twitterId
+         'twitter_id                  -> twitterUser.twitterId
         ,'twitter_name                -> twitterUser.twitterName
         ,'twitter_screen_name         -> twitterUser.twitterScreenName
         ,'twitter_profiel_image_url   -> twitterUser.twitterProfielImageUrl
@@ -192,7 +191,7 @@ object TwitterUser {
       ).executeUpdate()
     }
   }
-
+  
   /**
    * TwitterUser Insert処理
    */

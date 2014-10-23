@@ -10,13 +10,13 @@ import play.api.data.Mapping
 
 /** Stage Master */
 case class Stage (
-	 id            : Pk[Long]
+	 id            : Option[Long]   = None
   ,festivalId    : Long
 	,var stageName : String
-	,var sort      : Option[String]
-	,var color     : Option[String]
-	,var createDate: Option[Date]
-	,var updateDate: Option[Date]
+	,var sort      : Option[String] = None
+	,var color     : Option[String] = None
+	,var createDate: Option[Date]   = None
+	,var updateDate: Option[Date]   = None
 ) {
 }
 
@@ -26,7 +26,7 @@ object Stage {
    * Stage Simple
    */
   val simple = {
-    get[Pk[Long]]("id") ~
+    get[Option[Long]]("id") ~
     get[Long]("festival_id") ~
     get[String]("stage_name") ~
     get[String]("sort") ~
@@ -69,6 +69,9 @@ object Stage {
    * Stage Idを指定して取得
    */
   def findById(id: Long): Option[Stage] = {
+    val params = Seq[NamedParameter](
+      'id -> id
+    )
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -78,7 +81,7 @@ object Stage {
          order by id
         """
       ).on(
-        'id -> id
+        params: _*
       ).as(
         Stage.simple.singleOpt
       )
@@ -89,6 +92,9 @@ object Stage {
    * Stage from-toで件数を指定して取得
    */
   def findByFestivalId(festivalId: Long): Seq[Stage] = {
+    val params = Seq[NamedParameter](
+      'festival_id -> festivalId
+    )
     DB.withConnection { implicit connection =>
       // 親テーブル取得
       val resultList: Seq[Stage] = SQL(
@@ -99,7 +105,7 @@ object Stage {
          order by sort
         """
       ).on(
-        'festival_id -> festivalId
+        params: _*
       ).as(
         Stage.simple *
       )
@@ -111,6 +117,9 @@ object Stage {
    * Stageの件数を取得する
    */
   def countByFestivalId(festivalId: Long): Long = {
+    val params = Seq[NamedParameter](
+      'festival_id -> festivalId
+    )
     DB.withConnection { implicit connection =>
       // 件数取得
       SQL(
@@ -120,7 +129,7 @@ object Stage {
          where festival_id = {festival_id}
         """
       ).on(
-        'festival_id -> festivalId
+        params: _*
       ).as(scalar[Long].single)
     }
   }
@@ -129,6 +138,10 @@ object Stage {
    * 同じ名前のステージが登録されているかチェックする
    */
   def countByFestivalIdAndStageName(festivalId: Long, stageName: String): Boolean = {
+    val params = Seq[NamedParameter](
+       'festival_id -> festivalId
+      ,'stage_name  -> stageName
+    )
     DB.withConnection { implicit connection =>
       // 件数取得
       val count = SQL(
@@ -139,8 +152,7 @@ object Stage {
            and stage_name  = {stage_name}
         """
       ).on(
-         'festival_id -> festivalId
-        ,'stage_name  -> stageName
+        params: _*
       ).as(scalar[Long].single)
       count > 0
     }
@@ -150,6 +162,14 @@ object Stage {
    * Stage Insert処理
    */
   def insart(stage: Stage) {
+    val params = Seq[NamedParameter](
+       'festival_id -> stage.festivalId
+      ,'stage_name  -> stage.stageName
+      ,'sort        -> stage.sort.get
+      ,'color       -> stage.color.get
+      ,'create_date -> stage.createDate.get
+      ,'update_date -> stage.updateDate.get
+    )
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -170,21 +190,21 @@ object Stage {
           )
         """
       ).on(
-         'festival_id -> stage.festivalId
-        ,'stage_name  -> stage.stageName
-        ,'sort        -> stage.sort
-        ,'color       -> stage.color
-        ,'create_date -> stage.createDate.get
-        ,'update_date -> stage.updateDate.get
+        params: _*
       ).executeInsert()
 
     }
   }
-
+  
   /**
    * Stage Update処理
    */
   def update(stageId: Long, stage: Stage) {
+    val params = Seq[NamedParameter](
+       'id          -> stageId
+      ,'stage_name  -> stage.stageName
+      ,'update_date -> stage.updateDate.get
+    )
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -194,9 +214,7 @@ object Stage {
           where id = {id}
         """
       ).on(
-         'id          -> stageId
-        ,'stage_name  -> stage.stageName
-        ,'update_date -> stage.updateDate.get
+        params: _*
       ).executeUpdate()
     }
   }
@@ -204,9 +222,11 @@ object Stage {
   /**
    * Stage Delete処理
    */
-  def delete(stage: Stage) {
+  def delete(stageId: Long) {
+    val params = Seq[NamedParameter](
+       'stage_id -> stageId
+    )
     DB.withConnection { implicit connection =>
-
       // Performanceを削除する
       SQL(
         """
@@ -214,17 +234,17 @@ object Stage {
           where stage_id = {stage_id}
         """
       ).on(
-        'stage_id -> stage.id.get
+        params: _*
       ).executeUpdate()
 
       // Stageを削除する
       SQL(
         """
           delete from stage
-          where id = {id}
+          where id = {stage_id}
         """
       ).on(
-        'id -> stage.id.get
+        params: _*
       ).executeUpdate()
     }
   }

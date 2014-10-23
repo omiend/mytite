@@ -206,9 +206,10 @@ object Application extends Controller with Secured {
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("@" + twitterUser.get.twitterScreenName + "のフェス一覧", 1, 0, twitterUser, Seq.empty)
     // 削除対象のFestivalを取得
     Festival.findById(festivalId) match {
+      // ログインしているTwitterIDと同じIDの場合だけ削除を実行する
       case Some(festival) if festival.twitterId == twitterId.toLong => {
         // 削除処理実行
-        Festival.delete(festival)
+        Festival.delete(festivalId)
         Redirect(routes.Application.festival(1, twitterId.toLong))
       }
       case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : deleteFestival 01")
@@ -305,7 +306,7 @@ object Application extends Controller with Secured {
         Festival.findById(stage.festivalId) match {
           case Some(festival) if festival.twitterId == twitterId.toLong => {
             // 削除処理実行
-            Stage.delete(stage)
+            Stage.delete(stageId)
             Redirect(routes.Application.timetable(twitterId.toLong, festivalId))
           }
           case _ => Redirect(routes.Application.timetable(twitterId.toLong, festivalId)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : deleteStage 01")

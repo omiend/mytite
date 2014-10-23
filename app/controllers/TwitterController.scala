@@ -67,12 +67,12 @@ object TwitterController extends Controller {
                                                   ,twitterModel.accessToken.getTokenSecret
                                                   ,Some(nowDate)
                                                   ,Some(nowDate))
-            TwitterUser.update(tmp)
+            TwitterUser.update(tmp) // Coution! Option.get
             Option(tmp)
           }
           case _ => {
             // ログインしたらtwitter_userに登録
-            val tmp: TwitterUser = new TwitterUser(null
+            val tmp: TwitterUser = new TwitterUser(None
                                                   ,twitterModel.getTwitter.getId()
                                                   ,user.getName()
                                                   ,twitterModel.getTwitter.getScreenName()
