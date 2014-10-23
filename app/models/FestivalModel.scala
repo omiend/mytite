@@ -10,12 +10,12 @@ import scala.collection.immutable.Map
 
 /** Festival Table */
 case class Festival  (
-   id: Pk[Long]
-  ,var twitterId: Long
+   id              : Option[Long] = None
+  ,var twitterId   : Long
   ,var festivalName: String
-  ,var description: String
-  ,var createDate: Option[Date]
-  ,var updateDate: Option[Date]
+  ,var description : String
+  ,var createDate  : Option[Date] = None
+  ,var updateDate  : Option[Date] = None
 ) {
   var heartCount:Long = 0
 }
@@ -25,7 +25,7 @@ object Festival {
    * Festival Simple
    */
   val simple = {
-    get[Pk[Long]]("id") ~
+    get[Option[Long]]("id") ~
     get[Long]("twitter_id") ~
     get[String]("festival_name") ~
     get[String]("description") ~
@@ -47,7 +47,7 @@ object Festival {
    * Heart Count
    */
   val heartCount = {
-    get[Pk[Long]]("id") ~
+    get[Option[Long]]("id") ~
     get[Long]("heartCount") map {
       case id~heartCount => (id, heartCount)
     }
@@ -136,6 +136,13 @@ object Festival {
    * Festival Insert処理
    */
   def insart(festival: Festival) {
+    val params = Seq[NamedParameter](
+         'twitter_id    -> festival.twitterId
+        ,'festival_name -> festival.festivalName
+        ,'description   -> festival.description
+        ,'create_date   -> festival.createDate.get
+        ,'update_date   -> festival.updateDate.get
+    )
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -154,12 +161,7 @@ object Festival {
           )
         """
       ).on(
-         'id            -> festival.id.get
-        ,'twitter_id    -> festival.twitterId
-        ,'festival_name -> festival.festivalName
-        ,'description   -> festival.description
-        ,'create_date   -> festival.createDate.get
-        ,'update_date   -> festival.updateDate.get
+        params: _*
       ).executeUpdate()
     }
   }
@@ -168,6 +170,12 @@ object Festival {
    * Festival Insert処理
    */
   def update(festival: Festival) {
+    val params = Seq[NamedParameter](
+         'id            -> festival.id.get
+        ,'festival_name -> festival.festivalName
+        ,'description   -> festival.description
+        ,'update_date   -> festival.updateDate.get
+    )
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -178,10 +186,7 @@ object Festival {
           where id = {id}
         """
       ).on(
-         'id            -> festival.id.get
-        ,'festival_name -> festival.festivalName
-        ,'description   -> festival.description
-        ,'update_date   -> festival.updateDate.get
+        params: _*
       ).executeUpdate()
     }
   }
@@ -190,8 +195,14 @@ object Festival {
    * Festival／Stag Insert処理
    */
   def insartWithStage(festival: Festival, stageNameList: Seq[String]) {
+    val params1 = Seq[NamedParameter](
+         'twitter_id    -> festival.twitterId
+        ,'festival_name -> festival.festivalName
+        ,'description   -> festival.description
+        ,'create_date   -> festival.createDate.get
+        ,'update_date   -> festival.updateDate.get
+    )
     DB.withTransaction { implicit connection =>
-
       // --- Festival作成処理 --- //
       val createId = SQL(
         """
@@ -210,18 +221,21 @@ object Festival {
           ) on duplicate key update id = LAST_INSERT_ID(id)
         """
       ).on(
-         'id            -> festival.id.get
-        ,'twitter_id    -> festival.twitterId
-        ,'festival_name -> festival.festivalName
-        ,'description   -> festival.description
-        ,'create_date   -> festival.createDate.get
-        ,'update_date   -> festival.updateDate.get
+        params1: _*
       ).executeInsert()
 
       // --- Stage作成処理 --- //
       var index: Int = 1
       for (stageName <- stageNameList) {
         if (!stageName.isEmpty) {
+          val params2 = Seq[NamedParameter](
+               'festival_id -> createId.get
+              ,'stage_name  -> stageName
+              ,'sort        -> "%03d".format(index).toString
+              ,'color       -> "white"
+              ,'create_date -> festival.createDate.get
+              ,'update_date -> festival.updateDate.get
+          )
           SQL(
             """
               insert into stage(
@@ -241,12 +255,7 @@ object Festival {
               )
             """
           ).on(
-             'festival_id -> createId.get
-            ,'stage_name  -> stageName
-            ,'sort        -> "%03d".format(index).toString
-            ,'color       -> "white"
-            ,'create_date -> festival.createDate.get
-            ,'update_date -> festival.updateDate.get
+            params2: _*
           ).executeInsert()
           index = index + 1
         }
@@ -257,7 +266,10 @@ object Festival {
   /**
    * Festival delete処理
    */
-  def delete(festival: Festival) {
+  def delete(festivalId: Long) {
+    val params = Seq[NamedParameter](
+      'festival_id -> festivalId
+    )
     DB.withConnection { implicit connection =>
       // Performance削除処理
       SQL(
@@ -265,7 +277,7 @@ object Festival {
           delete from Performance where festival_id = {festival_id}
         """
       ).on(
-        'festival_id -> festival.id.get
+        params: _*
       ).executeUpdate()
 
       // Stage削除処理
@@ -274,7 +286,7 @@ object Festival {
           delete from Stage where festival_id = {festival_id}
         """
       ).on(
-        'festival_id -> festival.id.get
+        params: _*
       ).executeUpdate()
 
       // Heartを削除する
@@ -283,16 +295,16 @@ object Festival {
           delete from Heart where festival_id = {festival_id}
         """
       ).on(
-        'festival_id -> festival.id.get
+        params: _*
       ).executeUpdate()
 
       // Festival削除処理
       SQL(
         """
-          delete from Festival where id = {id}
+          delete from Festival where id = {festival_id}
         """
       ).on(
-        'id -> festival.id.get
+        params: _*
       ).executeUpdate()
     }
   }
