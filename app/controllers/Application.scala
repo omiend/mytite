@@ -22,7 +22,7 @@ object Application extends Controller with Secured {
   // Performance用 Form
   val performanceForm = Form(
     mapping(
-       "id"         -> ignored(NotAssigned: Pk[Long])
+       "id"         -> ignored(None: Option[Long])
       ,"festivalId" -> of[Long]
       ,"stageId"    -> of[Long]
       ,"artist"     -> nonEmptyText(maxLength = 35)
@@ -36,7 +36,7 @@ object Application extends Controller with Secured {
   // Stage用 Form
   val stageForm = Form(
     mapping(
-       "id"         -> ignored(NotAssigned: Pk[Long])
+       "id"         -> ignored(None: Option[Long])
       ,"festivalId" -> of[Long]
       ,"stageName"  -> text(maxLength = 20)
       ,"sort"       -> optional(text)
@@ -264,14 +264,7 @@ object Application extends Controller with Secured {
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("ステージ更新画面", 1, 0, twitterUser, Seq.empty)
     Stage.findById(stageId) match {
-      case Some(stage) => {
-        // Stageを取得
-        var stageSelectOptions: Seq[(String, String)] = Seq.empty
-        Stage.findByFestivalId(festivalId).map { stage =>
-          stageSelectOptions = stageSelectOptions :+ (stage.id.toString, stage.stageName)
-        }
-        Ok(views.html.editStage(pager, festivalId, stageId, stageForm.fill(stage)))
-      }
+      case Some(stage) => Ok(views.html.editStage(pager, festivalId, stageId, stageForm.fill(stage)))
       case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : editStage 01")
     }
   }
@@ -322,6 +315,20 @@ object Application extends Controller with Secured {
     }
   }
   
+  /** StageのSelectOptionを作成する */
+  def getStageOptions(festivalId: Long): Seq[(String, String)] = {
+    var stageSelectOptions: Seq[(String, String)] = Seq.empty
+    if (stageSelectOptions.length <= 0) {
+      Stage.findByFestivalId(festivalId).map { stage =>
+        stage.id match {
+          case Some(stageId) => stageSelectOptions = stageSelectOptions :+ (stageId.toString, stage.stageName)
+          case _ =>
+        }
+      }
+    }
+    stageSelectOptions
+  }
+
   /*****************************************************************************
    *** Performance登録画面起動
    *****************************************************************************/
@@ -330,11 +337,7 @@ object Application extends Controller with Secured {
     var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("パフォーマンス新規登録画面", 1, 0, twitterUser, Seq.empty)
-    // Stageを取得
-    var stageSelectOptions: Seq[(String, String)] = Seq.empty
-    Stage.findByFestivalId(festivalId).map { stage =>
-      stageSelectOptions = stageSelectOptions :+ (stage.id.toString, stage.stageName)
-    }
+    val stageSelectOptions = getStageOptions(festivalId)
     stageSelectOptions match {
       case stageSelectOptions if stageSelectOptions.length <= 0 => Redirect(routes.Application.timetable(twitterId.toLong, festivalId)).flashing("error" -> " 先にステージを登録してください")
       case _ => Ok(views.html.createPerformance(pager, festivalId, stageSelectOptions, performanceForm))
@@ -349,14 +352,9 @@ object Application extends Controller with Secured {
     var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("アーティスト新規登録画面", 1, 0, twitterUser, Seq.empty)
-    // Stageを取得
-    var stageSelectOptions: Seq[(String, String)] = Seq.empty
-    Stage.findByFestivalId(festivalId).map { stage =>
-      stageSelectOptions = stageSelectOptions :+ (stage.id.toString, stage.stageName)
-    }
     performanceForm.bindFromRequest.fold(
       formWithErrors => {
-        BadRequest(html.createPerformance(pager, festivalId, stageSelectOptions, formWithErrors))
+        BadRequest(html.createPerformance(pager, festivalId, getStageOptions(festivalId), formWithErrors))
       },
       performance => {
         def nowDate: java.util.Date = new java.util.Date
@@ -377,14 +375,7 @@ object Application extends Controller with Secured {
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("アーティスト更新画面", 1, 0, twitterUser, Seq.empty)
     Performance.findById(performanceId) match {
-      case Some(performance) => {
-        // Stageを取得
-        var stageSelectOptions: Seq[(String, String)] = Seq.empty
-        Stage.findByFestivalId(festivalId).map { stage =>
-          stageSelectOptions = stageSelectOptions :+ (stage.id.toString, stage.stageName)
-        }
-        Ok(views.html.editPerformance(pager, performanceId, stageSelectOptions, performanceForm.fill(performance)))
-      }
+      case Some(performance) => Ok(views.html.editPerformance(pager, performanceId, getStageOptions(festivalId), performanceForm.fill(performance)))
       case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : editPerformance 01")
     }
   }
@@ -397,14 +388,9 @@ object Application extends Controller with Secured {
     var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("アーティスト更新画面", 1, 0, twitterUser, Seq.empty)
-    // Stageを取得
-    var stageSelectOptions: Seq[(String, String)] = Seq.empty
-    Stage.findByFestivalId(festivalId).map { stage =>
-      stageSelectOptions = stageSelectOptions :+ (stage.id.toString, stage.stageName)
-    }
     performanceForm.bindFromRequest.fold(
       formWithErrors => {
-        BadRequest(views.html.editPerformance(pager, performanceId, stageSelectOptions, formWithErrors))
+        BadRequest(views.html.editPerformance(pager, performanceId, getStageOptions(festivalId), formWithErrors))
       },
       performance => {
         def nowDate: java.util.Date = new java.util.Date
