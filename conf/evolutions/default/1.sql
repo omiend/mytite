@@ -59,15 +59,10 @@ create table heart (
   constraint pk_heart primary key (id))
 ;
 
-alter table performance add constraint fk_performance_timeTable_1 foreign key (festival_id) references festival (id) on delete restrict on update restrict;
 create index ix_performance_timeTable_1 on performance (festival_id);
-alter table performance add constraint fk_performance_stage_2 foreign key (stage_id) references stage (id) on delete restrict on update restrict;
 create index ix_performance_stage_2 on performance (stage_id);
-alter table stage add constraint fk_stage_festival_3 foreign key (festival_id) references festival (id) on delete restrict on update restrict;
 create index ix_stage_festival_3 on stage (festival_id);
-alter table festival add constraint fk_festival_twitterUser_4 foreign key (twitter_id) references twitter_user (twitter_id) on delete restrict on update restrict;
 create index ix_festival_twitterUser_4 on festival (twitter_id);
-alter table stage add constraint fk_heart_festival_5 foreign key (festival_id) references festival (id) on delete restrict on update restrict;
 create index ix_heart_festival_5 on heart (festival_id);
 
 # --- !Downs
@@ -81,5 +76,7 @@ drop table stage;
 drop table festival;
 
 drop table twitter_user;
+
+drop table heart;
 
 SET FOREIGN_KEY_CHECKS=1;
