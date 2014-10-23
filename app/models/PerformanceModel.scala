@@ -9,14 +9,14 @@ import anorm.features.anyToStatement
 
 /** Performance Table */
 case class Performance (
-	 id        : Pk[Long]
-	,festivalId: Long
+	 id            : Option[Long] = None
+	,festivalId    : Long
 	,var stageId   : Long
 	,var artist    : String
 	,var time      : String
 	,var timeFrame : String
-	,var createDate: Option[Date]
-	,var updateDate: Option[Date]
+	,var createDate: Option[Date] = None
+	,var updateDate: Option[Date] = None
 ) {
   /** TimeFrameに付随するRowSpan数を取得する */
   def getTableRowSpanNumber: Int = {
@@ -36,7 +36,7 @@ object Performance {
    * Performance Simple
    */
   val simple = {
-    get[Pk[Long]]("id") ~
+    get[Option[Long]]("id") ~
     get[Long]("festival_id") ~
     get[Long]("stage_id") ~
     get[String]("artist") ~
@@ -62,6 +62,9 @@ object Performance {
    * Performance Idを指定して取得
    */
   def findById(id: Long): Option[Performance] = {
+    val params = Seq[NamedParameter](
+      'id -> id
+    )
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -71,7 +74,7 @@ object Performance {
          order by stage_id, time, Id
         """
       ).on(
-        'id -> id
+        params: _*
       ).as(
         Performance.simple.singleOpt
       )
@@ -82,6 +85,9 @@ object Performance {
    * Performance FestivalIdを指定して取得
    */
   def findByFestivalId(festivalId: Long): Seq[Performance] = {
+    val params = Seq[NamedParameter](
+      'festival_id -> festivalId
+    )
     DB.withConnection { implicit connection =>
       // 親テーブル取得
       val resultList: Seq[Performance] = SQL(
@@ -92,7 +98,7 @@ object Performance {
          order by stage_id, time, Id
         """
       ).on(
-        'festival_id -> festivalId
+        params: _*
       ).as(
         Performance.simple *
       )
@@ -104,7 +110,15 @@ object Performance {
    * Performance Insert処理
    */
   def insart(performance: Performance) {
-
+    val params = Seq[NamedParameter](
+       'festival_id -> performance.festivalId
+      ,'stage_id    -> performance.stageId
+      ,'artist      -> performance.artist
+      ,'time        -> performance.time
+      ,'time_frame  -> performance.timeFrame
+      ,'create_date -> performance.createDate.get
+      ,'update_date -> performance.updateDate.get
+    )
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -127,13 +141,7 @@ object Performance {
           )
         """
       ).on(
-         'festival_id -> performance.festivalId
-        ,'stage_id    -> performance.stageId
-        ,'artist      -> performance.artist
-        ,'time        -> performance.time
-        ,'time_frame  -> performance.timeFrame
-        ,'create_date -> performance.createDate.get
-        ,'update_date -> performance.updateDate.get
+        params: _*
       ).executeInsert()
     }
   }
@@ -142,6 +150,14 @@ object Performance {
    * Performance Update処理
    */
   def update(performanceId: Long, performance: Performance) {
+    val params = Seq[NamedParameter](
+       'id          -> performanceId
+      ,'stage_id    -> performance.stageId
+      ,'artist      -> performance.artist
+      ,'time        -> performance.time
+      ,'time_frame  -> performance.timeFrame
+      ,'update_date -> performance.updateDate.get
+    )
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -154,12 +170,7 @@ object Performance {
           where id = {id}
         """
       ).on(
-         'id          -> performanceId
-        ,'stage_id    -> performance.stageId
-        ,'artist      -> performance.artist
-        ,'time        -> performance.time
-        ,'time_frame  -> performance.timeFrame
-        ,'update_date -> performance.updateDate.get
+        params: _*
       ).executeUpdate()
     }
   }
@@ -168,6 +179,9 @@ object Performance {
    * Performance Delete処理
    */
   def delete(performance: Performance) {
+    val params = Seq[NamedParameter](
+      'id -> performance.id.get
+    )
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -175,7 +189,7 @@ object Performance {
           where id = {id}
         """
       ).on(
-        'id -> performance.id.get
+        params: _*
       ).executeUpdate()
     }
   }
