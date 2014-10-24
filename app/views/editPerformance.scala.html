@@ -1,4 +1,4 @@
-@(pager: Pager[TwitterUser], performanceId: Long, stageSelectOptions: Seq[(String, String)], performanceForm: Form[Performance])(implicit flash: play.api.mvc.Flash)
+@(pager: Pager[TwitterUser], festivalId: Long, performanceId: Long, stageSelectOptions: Seq[(String, String)], performanceForm: Form[Performance])(implicit flash: play.api.mvc.Flash)
 @import helper._
 @import models.TimeTable
 
@@ -22,7 +22,7 @@
     </div><!--/span-->
   </div><!--/row-->
 
-  @helper.form(action = routes.Application.updatePerformance(performanceForm.get.festivalId, performanceId)) {
+  @helper.form(action = routes.Application.updatePerformance(festivalId, performanceId)) {
     <div class="row">
       <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
         <div class="col-md-12 col-sm-12 col-lg-12">
@@ -44,9 +44,9 @@
     <div class="row-fluid">
       <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
         <div class="col-md-3 col-sm-3 col-lg-3"><p><input type="submit" class="btn btn-primary btn-xs btn-block" value="保存"></p></div>
-        <div class="col-md-3 col-sm-3 col-lg-3"><p><a href="@routes.Application.timetable(pager.twitterUser.get.twitterId, performanceForm.get.festivalId)" class="btn btn-default btn-xs btn-block">キャンセル</a></p></div>
+        <div class="col-md-3 col-sm-3 col-lg-3"><p><a href="@routes.Application.timetable(pager.twitterUser.get.twitterId, festivalId)" class="btn btn-default btn-xs btn-block">キャンセル</a></p></div>
         <div class="col-md-3 col-sm-3 col-lg-3"></div>
-        <div class="col-md-3 col-sm-3 col-lg-3"><p><a href="@routes.Application.deletePerformance(performanceForm.get.festivalId, performanceId)" class="btn btn-danger btn-xs btn-block">削除</a></p></div>
+        <div class="col-md-3 col-sm-3 col-lg-3"><p><a href="@routes.Application.deletePerformance(festivalId, performanceId)" class="btn btn-danger btn-xs btn-block">削除</a></p></div>
       </div><!--/span-->
     </div><!--/row-->
     <script>
