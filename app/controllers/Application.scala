@@ -62,7 +62,7 @@ object Application extends Controller with Secured {
     // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
       case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
-      case _ => null
+      case _ => None
     }
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("トップ", pageNum, 0, twitterUser, Seq.empty)
@@ -82,7 +82,7 @@ object Application extends Controller with Secured {
     // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
       case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
-      case _ => null
+      case _ => None
     }
     // 参照対象のTwitterUserを取得する
     var targetTwitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(targetTwitterId)
@@ -136,7 +136,7 @@ object Application extends Controller with Secured {
         def nowDate: java.util.Date = new java.util.Date
         // --- Festival作成処理 --- //
         var festival: Festival = Festival(
-           null
+           None
           ,twitterId.toLong
           ,festivalAndStage._1  // Festival Name
           ,festivalAndStage._2  // description
@@ -376,7 +376,7 @@ object Application extends Controller with Secured {
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("アーティスト更新画面", 1, 0, twitterUser, Seq.empty)
     Performance.findById(performanceId) match {
-      case Some(performance) => Ok(views.html.editPerformance(pager, performanceId, getStageOptions(festivalId), performanceForm.fill(performance)))
+      case Some(performance) => Ok(views.html.editPerformance(pager, festivalId, performanceId, getStageOptions(festivalId), performanceForm.fill(performance)))
       case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : editPerformance 01")
     }
   }
@@ -391,7 +391,7 @@ object Application extends Controller with Secured {
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("アーティスト更新画面", 1, 0, twitterUser, Seq.empty)
     performanceForm.bindFromRequest.fold(
       formWithErrors => {
-        BadRequest(views.html.editPerformance(pager, performanceId, getStageOptions(festivalId), formWithErrors))
+        BadRequest(views.html.editPerformance(pager, festivalId, performanceId, getStageOptions(festivalId), formWithErrors))
       },
       performance => {
         def nowDate: java.util.Date = new java.util.Date
@@ -439,7 +439,7 @@ object Application extends Controller with Secured {
       }
       case _ => {
         isExists = Heart.countHeartByFestivalId(festivalId)
-        null
+        None
       }
     }
     // Pagerを初期化
@@ -469,7 +469,7 @@ object Application extends Controller with Secured {
     // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
       case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
-      case _ => null
+      case _ => None
     }
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("アバウト", 1, 0, twitterUser, Seq.empty)
@@ -480,7 +480,7 @@ object Application extends Controller with Secured {
     // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
       case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
-      case _ => null
+      case _ => None
     }
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("遊び方", 1, 0, twitterUser, Seq.empty)

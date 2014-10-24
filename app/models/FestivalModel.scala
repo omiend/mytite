@@ -218,7 +218,7 @@ object Festival {
             ,{description}
             ,{create_date}
             ,{update_date}
-          ) on duplicate key update id = LAST_INSERT_ID(id)
+          )/*! on duplicate key update id = LAST_INSERT_ID(id) */
         """
       ).on(
         params1: _*
