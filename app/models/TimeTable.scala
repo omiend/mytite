@@ -114,16 +114,22 @@ object TimeTable {
       TimeTable(timeLabel, stageList)
     }
 
+    // 対象のPerformanceを取得する
+    val performanceList: Seq[Performance] = Performance.findByFestivalId(festivalId)
+
     // 時間ラベル順に処理
     TIME_LABEL_LIST foreach { timeLabel =>
       // ステージごとの処理
       stageList foreach { stage =>
         // 取得したパフォーマンスごとの処理
-        Performance.findByFestivalId(festivalId) collect {
+        performanceList collect {
           // パフォーマンスの時間ラベルとステージIDを指定
           case performance if timeLabel == performance.time && stage.id.get == performance.stageId => {
             timeTableList collect {
-              case timeTable if timeLabel == timeTable.timeLabel => timeTable.performanceStageMap = timeTable.performanceStageMap + (stage.id.get -> performance)
+              case timeTable if timeLabel == timeTable.timeLabel => {
+                // Stage.Idをキーとして、Performanceをセットする
+                timeTable.performanceStageMap = timeTable.performanceStageMap + (stage.id.get -> performance)
+              }
               case _ =>
             }
           }
