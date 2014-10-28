@@ -240,7 +240,6 @@ object Application extends Controller with Secured {
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("ステージ新規登録画面", 1, 0, twitterUser, Seq.empty)
     stageForm.bindFromRequest.fold(
       formWithErrors => {
-        println(formWithErrors)
         BadRequest(html.createStage(pager, festivalId, formWithErrors))
       },
       stage => {
@@ -280,7 +279,6 @@ object Application extends Controller with Secured {
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("ステージ更新画面", 1, 0, twitterUser, Seq.empty)
     stageForm.bindFromRequest.fold(
       formWithErrors => {
-        println(formWithErrors)
         BadRequest(views.html.editStage(pager, festivalId, stageId, formWithErrors))
       },
       stage => {
