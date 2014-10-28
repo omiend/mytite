@@ -65,6 +65,28 @@ object TwitterUser {
   }
   
   /**
+   * Idを指定して取得
+   */
+  def findById(id: Long): Option[TwitterUser] = {
+    val params = Seq[NamedParameter](
+       'id -> id
+    )
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+          select *
+            from twitter_user
+           where id = {id}
+        """
+      ).on(
+        params: _*
+      ).as(
+        TwitterUser.simple.singleOpt
+      )
+    }
+  }
+
+  /**
    * TwitterUser twitter_idを指定して取得
    */
   def getByTwitterId(twitterId: Long): Option[TwitterUser] = {
