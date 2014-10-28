@@ -39,6 +39,24 @@ object Heart {
     }
   }
 
+  def findById(id: Long):Option[Heart] = {
+    val params = Seq[NamedParameter](
+      'id -> id
+    )
+    DB.withConnection { implicit connection =>
+      // 件数取得
+      SQL(
+        """
+        select *
+          from Heart
+         where id = {id}
+        """
+      ).on(
+        params: _*
+      ).as(Heart.simple.singleOpt)
+    }
+  }
+
   /**
    * Heartの件数を取得する
    */
