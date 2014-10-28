@@ -33,15 +33,17 @@ import org.specs2.specification._
 @RunWith(classOf[JUnitRunner])
 class ApplicationSpec extends Specification {
 
+  def fakeApp = FakeApplication(additionalConfiguration = inMemoryDatabase())
+
   "Application" should {
     
     // GET /hoge (send 404 on a bad request)
-    "GET  /hoge (send 404 on a bad request)" in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "GET  /hoge (send 404 on a bad request)" in new WithApplication(fakeApp) {
       route(FakeRequest(GET, "/hoge")) must beNone
     }
 
     // GET     /                           controllers.Application.index(p: Int ?= 1)
-    "GET  / " in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "GET  / " in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableHeart)
       // テスト対象実行
@@ -51,7 +53,7 @@ class ApplicationSpec extends Specification {
     }
 
     // GET     /usage                      controllers.Application.usage
-    "GET  /usage " in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "GET  /usage " in new WithApplication(fakeApp) {
       // テスト対象実行
       val resultRoute = route(FakeRequest(GET, "/usage")).get
       status(resultRoute) must equalTo(OK)
@@ -59,7 +61,7 @@ class ApplicationSpec extends Specification {
     }
 
     // GET     /about                      controllers.Application.about
-    "GET  /about " in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "GET  /about " in new WithApplication(fakeApp) {
       // テスト対象実行
       val resultRoute = route(FakeRequest(GET, "/about")).get
       status(resultRoute) must equalTo(OK)
@@ -67,7 +69,7 @@ class ApplicationSpec extends Specification {
     }
 
     // GET     /festival/:targetTwitterId                    controllers.Application.festival(p: Int ?= 1, targetTwitterId: Long)
-    "GET  /festival/:targetTwitterId " in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "GET  /festival/:targetTwitterId " in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage, createTableHeart)
       // --- テストデータ作成
@@ -79,7 +81,7 @@ class ApplicationSpec extends Specification {
     }
 
     // GET     /createFestival                               controllers.Application.createFestival
-    "GET  /createFestival " in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "GET  /createFestival " in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage, createTableHeart)
       // --- テストデータ作成
@@ -91,7 +93,7 @@ class ApplicationSpec extends Specification {
     }
 
     // POST    /insertFestival                               controllers.Application.insertFestival
-    "POST /insertFestival " in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "POST /insertFestival " in new WithApplication(fakeApp) {
 
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage)
@@ -141,7 +143,7 @@ class ApplicationSpec extends Specification {
     }
 
     // GET     /editFestival/:festivalId                     controllers.Application.editFestival(festivalId: Long)
-    "GET  /editFestival/:festivalId " in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "GET  /editFestival/:festivalId " in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage)
       // --- テストデータ作成
@@ -152,13 +154,11 @@ class ApplicationSpec extends Specification {
     }
 
     // POST    /updateFestival                               controllers.Application.updateFestival(festivalId: Long)
-    "POST /updateFestival " in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
-
+    "POST /updateFestival " in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage)
       // --- テストデータ作成
       createTestData(createTestDataTwitterUser, createTestDataFestival)
-
       // --- 異常ケース
       // テスト対象実行
       val resultRouteByBadRequest = route(FakeRequest(POST, "/updateFestival?festivalId=900001").withFormUrlEncodedBody(
@@ -167,7 +167,6 @@ class ApplicationSpec extends Specification {
       ).withSession("twitterId" -> "900001")).get
       // リターン値
       status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
-
       // --- 正常ケース
       // テスト対象実行
       val resultRoute = route(FakeRequest(POST, "/updateFestival?festivalId=900001").withFormUrlEncodedBody(
@@ -180,14 +179,13 @@ class ApplicationSpec extends Specification {
       val festival: Option[Festival] = Festival.findById(900001)
       // Festivalが取得できる事
       festival must beSome[Festival]
-      
       // 項目の確認
       festival.get.festivalName must beMatching("TEST_UPDATED_FES")
       festival.get.description  must beMatching("TEST_FESTIVAL_DESCRIPTION_UPDATED_UPDATE")
     }
 
     // GET     /deleteFestival/:festivalId                   controllers.Application.deleteFestival(festivalId: Long)
-    "GET  /deleteFestival/:festivalId " in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "GET  /deleteFestival/:festivalId " in new WithApplication(fakeApp) {
 
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage, createTablePerformance, createTableHeart)
@@ -206,7 +204,7 @@ class ApplicationSpec extends Specification {
 
     // # Stage
     // GET     /createStage/:festivalId                      controllers.Application.createStage(festivalId: Long)
-    "GET  /createStage/:festivalId " in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "GET  /createStage/:festivalId " in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage)
       // --- テストデータ作成
@@ -217,7 +215,7 @@ class ApplicationSpec extends Specification {
     }
 
     // POST    /insertStage                                  controllers.Application.insertStage(festivalId: Long)
-    "POST /insertStage " in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "POST /insertStage " in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage)
       // --- テストデータ作成
@@ -247,7 +245,7 @@ class ApplicationSpec extends Specification {
     }
 
     // GET     /editStage/:festivalId/:stageId               controllers.Application.editStage(festivalId: Long, stageId: Long)
-    "GET  /editStage/:festivalId/:stageId "  in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "GET  /editStage/:festivalId/:stageId "  in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage)
       // --- テストデータ作成
@@ -260,7 +258,7 @@ class ApplicationSpec extends Specification {
     }
 
     // POST    /updateStage                                  controllers.Application.updateStage(festivalId: Long, stageId: Long)
-    "POST /updateStage "  in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "POST /updateStage "  in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage)
       // --- テストデータ作成
@@ -291,7 +289,7 @@ class ApplicationSpec extends Specification {
     }
 
     // GET     /deleteStage/:festivalId/:stageId             controllers.Application.deleteStage(festivalId: Long, stageId: Long)
-    "GET  /deleteStage/:festivalId/:stageId "  in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "GET  /deleteStage/:festivalId/:stageId "  in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage, createTablePerformance)
       // --- テストデータ作成
@@ -309,7 +307,7 @@ class ApplicationSpec extends Specification {
 
     // # Performance
     // GET     /createPerformance/:festivalId                controllers.Application.createPerformance(festivalId: Long)
-    "GET  /createPerformance/:festivalId " in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "GET  /createPerformance/:festivalId " in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage)
       // --- テストデータ作成
@@ -319,7 +317,7 @@ class ApplicationSpec extends Specification {
       status(resultRoute) must equalTo(OK)
     }
     // POST    /insertPerformance                            controllers.Application.insertPerformance(festivalId: Long)
-    "POST /insertPerformance " in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "POST /insertPerformance " in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage, createTablePerformance)
       // --- テストデータ作成
@@ -361,7 +359,7 @@ class ApplicationSpec extends Specification {
     }
 
     // GET     /editPerformance/:festivalId/:performanceId   controllers.Application.editPerformance(festivalId: Long, performanceId: Long)
-    "GET  /editPerformance/:festivalId/:performanceId "  in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "GET  /editPerformance/:festivalId/:performanceId "  in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage, createTablePerformance)
       // --- テストデータ作成
@@ -374,12 +372,11 @@ class ApplicationSpec extends Specification {
     }
 
     // POST    /updatePerformance                            controllers.Application.updatePerformance(festivalId: Long, performanceId: Long)
-    "POST /updatePerformance "  in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "POST /updatePerformance "  in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage, createTablePerformance)
       // --- テストデータ作成
       createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataStage, createTestDataPerformance)
-
       // 異常ケース
       // テスト対象実行
       val resultRouteByBadRequest = route(FakeRequest(POST, "/updatePerformance?festivalId=900001&performanceId=900001").withFormUrlEncodedBody(
@@ -389,10 +386,8 @@ class ApplicationSpec extends Specification {
         ,"time"       -> "10:30"
         ,"timeFrame"  -> "60"
       ).withSession("twitterId" -> "900001")).get
-
       // リターン値
       status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
-
       // 正常ケース
       // テスト対象実行
       val resultRoute = route(FakeRequest(POST, "/updatePerformance?festivalId=900001&performanceId=900001").withFormUrlEncodedBody(
@@ -415,12 +410,11 @@ class ApplicationSpec extends Specification {
     }
 
     // GET     /deletePerformance/:festivalId/:performanceId controllers.Application.deletePerformance(festivalId: Long, performanceId: Long)
-    "GET  /deletePerformance/:festivalId/:performanceId "  in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "GET  /deletePerformance/:festivalId/:performanceId "  in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage, createTablePerformance)
       // --- テストデータ作成
       createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataStage, createTestDataPerformance)
-
       // テスト対象実行
       val resultRoute = route(FakeRequest(GET, "/deletePerformance/900001/900001").withSession("twitterId" -> "900001")).get
       // リターン値
@@ -433,38 +427,197 @@ class ApplicationSpec extends Specification {
 
     // # TimeTable
     // GET     /timetable/:targetTwitterId/:festivalId       controllers.Application.timetable(targetTwitterId: Long, festivalId: Long)
-    "GET  /timetable/:targetTwitterId/:festivalId "  in new WithApplication(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "GET  /timetable/:targetTwitterId/:festivalId "  in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage, createTablePerformance, createTableHeart)
       // --- テストデータ作成
       createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataStage, createTestDataPerformance, createTestDataHeart)
-
       // テスト対象実行
       val resultRoute = route(FakeRequest(GET, "/deletePerformance/900001/900001").withSession("twitterId" -> "900001")).get
       // リターン値
       status(resultRoute) must equalTo(SEE_OTHER)
-      println(resultRoute)
     }
 
     // # Twitter
     // GET     /twitterLogin                                 controllers.TwitterController.twitterLogin
-    // GET     /twitterOAuthCallback                         controllers.TwitterController.twitterOAuthCallback
+    "GET  /twitterLogin " in new WithApplication(fakeApp) {
+      // --- Database初期化
+      executeDdl(createTableTwitterUser)
+      // テスト対象実行
+      val resultRoute = route(FakeRequest(GET, "/twitterLogin")).get
+      status(resultRoute) must equalTo(SEE_OTHER)
+    }
+
+    // // GET     /twitterOAuthCallback                         controllers.TwitterController.twitterOAuthCallback
+    // "GET  /twitterOAuthCallback " in new WithApplication(fakeApp) {
+    //   // --- Database初期化
+    //   executeDdl(createTableTwitterUser)
+    //   // 異常ケース
+    //   val resultRouteByBadRequest = route(FakeRequest(GET, "/twitterOAuthCallback?denied=denied")).get
+    //   status(resultRouteByBadRequest) must equalTo(SEE_OTHER)
+    //   // テスト対象実行
+    //   val resultRoute = route(FakeRequest(GET, "/twitterOAuthCallback?oauth_token=TEST_OAUTH_TOKEN&oauth_verifier=TEST_OAUTH_VERIRIER")).get
+    //   status(resultRoute) must equalTo(SEE_OTHER)
+    //   val twitterUser: Option[TwitterUser] = TwitterUser.findById(1)
+    //   // TwitterUserが取得出来ること
+    //   twitterUser must beSome[TwitterUser]
+    // }
+
     // GET     /twitterLogout                                controllers.TwitterController.twitterLogout
+    "GET  /twitterLogout" in new WithApplication(fakeApp) {
+      // --- Database初期化
+      executeDdl(createTableTwitterUser)
+      // テスト対象実行
+      val resultRoute = route(FakeRequest(GET, "/twitterLogout").withSession("twitterId" -> "900001")).get
+      status(resultRoute) must equalTo(SEE_OTHER)
+    }
 
     // # javascriptRoutes
-    // GET     /javascriptRoutes                             controllers.JsRouter.javascriptRoutes
+    // GET /javascriptRoutes controllers.JsRouter.javascriptRoutes
+    "GET  /javascriptRoutes" in new WithApplication(fakeApp) {
+      // --- Database初期化
+      executeDdl(createTableTwitterUser)
+      // テスト対象実行
+      val resultRoute = route(FakeRequest(GET, "/javascriptRoutes")).get
+      status(resultRoute) must equalTo(OK)
+    }
 
     // # Ajax Festival
-    // POST    /ajaxUpdateFestival                           controllers.AjaxController.ajaxUpdateFestival(festivalId: Long, festivalName: String)
+    // POST /ajaxUpdateFestival controllers.AjaxController.ajaxUpdateFestival(festivalId: Long, festivalName: String)
+    "POST /ajaxUpdateFestival " in new WithApplication(fakeApp) {
+      // --- Database初期化
+      executeDdl(createTableTwitterUser, createTableFestival, createTableStage)
+      // --- テストデータ作成
+      createTestData(createTestDataTwitterUser, createTestDataFestival)
+      // --- 異常ケース
+      // テスト対象実行
+      val resultRouteByBadRequest = route(FakeRequest(POST, "/ajaxUpdateFestival?festivalId=900001&festivalName=TEST_FESTIVAL_NAME_XXXXXXXXXXXXXXXXXXXXX").withSession("twitterId" -> "900001")).get
+      // リターン値
+      status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
+      // --- 正常ケース
+      // テスト対象実行
+      val resultRoute = route(FakeRequest(POST, "/ajaxUpdateFestival?festivalId=900001&festivalName=TEST_UPDATED_FES").withSession("twitterId" -> "900001")).get
+      // リターン値
+      status(resultRoute) must equalTo(OK)
+      // 更新されたFestivalを取得
+      val festival: Option[Festival] = Festival.findById(900001)
+      // Festivalが取得できる事
+      festival must beSome[Festival]
+      // 項目の確認
+      festival.get.festivalName must beMatching("TEST_UPDATED_FES")
+    }
 
     // # Ajax Stage
     // POST    /ajaxUpdateStage                              controllers.AjaxController.ajaxUpdateStage(stageId: Long, stageName: String)
-    // POST    /ajaxUpdatePerformance                        controllers.AjaxController.ajaxUpdatePerformance(performanceId: Long, artist: String)
-    // POST    /ajaxUpdatePerformanceByTimeFrame             controllers.AjaxController.ajaxUpdatePerformanceByTimeFrame(performanceId: Long, stageId: Long, time: String)
+    "POST /ajaxUpdateStage "  in new WithApplication(fakeApp) {
+      // --- Database初期化
+      executeDdl(createTableTwitterUser, createTableFestival, createTableStage)
+      // --- テストデータ作成
+      createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataStage)
+      // 異常ケース
+      // テスト対象実行
+      val resultRouteByBadRequest = route(FakeRequest(POST, "/ajaxUpdateStage?stageId=900001&stageName=TEST_STAGE_NAME_XXXXXXXX").withSession("twitterId" -> "900001")).get
+      // リターン値
+      status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
+      // 正常ケース
+      // テスト対象実行
+      val resultRoute = route(FakeRequest(POST, "/ajaxUpdateStage?stageId=900001&stageName=TEST_STAGE_NAME_UP").withSession("twitterId" -> "900001")).get
+      // リターン値
+      status(resultRoute) must equalTo(OK)
+      // 更新されたStageを取得
+      val stage: Option[Stage] = Stage.findById(900001)
+      // Stageが取得できる事
+      stage must beSome[Stage]
+      // 項目の確認
+      stage.get.stageName must beMatching("TEST_STAGE_NAME_UP")
+    }
+
+    // POST /ajaxUpdatePerformance controllers.AjaxController.ajaxUpdatePerformance(performanceId: Long, artist: String)
+    "POST /ajaxUpdatePerformance "  in new WithApplication(fakeApp) {
+      // --- Database初期化
+      executeDdl(createTableTwitterUser, createTableFestival, createTableStage, createTablePerformance)
+      // --- テストデータ作成
+      createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataStage, createTestDataPerformance)
+      // 異常ケース
+      // テスト対象実行
+      val resultRouteByBadRequest = route(FakeRequest(POST, "/ajaxUpdatePerformance?performanceId=900001&artist=TEST_ARTIST_NAME_UPDATE_XXXXXXXXXXXX").withSession("twitterId" -> "900001")).get
+      // リターン値
+      status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
+      // 正常ケース
+      // テスト対象実行
+      val resultRoute = route(FakeRequest(POST, "/ajaxUpdatePerformance?performanceId=900001&artist=TEST_ARTIST_NAME_UPDATE").withSession("twitterId" -> "900001")).get
+      // リターン値
+      status(resultRoute) must equalTo(OK)
+      // 更新されたPerformanceを取得
+      val performance: Option[Performance] = Performance.findById(900001)
+      // Performanceが取得できる事
+      performance must beSome[Performance]
+      // 項目の確認
+      performance.get.artist must beMatching("TEST_ARTIST_NAME_UPDATE")
+    }
+
+    // POST /ajaxUpdatePerformanceByTimeFrame controllers.AjaxController.ajaxUpdatePerformanceByTimeFrame(performanceId: Long, stageId: Long, time: String)
+    "POST /ajaxUpdatePerformanceByTimeFrame "  in new WithApplication(fakeApp) {
+      // --- Database初期化
+      executeDdl(createTableTwitterUser, createTableFestival, createTableStage, createTablePerformance)
+      // --- テストデータ作成
+      createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataStage, createTestDataPerformance)
+      // 異常ケース
+      // テスト対象実行
+      val resultRouteByBadRequest = route(FakeRequest(POST, "/ajaxUpdatePerformanceByTimeFrame?performanceId=900002&stageId=900001&time=10:30").withSession("twitterId" -> "900001")).get
+      // リターン値
+      status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
+      // 正常ケース
+      // テスト対象実行
+      val resultRoute = route(FakeRequest(POST, "/ajaxUpdatePerformanceByTimeFrame?performanceId=900001&stageId=900001&time=10:30").withSession("twitterId" -> "900001")).get
+      // リターン値
+      status(resultRoute) must equalTo(OK)
+      // 更新されたPerformanceを取得
+      val performance: Option[Performance] = Performance.findById(900001)
+      // Performanceが取得できる事
+      performance must beSome[Performance]
+      // 項目の確認
+      performance.get.time must beMatching("10:30")
+    }
 
     // # Ajax Heart
-    // POST    /ajaxInsertHeart                              controllers.AjaxController.ajaxInsertHeart(festivalId: Long)
-    // POST    /ajaxDeleteHeart                              controllers.AjaxController.ajaxDeleteHeart(festivalId: Long)
+    // POST /ajaxInsertHeart controllers.AjaxController.ajaxInsertHeart(festivalId: Long)
+    "POST /ajaxInsertHeart "  in new WithApplication(fakeApp) {
+      // --- Database初期化
+      executeDdl(createTableTwitterUser, createTableFestival, createTableStage, createTablePerformance, createTableHeart)
+      // --- テストデータ作成
+      createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataStage, createTestDataPerformance)
+      // 異常ケース
+      // テスト対象実行
+      val resultRouteByBadRequest = route(FakeRequest(POST, "/ajaxInsertHeart?festivalId=900002").withSession("twitterId" -> "900001")).get
+      // リターン値
+      status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
+      // 正常ケース
+      // テスト対象実行
+      val resultRoute = route(FakeRequest(POST, "/ajaxInsertHeart?festivalId=900001").withSession("twitterId" -> "900001")).get
+      // リターン値
+      status(resultRoute) must equalTo(OK)
+      // 更新されたHeartを取得
+      val heart: Option[Heart] = Heart.findById(1)
+      // Heartが取得できる事
+      heart must beSome[Heart]
+    }
+
+    // POST /ajaxDeleteHeart controllers.AjaxController.ajaxDeleteHeart(festivalId: Long)
+    "POST /ajaxDeleteHeart "  in new WithApplication(fakeApp) {
+      // --- Database初期化
+      executeDdl(createTableTwitterUser, createTableFestival, createTableHeart)
+      // --- テストデータ作成
+      createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataHeart)
+      // テスト対象実行
+      val resultRoute = route(FakeRequest(POST, "/ajaxDeleteHeart?festivalId=900001").withSession("twitterId" -> "900001")).get
+      // リターン値
+      status(resultRoute) must equalTo(OK)
+      // 更新されたHeartを取得
+      val heart: Option[Heart] = Heart.findById(900001)
+      // Heartが取得できない事
+      heart must beNone
+    }
   }
 
   /********************************************************
