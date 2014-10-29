@@ -37,6 +37,10 @@ GET     /twitterLogin                                 controllers.TwitterControl
 GET     /twitterOAuthCallback                         controllers.TwitterController.twitterOAuthCallback
 GET     /twitterLogout                                controllers.TwitterController.twitterLogout
 
+# Delete All
+GET     /withdraw                                     controllers.Application.withdraw
+GET     /deleteAll                                    controllers.Application.deleteAll
+
 # javascriptRoutes
 GET     /javascriptRoutes                             controllers.JsRouter.javascriptRoutes
 
