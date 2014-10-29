@@ -620,7 +620,7 @@ class ApplicationSpec extends Specification {
     }
 
     // GET /withdraw controllers.Application.withdraw
-    "GET /withdraw "  in new WithApplication(fakeApp) {
+    "GET  /withdraw "  in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser)
       // --- テストデータ作成
