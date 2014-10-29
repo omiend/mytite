@@ -5,8 +5,6 @@ import play.api.mvc._
 import models._
 import twitter4j._
 import twitter4j.auth._
-import twitter4j.auth.AccessToken
-import twitter4j.User
 
 /**
  * ツイッターログインコントローラ
