@@ -617,6 +617,41 @@ class ApplicationSpec extends Specification {
       // Heartが取得できない事
       heart must beNone
     }
+
+    // GET /withdraw controllers.Application.withdraw
+    "GET  /withdraw "  in new WithApplication(fakeApp) {
+      // --- Database初期化
+      executeDdl(createTableTwitterUser)
+      // --- テストデータ作成
+      createTestData(createTestDataTwitterUser)
+      // テスト対象実行
+      val resultRoute = route(FakeRequest(GET, "/withdraw").withSession("twitterId" -> "900001")).get
+      // リターン値
+      status(resultRoute) must equalTo(OK)
+    }
+
+    // GET /deleteAll controllers.Application.deleteAll
+    "GET  /deleteAll "  in new WithApplication(fakeApp) {
+      // --- Database初期化
+      executeDdl(createTableTwitterUser, createTableFestival, createTableHeart, createTableStage, createTablePerformance)
+      // --- テストデータ作成
+      createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataHeart, createTestDataStage, createTestDataPerformance)
+      // テスト対象実行
+      val resultRoute = route(FakeRequest(GET, "/deleteAll").withSession("twitterId" -> "900001")).get
+      // リターン値
+      status(resultRoute) must equalTo(SEE_OTHER)
+      // 削除されたデータを取得し、存在しないことを確認
+      val twitterUser: Option[TwitterUser] = TwitterUser.findById(900001)
+      twitterUser must beNone
+      val festival:    Option[Festival]    = Festival.findById(900001)
+      festival must beNone
+      val heart:       Option[Heart]       = Heart.findById(900001)
+      heart must beNone
+      val stage:       Option[Stage]       = Stage.findById(900001)
+      stage must beNone
+      val performance: Option[Performance] = Performance.findById(900001)
+      performance must beNone
+    }
   }
 
   /********************************************************

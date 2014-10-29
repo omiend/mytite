@@ -106,7 +106,7 @@ object Application extends Controller with Secured {
   /*****************************************************************************
    *** Festival／Stage登録画面起動
    *****************************************************************************/
-  def createFestival() = IsAuthenticated { twitterId => implicit request =>
+  def createFestival = IsAuthenticated { twitterId => implicit request =>
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
     // Pagerを初期化
@@ -457,6 +457,31 @@ object Application extends Controller with Secured {
         }
       }
       case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : timetable 01")
+    }
+  }
+
+  /*****************************************************************************
+   *** 退会ページ
+   *****************************************************************************/
+  def withdraw = IsAuthenticated { twitterId => implicit request =>
+    // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
+    var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
+      case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
+      case _ => None
+    }
+    // Pagerを初期化
+    val pager: Pager[TwitterUser] = Pager[TwitterUser]("退会ページ", 1, 0, twitterUser, Seq.empty)
+    Ok(views.html.withdraw(pager))
+  }
+
+  def deleteAll = IsAuthenticated { twitterId => implicit request =>
+    val pager: Pager[TwitterUser] = Pager[TwitterUser]("トップ", 1, 0, None, Seq.empty)
+    TwitterUser.getByTwitterId(twitterId.toLong) match {
+      case Some(twitterUser) => {
+        TwitterUser.deleteAll(twitterId.toLong)
+        Redirect(routes.TwitterController.twitterLogout)
+      }
+      case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : deleteAll 01")
     }
   }
 
