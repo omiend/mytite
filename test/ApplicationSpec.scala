@@ -10,7 +10,6 @@ import anorm.SimpleSql
 
 import play.api.db._
 import play.api.db.DBPlugin
-// import play.api.db.evolutions.{InvalidDatabaseRevision, Evolutions, Evolution, OfflineEvolutions}
 
 import play.api.Play.current
 
@@ -87,7 +86,7 @@ class ApplicationSpec extends Specification {
       // --- テストデータ作成
       createTestData(createTestDataTwitterUser)
       // テスト対象実行
-      val resultRoute = route(FakeRequest(GET, "/createFestival").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(GET, "/createFestival").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       status(resultRoute) must equalTo(OK)
       contentType(resultRoute) must beSome.which(_ == "text/html")
     }
@@ -106,7 +105,7 @@ class ApplicationSpec extends Specification {
          "festivalName" -> "TEST_FESTIVAL_NAME_XXXXXXXXXXXXXXXXXXXXX"
         ,"description"  -> "TEST_FESTIVAL_DESCRIPTION"
         ,"stageName[0]" -> "TEST_STAGE_NAME_1"
-      ).withSession("twitterId" -> "900001")).get
+      ).withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
 
       // リターン値
       status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
@@ -120,7 +119,7 @@ class ApplicationSpec extends Specification {
         ,"stageName[1]" -> "TEST_STAGE_NAME_2"
         ,"stageName[2]" -> "TEST_STAGE_NAME_3"
         ,"stageName[3]" -> "TEST_STAGE_NAME_4"
-      ).withSession("twitterId" -> "900001")).get
+      ).withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(SEE_OTHER)
       // 登録されたFestivalを取得
@@ -149,7 +148,7 @@ class ApplicationSpec extends Specification {
       // --- テストデータ作成
       createTestData(createTestDataTwitterUser, createTestDataFestival)
       // テスト対象実行
-      val resultRoute = route(FakeRequest(GET, "/editFestival/900001").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(GET, "/editFestival/900001").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       status(resultRoute) must equalTo(OK)
     }
 
@@ -164,7 +163,7 @@ class ApplicationSpec extends Specification {
       val resultRouteByBadRequest = route(FakeRequest(POST, "/updateFestival?festivalId=900001").withFormUrlEncodedBody(
          "festivalName" -> "TEST_FESTIVAL_NAME_XXXXXXXXXXXXXXXXXXXXX"
         ,"description"  -> "TEST_FESTIVAL_DESCRIPTION_UPDATED_UPDATE"
-      ).withSession("twitterId" -> "900001")).get
+      ).withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
       // --- 正常ケース
@@ -172,7 +171,7 @@ class ApplicationSpec extends Specification {
       val resultRoute = route(FakeRequest(POST, "/updateFestival?festivalId=900001").withFormUrlEncodedBody(
          "festivalName" -> "TEST_UPDATED_FES"
         ,"description"  -> "TEST_FESTIVAL_DESCRIPTION_UPDATED_UPDATE"
-      ).withSession("twitterId" -> "900001")).get
+      ).withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(SEE_OTHER)
       // 更新されたFestivalを取得
@@ -193,7 +192,7 @@ class ApplicationSpec extends Specification {
       createTestData(createTestDataTwitterUser, createTestDataFestival)
 
       // テスト対象実行
-      val resultRoute = route(FakeRequest(GET, "/deleteFestival/900001").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(GET, "/deleteFestival/900001").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(SEE_OTHER)
       // Festivalを取得
@@ -210,7 +209,7 @@ class ApplicationSpec extends Specification {
       // --- テストデータ作成
       createTestData(createTestDataTwitterUser, createTestDataFestival)
       // テスト対象実行
-      val resultRoute = route(FakeRequest(GET, "/createStage/900001").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(GET, "/createStage/900001").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       status(resultRoute) must equalTo(OK)
     }
 
@@ -225,7 +224,7 @@ class ApplicationSpec extends Specification {
       // テスト対象実行
       val resultRouteByBadRequest = route(FakeRequest(POST, "/insertStage?festivalId=900001").withFormUrlEncodedBody(
         "stageName" -> "TEST_STAGE_NAME_XXXXX"
-      ).withSession("twitterId" -> "900001")).get
+      ).withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
 
@@ -233,7 +232,7 @@ class ApplicationSpec extends Specification {
       // テスト対象実行
       val resultRoute = route(FakeRequest(POST, "/insertStage?festivalId=900001").withFormUrlEncodedBody(
         "stageName" -> "TEST_STAGE_NAME"
-      ).withSession("twitterId" -> "900001")).get
+      ).withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(SEE_OTHER)
       // 登録されたStageを取得する
@@ -252,7 +251,7 @@ class ApplicationSpec extends Specification {
       createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataStage)
 
       // テスト対象実行
-      val resultRoute = route(FakeRequest(GET, "/editStage/900001/900001").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(GET, "/editStage/900001/900001").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(OK)
     }
@@ -268,7 +267,7 @@ class ApplicationSpec extends Specification {
       // テスト対象実行
       val resultRouteByBadRequest = route(FakeRequest(POST, "/updateStage?festivalId=900001&stageId=900001").withFormUrlEncodedBody(
          "stageName" -> "TEST_STAGE_NAME_UPDATE_XXXXXXXX"
-      ).withSession("twitterId" -> "900001")).get
+      ).withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
 
       // リターン値
       status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
@@ -277,7 +276,7 @@ class ApplicationSpec extends Specification {
       // テスト対象実行
       val resultRoute = route(FakeRequest(POST, "/updateStage?festivalId=900001&stageId=900001").withFormUrlEncodedBody(
          "stageName" -> "TEST_STAGE_NAME_UP"
-      ).withSession("twitterId" -> "900001")).get
+      ).withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(SEE_OTHER)
       // 更新されたStageを取得
@@ -296,7 +295,7 @@ class ApplicationSpec extends Specification {
       createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataStage)
 
       // テスト対象実行
-      val resultRoute = route(FakeRequest(GET, "/deleteStage/900001/900001").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(GET, "/deleteStage/900001/900001").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(SEE_OTHER)
       // Stageを取得
@@ -313,7 +312,7 @@ class ApplicationSpec extends Specification {
       // --- テストデータ作成
       createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataStage)
       // テスト対象実行
-      val resultRoute = route(FakeRequest(GET, "/createPerformance/900001").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(GET, "/createPerformance/900001").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       status(resultRoute) must equalTo(OK)
     }
     // POST    /insertPerformance                            controllers.Application.insertPerformance(festivalId: Long)
@@ -331,7 +330,7 @@ class ApplicationSpec extends Specification {
         ,"artist"     -> "TEST_ARTIST_NAME_XXXXXXXXXXXXXXXXXXX"
         ,"time"       -> "10:00"
         ,"timeFrame"  -> "30"
-      ).withSession("twitterId" -> "900001")).get
+      ).withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
 
@@ -343,7 +342,7 @@ class ApplicationSpec extends Specification {
         ,"artist"     -> "TEST_ARTIST_NAME"
         ,"time"       -> "10:00"
         ,"timeFrame"  -> "30"
-      ).withSession("twitterId" -> "900001")).get
+      ).withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(SEE_OTHER)
       // 登録されたPerformanceを取得する
@@ -366,7 +365,7 @@ class ApplicationSpec extends Specification {
       createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataStage, createTestDataPerformance)
 
       // テスト対象実行
-      val resultRoute = route(FakeRequest(GET, "/editPerformance/900001/900001").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(GET, "/editPerformance/900001/900001").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(OK)
     }
@@ -385,7 +384,7 @@ class ApplicationSpec extends Specification {
         ,"artist"     -> "TEST_ARTIST_NAME_UPDATE_XXXXXXXXXXXX"
         ,"time"       -> "10:30"
         ,"timeFrame"  -> "60"
-      ).withSession("twitterId" -> "900001")).get
+      ).withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
       // 正常ケース
@@ -396,7 +395,7 @@ class ApplicationSpec extends Specification {
         ,"artist"     -> "TEST_ARTIST_NAME_UPDATE"
         ,"time"       -> "10:30"
         ,"timeFrame"  -> "60"
-      ).withSession("twitterId" -> "900001")).get
+      ).withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(SEE_OTHER)
       // 更新されたPerformanceを取得
@@ -416,7 +415,7 @@ class ApplicationSpec extends Specification {
       // --- テストデータ作成
       createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataStage, createTestDataPerformance)
       // テスト対象実行
-      val resultRoute = route(FakeRequest(GET, "/deletePerformance/900001/900001").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(GET, "/deletePerformance/900001/900001").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(SEE_OTHER)
       // Performanceを取得
@@ -433,21 +432,21 @@ class ApplicationSpec extends Specification {
       // --- テストデータ作成
       createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataStage, createTestDataPerformance, createTestDataHeart)
       // テスト対象実行
-      val resultRoute = route(FakeRequest(GET, "/deletePerformance/900001/900001").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(GET, "/deletePerformance/900001/900001").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(SEE_OTHER)
     }
 
-    // # Twitter
-    // GET     /twitterLogin                                 controllers.TwitterController.twitterLogin
-    "GET  /twitterLogin " in new WithApplication(fakeApp) {
-      // --- Database初期化
-      executeDdl(createTableTwitterUser)
-      // テスト対象実行
-      val resultRoute = route(FakeRequest(GET, "/twitterLogin")).get
-      status(resultRoute) must equalTo(SEE_OTHER)
-    }
-
+    // // # Twitter
+    // // GET     /twitterLogin                                 controllers.TwitterController.twitterLogin
+    // "GET  /twitterLogin " in new WithApplication(fakeApp) {
+    //   // --- Database初期化
+    //   executeDdl(createTableTwitterUser)
+    //   // テスト対象実行
+    //   val resultRoute = route(FakeRequest(GET, "/twitterLogin")).get
+    //   status(resultRoute) must equalTo(SEE_OTHER)
+    // }
+    // 
     // // GET     /twitterOAuthCallback                         controllers.TwitterController.twitterOAuthCallback
     // "GET  /twitterOAuthCallback " in new WithApplication(fakeApp) {
     //   // --- Database初期化
@@ -468,7 +467,7 @@ class ApplicationSpec extends Specification {
       // --- Database初期化
       executeDdl(createTableTwitterUser)
       // テスト対象実行
-      val resultRoute = route(FakeRequest(GET, "/twitterLogout").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(GET, "/twitterLogout").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       status(resultRoute) must equalTo(SEE_OTHER)
     }
 
@@ -491,12 +490,12 @@ class ApplicationSpec extends Specification {
       createTestData(createTestDataTwitterUser, createTestDataFestival)
       // --- 異常ケース
       // テスト対象実行
-      val resultRouteByBadRequest = route(FakeRequest(POST, "/ajaxUpdateFestival?festivalId=900001&festivalName=TEST_FESTIVAL_NAME_XXXXXXXXXXXXXXXXXXXXX").withSession("twitterId" -> "900001")).get
+      val resultRouteByBadRequest = route(FakeRequest(POST, "/ajaxUpdateFestival?festivalId=900001&festivalName=TEST_FESTIVAL_NAME_XXXXXXXXXXXXXXXXXXXXX").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
       // --- 正常ケース
       // テスト対象実行
-      val resultRoute = route(FakeRequest(POST, "/ajaxUpdateFestival?festivalId=900001&festivalName=TEST_UPDATED_FES").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(POST, "/ajaxUpdateFestival?festivalId=900001&festivalName=TEST_UPDATED_FES").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(OK)
       // 更新されたFestivalを取得
@@ -516,12 +515,12 @@ class ApplicationSpec extends Specification {
       createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataStage)
       // 異常ケース
       // テスト対象実行
-      val resultRouteByBadRequest = route(FakeRequest(POST, "/ajaxUpdateStage?stageId=900001&stageName=TEST_STAGE_NAME_XXXXXXXX").withSession("twitterId" -> "900001")).get
+      val resultRouteByBadRequest = route(FakeRequest(POST, "/ajaxUpdateStage?stageId=900001&stageName=TEST_STAGE_NAME_XXXXXXXX").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
       // 正常ケース
       // テスト対象実行
-      val resultRoute = route(FakeRequest(POST, "/ajaxUpdateStage?stageId=900001&stageName=TEST_STAGE_NAME_UP").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(POST, "/ajaxUpdateStage?stageId=900001&stageName=TEST_STAGE_NAME_UP").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(OK)
       // 更新されたStageを取得
@@ -540,12 +539,12 @@ class ApplicationSpec extends Specification {
       createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataStage, createTestDataPerformance)
       // 異常ケース
       // テスト対象実行
-      val resultRouteByBadRequest = route(FakeRequest(POST, "/ajaxUpdatePerformance?performanceId=900001&artist=TEST_ARTIST_NAME_UPDATE_XXXXXXXXXXXX").withSession("twitterId" -> "900001")).get
+      val resultRouteByBadRequest = route(FakeRequest(POST, "/ajaxUpdatePerformance?performanceId=900001&artist=TEST_ARTIST_NAME_UPDATE_XXXXXXXXXXXX").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
       // 正常ケース
       // テスト対象実行
-      val resultRoute = route(FakeRequest(POST, "/ajaxUpdatePerformance?performanceId=900001&artist=TEST_ARTIST_NAME_UPDATE").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(POST, "/ajaxUpdatePerformance?performanceId=900001&artist=TEST_ARTIST_NAME_UPDATE").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(OK)
       // 更新されたPerformanceを取得
@@ -564,12 +563,12 @@ class ApplicationSpec extends Specification {
       createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataStage, createTestDataPerformance)
       // 異常ケース
       // テスト対象実行
-      val resultRouteByBadRequest = route(FakeRequest(POST, "/ajaxUpdatePerformanceByTimeFrame?performanceId=900002&stageId=900001&time=10:30").withSession("twitterId" -> "900001")).get
+      val resultRouteByBadRequest = route(FakeRequest(POST, "/ajaxUpdatePerformanceByTimeFrame?performanceId=900002&stageId=900001&time=10:30").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
       // 正常ケース
       // テスト対象実行
-      val resultRoute = route(FakeRequest(POST, "/ajaxUpdatePerformanceByTimeFrame?performanceId=900001&stageId=900001&time=10:30").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(POST, "/ajaxUpdatePerformanceByTimeFrame?performanceId=900001&stageId=900001&time=10:30").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(OK)
       // 更新されたPerformanceを取得
@@ -589,12 +588,12 @@ class ApplicationSpec extends Specification {
       createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataStage, createTestDataPerformance)
       // 異常ケース
       // テスト対象実行
-      val resultRouteByBadRequest = route(FakeRequest(POST, "/ajaxInsertHeart?festivalId=900002").withSession("twitterId" -> "900001")).get
+      val resultRouteByBadRequest = route(FakeRequest(POST, "/ajaxInsertHeart?festivalId=900002").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
       // 正常ケース
       // テスト対象実行
-      val resultRoute = route(FakeRequest(POST, "/ajaxInsertHeart?festivalId=900001").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(POST, "/ajaxInsertHeart?festivalId=900001").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(OK)
       // 更新されたHeartを取得
@@ -610,7 +609,7 @@ class ApplicationSpec extends Specification {
       // --- テストデータ作成
       createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataHeart)
       // テスト対象実行
-      val resultRoute = route(FakeRequest(POST, "/ajaxDeleteHeart?festivalId=900001").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(POST, "/ajaxDeleteHeart?festivalId=900001").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(OK)
       // 更新されたHeartを取得
