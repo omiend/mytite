@@ -246,4 +246,56 @@ object TwitterUser {
       ).executeUpdate()
     }
   }
+
+  def deleteAll(twitterId: Long) {
+    val params = Seq[NamedParameter](
+      'twitter_id -> twitterId
+    )
+    DB.withConnection { implicit connection =>
+      // Performance削除処理
+      SQL(
+        """
+          delete from Performance where festival_id in (select festival_id from Festival where twitter_id = {twitter_id})
+        """
+      ).on(
+        params: _*
+      ).executeUpdate()
+
+      // Stage削除処理
+      SQL(
+        """
+          delete from Stage where festival_id in (select festival_id from Festival where twitter_id = {twitter_id})
+        """
+      ).on(
+        params: _*
+      ).executeUpdate()
+
+      // Heartを削除する
+      SQL(
+        """
+          delete from Heart where twitter_id = {twitter_id}
+        """
+      ).on(
+        params: _*
+      ).executeUpdate()
+
+      // Festival削除処理
+      SQL(
+        """
+          delete from Festival where twitter_id = {twitter_id}
+        """
+      ).on(
+        params: _*
+      ).executeUpdate()
+
+      // TwitterUser削除処理
+      SQL(
+        """
+          delete from twitter_user where twitter_id = {twitter_id}
+        """
+      ).on(
+        params: _*
+      ).executeUpdate() 
+    }
+  }
 }
