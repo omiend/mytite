@@ -488,7 +488,7 @@ object Application extends Controller with Secured {
   /*****************************************************************************
    *** 静的ページ
    *****************************************************************************/
-  def about() = Action { implicit request =>
+  def about = Action { implicit request =>
     // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
       case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
@@ -499,7 +499,7 @@ object Application extends Controller with Secured {
     Ok(views.html.about(pager))
   }
 
-  def usage() = Action { implicit request =>
+  def usage = Action { implicit request =>
     // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
       case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)

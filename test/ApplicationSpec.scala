@@ -625,7 +625,7 @@ class ApplicationSpec extends Specification {
       // --- テストデータ作成
       createTestData(createTestDataTwitterUser)
       // テスト対象実行
-      val resultRoute = route(FakeRequest(GET, "/withdraw").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(GET, "/withdraw").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(OK)
     }
@@ -637,7 +637,7 @@ class ApplicationSpec extends Specification {
       // --- テストデータ作成
       createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataHeart, createTestDataStage, createTestDataPerformance)
       // テスト対象実行
-      val resultRoute = route(FakeRequest(GET, "/deleteAll").withSession("twitterId" -> "900001")).get
+      val resultRoute = route(FakeRequest(GET, "/deleteAll").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(SEE_OTHER)
       // 削除されたデータを取得し、存在しないことを確認
