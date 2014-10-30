@@ -27,8 +27,8 @@ object TwitterController extends Controller {
     val requestToken: RequestToken = twitter.getOAuthRequestToken("http://" + request.host + "/twitterOAuthCallback")
 
     // TwitterとRequestTokenのオブジェクトをCacheに格納(1分有効)
-    Cache.set("twitter", twitter, 1)
-    Cache.set("requestToken", requestToken, 1)
+    Cache.set("twitter", twitter, 60)
+    Cache.set("requestToken", requestToken, 60)
 
     // Twitterのログイン画面にリダイレクト
     Redirect(requestToken.getAuthorizationURL())
