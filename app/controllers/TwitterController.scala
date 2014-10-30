@@ -2,27 +2,34 @@ package controllers
 
 import play.api._
 import play.api.mvc._
+import play.api.Play.current
+
 import models._
+
+import play.api.cache._
+
 import twitter4j._
 import twitter4j.auth._
-
 /**
  * ツイッターログインコントローラ
  */
 object TwitterController extends Controller {
 
-  var twitter: Twitter = null
-  var requestToken: RequestToken = null
-  var accessToken: AccessToken = null
-
   /**
    * Twitterへログインする
    */
   def twitterLogin = Action { implicit request =>
+
     // Twitterオブジェクトの初期化
-    twitter = (new TwitterFactory()).getInstance()
+    val twitter: Twitter = (new TwitterFactory()).getInstance()
+
     // RequestTokenの取得
-    requestToken = twitter.getOAuthRequestToken("http://" + request.host + "/twitterOAuthCallback")
+    val requestToken: RequestToken = twitter.getOAuthRequestToken("http://" + request.host + "/twitterOAuthCallback")
+
+    // TwitterとRequestTokenのオブジェクトをCacheに格納(1分有効)
+    Cache.set("twitter", twitter, 1)
+    Cache.set("requestToken", requestToken, 1)
+
     // Twitterのログイン画面にリダイレクト
     Redirect(requestToken.getAuthorizationURL())
   }
@@ -31,66 +38,91 @@ object TwitterController extends Controller {
    * TwitterからのCallBack処理
    */
   def twitterOAuthCallback = Action { implicit request =>
-
+    // 承認可否を精査（deniedがあったら承認キャンセル）
     request.queryString.get("denied") match {
+
       // Twitterのアプリケーション承認キャンセル時
       case Some(denied) => Redirect(routes.TwitterController.twitterLogout)
+
       // Twitterのアプリケーション承認時
       case _ => {
+        println(" ------------------- " + Cache.getAs[Twitter]("twitter"))
+        // TwitterのオブジェクトをCacheから取得
+        Cache.getAs[Twitter]("twitter") match {
+          case Some(twitter) => {
 
-        // AuthTokenを取得する
-        var authToken   : String = request.queryString.get("oauth_token").get.head
-        var authVerifier: String = request.queryString.get("oauth_verifier").get.head
+            // RequestTokenのオブジェクトをCacheから取得
+            val getRequestToken: Option[RequestToken] = Cache.getAs[RequestToken]("requestToken")
 
-        // OAuthトークンの設定
-        accessToken = twitter.getOAuthAccessToken(requestToken, authVerifier)
+            getRequestToken match {
+              case Some(requestToken) => {
 
-        // Twitterオブジェクトの認証
-        twitter.verifyCredentials()
+                // AuthTokenを取得する
+                var authToken   : String = request.queryString.get("oauth_token").get.head
+                var authVerifier: String = request.queryString.get("oauth_verifier").get.head
 
-        // TwitterのUserオブジェクトを取得
-        var user: User = twitter.showUser(twitter.getId())
+                // AccessTokenを取得する
+                val accessToken: AccessToken = twitter.getOAuthAccessToken(requestToken, authVerifier)
+                twitter.getOAuthAccessToken(requestToken, authVerifier)
 
-        // TwitterUserが取得出来た場合はそのまま利用する
-        def nowDate: java.util.Date = new java.util.Date
-        TwitterUser.getByTwitterId(twitter.getId()) match {
-          case Some(s) => {
-            // 既にログインした事有る場合はUpdateを行う
-            val tmp: TwitterUser = new TwitterUser(s.id
-                                                  ,twitter.getId()
-                                                  ,user.getName()
-                                                  ,twitter.getScreenName()
-                                                  ,user.getProfileImageURL()
-                                                  ,user.getDescription()
-                                                  ,accessToken.getToken
-                                                  ,accessToken.getTokenSecret
-                                                  ,Some(nowDate)
-                                                  ,Some(nowDate))
-            TwitterUser.update(tmp) // Coution! Option.get
-            Option(tmp)
+                // Twitterオブジェクトの認証
+                twitter.verifyCredentials()
+
+                // TwitterのUserオブジェクトを取得
+                var user: User = twitter.showUser(twitter.getId())
+
+                // TwitterUserが取得出来た場合はそのまま利用する
+                def nowDate: java.util.Date = new java.util.Date
+                TwitterUser.getByTwitterId(twitter.getId()) match {
+                  case Some(s) => {
+                    // 既にログインした事有る場合はUpdateを行う
+                    val tmp: TwitterUser = new TwitterUser(s.id
+                                                          ,twitter.getId()
+                                                          ,user.getName()
+                                                          ,twitter.getScreenName()
+                                                          ,user.getProfileImageURL()
+                                                          ,user.getDescription()
+                                                          ,accessToken.getToken
+                                                          ,accessToken.getTokenSecret
+                                                          ,Some(nowDate)
+                                                          ,Some(nowDate))
+                    TwitterUser.update(tmp) // Coution! Option.get
+                    Option(tmp)
+                  }
+                  case _ => {
+                    // ログインしたらtwitter_userに登録
+                    val tmp: TwitterUser = new TwitterUser(None
+                                                          ,twitter.getId()
+                                                          ,user.getName()
+                                                          ,twitter.getScreenName()
+                                                          ,user.getProfileImageURL()
+                                                          ,user.getDescription()
+                                                          ,accessToken.getToken
+                                                          ,accessToken.getTokenSecret
+                                                          ,Some(nowDate)
+                                                          ,Some(nowDate))
+                    TwitterUser.insart(tmp)
+                    Option(tmp)
+                  }
+                }
+
+                // Cacheから削除
+                Cache.remove("twitter")
+                Cache.remove("requestToken")
+
+                // CookieにTwitterId等を保存し、return
+                Redirect(routes.Application.index(1)).withSession(
+                   "twitterId"         -> String.valueOf(twitter.getId())
+                  ,"accessToken"       -> accessToken.getToken
+                  ,"accessTokenSecret" -> accessToken.getTokenSecret
+                )
+              }
+              case _ => Redirect(routes.Application.index(1)).flashing("error" -> "ログインに失敗しました。 - ERROR CODE : twitterOAuthCallback 02")
+            }
           }
-          case _ => {
-            // ログインしたらtwitter_userに登録
-            val tmp: TwitterUser = new TwitterUser(None
-                                                  ,twitter.getId()
-                                                  ,user.getName()
-                                                  ,twitter.getScreenName()
-                                                  ,user.getProfileImageURL()
-                                                  ,user.getDescription()
-                                                  ,accessToken.getToken
-                                                  ,accessToken.getTokenSecret
-                                                  ,Some(nowDate)
-                                                  ,Some(nowDate))
-            TwitterUser.insart(tmp)
-            Option(tmp)
-          }
+          // 取得できない場合はトップ画面へ
+          case _ => Redirect(routes.Application.index(1)).flashing("error" -> "ログインに失敗しました。 - ERROR CODE : twitterOAuthCallback 01")
         }
-        // CookieにTwitterId等を保存し、return
-        Redirect(routes.Application.index(1)).withSession(
-           "twitterId"         -> String.valueOf(twitter.getId())
-          ,"accessToken"       -> accessToken.getToken
-          ,"accessTokenSecret" -> accessToken.getTokenSecret
-        )
       }
     }
   }
@@ -99,15 +131,6 @@ object TwitterController extends Controller {
    * ログアウト処理
    */
   def twitterLogout = Action { implicit request =>
-    // Twitter ShutDown
-    if (twitter != null) {
-      twitter.shutdown()
-      twitter = null
-      requestToken = null
-      accessToken = null
-    }
-    // Pager初期化
-    val pager: Pager[TwitterUser] = Pager[TwitterUser]("とっぷ", 1, 0, null, Seq.empty)
     // SessionからTwitterIdを削除
     Redirect(routes.Application.index(1)).withSession(
       request.session - "twitterId" 
