@@ -7,7 +7,7 @@ case class Pager[A](var title: String, var pageNum: Int, var totalRows: Int, var
   val maxListCount: Int = 15
 
   /** 現在ページの両脇ページ番号を表示する件数 */
-  val behindAndFrontCount: Int = 2
+  val behindAndFrontCount: Int = 5
 
   /** 取得したデータの件数からページ数を計算 */
   lazy val maxPageRowCount: Int = {
