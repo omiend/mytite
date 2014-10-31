@@ -16,48 +16,7 @@ import views._
  */
 object Application extends Controller with Secured {
 
-  /*****************************************************************************
-   * Form
-   *****************************************************************************/
-  // Performance用 Form
-  val performanceForm = Form(
-    mapping(
-       "id"         -> ignored(None: Option[Long])
-      ,"festivalId" -> of[Long]
-      ,"stageId"    -> of[Long]
-      ,"artist"     -> nonEmptyText(maxLength = 35)
-      ,"time"       -> text
-      ,"timeFrame"  -> text
-      ,"createDate" -> optional(date("yyyy-MM-dd"))
-      ,"updateDate" -> optional(date("yyyy-MM-dd"))
-    )(Performance.apply)(Performance.unapply)
-  )
-
-  // Stage用 Form
-  val stageForm = Form(
-    mapping(
-       "id"         -> ignored(None: Option[Long])
-      ,"festivalId" -> of[Long]
-      ,"stageName"  -> text(maxLength = 20)
-      ,"sort"       -> optional(text)
-      ,"coler"      -> optional(text)
-      ,"createDate" -> optional(date("yyyy-MM-dd"))
-      ,"updateDate" -> optional(date("yyyy-MM-dd"))
-    )(Stage.apply)(Stage.unapply)
-  )
-
-  // Festival/Stage登録処理用 Form
-  val festivalAndStageForm = Form(
-    tuple(
-       "festivalName" -> nonEmptyText(maxLength = 20)
-      ,"description"  -> text(maxLength = 50)
-      ,"stageName"    -> seq(text(maxLength = 20))
-    )
-  )
-  
-  /*****************************************************************************
-   * トップページ
-   *****************************************************************************/
+  /** トップページ */
   def index(pageNum: Int) = Action { implicit request =>
     // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
@@ -85,12 +44,10 @@ object Application extends Controller with Secured {
       case _ => None
     }
     // 参照対象のTwitterUserを取得する
-    var targetTwitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(targetTwitterId)
-    // Pagerを初期化
-    val pager: Pager[Festival] = Pager[Festival]("@" + targetTwitterUser.get.twitterScreenName + "のフェス一覧", pageNum, 0, twitterUser, Seq.empty)
-    // Festivalを表示するユーザーを取得する
     TwitterUser.getByTwitterId(targetTwitterId) match {
       case Some(targetTwitterUser) => {
+        // Pagerを初期化
+        val pager: Pager[Festival] = Pager[Festival]("@" + targetTwitterUser.twitterScreenName + "のフェス一覧", pageNum, 0, twitterUser, Seq.empty)
         // Festival一覧を取得する
         val resultTuple = Festival.findFromTo(targetTwitterId, pager.pageNum * pager.maxListCount - pager.maxListCount, pager.maxListCount)
         // データリスト
@@ -509,4 +466,43 @@ object Application extends Controller with Secured {
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("遊び方", 1, 0, twitterUser, Seq.empty)
     Ok(views.html.usage(pager))
   }
+
+  /*****************************************************************************
+   * Form
+   *****************************************************************************/
+  // Performance用 Form
+  val performanceForm = Form(
+    mapping(
+       "id"         -> ignored(None: Option[Long])
+      ,"festivalId" -> of[Long]
+      ,"stageId"    -> of[Long]
+      ,"artist"     -> nonEmptyText(maxLength = 35)
+      ,"time"       -> text
+      ,"timeFrame"  -> text
+      ,"createDate" -> optional(date("yyyy-MM-dd"))
+      ,"updateDate" -> optional(date("yyyy-MM-dd"))
+    )(Performance.apply)(Performance.unapply)
+  )
+
+  // Stage用 Form
+  val stageForm = Form(
+    mapping(
+       "id"         -> ignored(None: Option[Long])
+      ,"festivalId" -> of[Long]
+      ,"stageName"  -> text(maxLength = 20)
+      ,"sort"       -> optional(text)
+      ,"coler"      -> optional(text)
+      ,"createDate" -> optional(date("yyyy-MM-dd"))
+      ,"updateDate" -> optional(date("yyyy-MM-dd"))
+    )(Stage.apply)(Stage.unapply)
+  )
+
+  // Festival/Stage登録処理用 Form
+  val festivalAndStageForm = Form(
+    tuple(
+       "festivalName" -> nonEmptyText(maxLength = 20)
+      ,"description"  -> text(maxLength = 50)
+      ,"stageName"    -> seq(text(maxLength = 20))
+    )
+  )
 }
