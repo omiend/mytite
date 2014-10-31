@@ -16,7 +16,9 @@
     <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
       <div class="col-sm-4 col-md-4 col-lg-4">
         <p>
-          <a href="/deleteAll" class="btn btn-danger btn-xs btn-block" onclick="if(!confirm('よろしいですか？'))return false">退会する</a>
+          <form name="test" method="POST" action="@routes.Application.deleteAll">
+            <input type="submit" class="btn btn-danger btn-xs btn-block" onclick="if(!confirm('よろしいですか？'))return false" value="退会する"/>
+          </form>
         </p>
       </div><!--/span-->
     </div><!--/span-->
