@@ -15,7 +15,7 @@ import views._
 object AjaxController extends Controller with Secured {
 
   /*****************************************************************************
-   *** Ajax用 Stage更新処理
+   *** Ajax用 Festival更新処理
    *****************************************************************************/
   def ajaxUpdateFestival(festivalId: Long, festivalName: String) = IsAuthenticated { twitterId => implicit request =>
     Festival.findById(festivalId) match {
@@ -90,7 +90,7 @@ object AjaxController extends Controller with Secured {
       case Some(festival) => {
         def nowDate: java.util.Date = new java.util.Date
         var heart: Heart = Heart(
-           null
+           None
           ,festivalId
           ,twitterId.toLong
           ,Some(nowDate)
