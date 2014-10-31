@@ -46,7 +46,6 @@ object TwitterController extends Controller {
 
       // Twitterのアプリケーション承認時
       case _ => {
-        println(" ------------------- " + Cache.getAs[Twitter]("twitter"))
         // TwitterのオブジェクトをCacheから取得
         Cache.getAs[Twitter]("twitter") match {
           case Some(twitter) => {
