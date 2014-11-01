@@ -12,4 +12,5 @@ libraryDependencies ++= Seq(
   ,cache
   ,"mysql" % "mysql-connector-java" % "5.1.20"
   ,"org.twitter4j" % "twitter4j-core" % "4.0.2"
+  ,"com.typesafe.slick" %% "slick" % "2.1.0"
 )
