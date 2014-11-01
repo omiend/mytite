@@ -25,16 +25,16 @@ class TwitterUserTable(tag: Tag) extends Table[TwitterUser](tag, "CAT") {
   def name = column[String]("name", O.PrimaryKey)
   def color = column[String]("color", O.NotNull)
 
-  def id                       = column[Long]  ("id",                       O.PrimaryKey)
-  def twitterId                = column[Long]  ("twitterId",                O.NotNull)
-  def twitterName              = column[String]("twitterName",              O.NotNull)
-  def twitterScreenName        = column[String]("twitterScreenName",        O.NotNull)
-  def twitterProfielImageUrl   = column[String]("twitterProfielImageUrl",   O.NotNull)
-  def twitterDescription       = column[String]("twitterDescription",       O.NotNull)
-  def twitterAccessToken       = column[String]("twitterAccessToken",       O.NotNull)
-  def twitterAccessTokenSecret = column[String]("twitterAccessTokenSecret", O.NotNull)
-  def createDate               = column[Date]  ("createDate",               O.NotNull)
-  def updateDate               = column[Date]  ("updateDate",               O.NotNull)
+  def id                       = column[Long]  ("id",　O.PrimaryKey)
+  def twitterId                = column[Long]  ("twitterId",　O.NotNull)
+  def twitterName              = column[String]("twitterName",　O.NotNull)
+  def twitterScreenName        = column[String]("twitterScreenName")
+  def twitterProfielImageUrl   = column[String]("twitterProfielImageUrl")
+  def twitterDescription       = column[String]("twitterDescription")
+  def twitterAccessToken       = column[String]("twitterAccessToken")
+  def twitterAccessTokenSecret = column[String]("twitterAccessTokenSecret")
+  def createDate               = column[Date]  ("createDate")
+  def updateDate               = column[Date]  ("updateDate")
 
   def * = (id
           ,twitterId
