@@ -1,4 +1,4 @@
-name := """tite_scala"""
+name := """playframeworkscala_mytite"""
 
 version := "1.2"
 
