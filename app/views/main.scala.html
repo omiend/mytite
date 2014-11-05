@@ -46,13 +46,13 @@
                       <li><a href="@routes.Application.festival(1, user.twitterScreenName)">自分のタイムテーブル</a></li>
                       <!-- <li><a href="https://twitter.com/@user.twitterScreenName" target=”_blank”>&#64;@user.twitterScreenName</a></li> -->
                       <li class="divider"></li>
-                      <li><a href="/twitterLogout">ログアウト</a></li>
-                      <li><a href="/withdraw">退会へ</a></li>
+                      <li><a href="@routes.TwitterController.twitterLogout">ログアウト</a></li>
+                      <li><a href="@routes.Application.withdraw">退会へ</a></li>
                     </ul>
                   </li>
                 }
                 case _ => {
-                  <li><a href="/twitterLogin">ログイン</a></li>
+                  <li><a href="@routes.TwitterController.twitterLogin">ログイン</a></li>
                 }
               }
               <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>

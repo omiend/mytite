@@ -24,7 +24,7 @@ object TwitterController extends Controller {
     val twitter: Twitter = (new TwitterFactory()).getInstance()
 
     // RequestTokenの取得
-    val requestToken: RequestToken = twitter.getOAuthRequestToken("http://" + request.host + "/twitterOAuthCallback")
+    val requestToken: RequestToken = twitter.getOAuthRequestToken("http://" + request.host + "/twitter/OAuthCallback")
 
     // TwitterとRequestTokenのオブジェクトをCacheに格納(1分有効)
     Cache.set("twitter", twitter, 60)
