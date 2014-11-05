@@ -10,7 +10,7 @@ GET  /mytite/about                controllers.Application.about
 GET  /mytite/withdraw             controllers.Application.withdraw
 
 # Delete All
-POST /d                    controllers.Application.deleteAll
+POST /mytite/d                    controllers.Application.deleteAll
 
 # Festival
 GET  /:twitterScreenName        controllers.Application.festival(p: Int ?= 1, twitterScreenName: String)
