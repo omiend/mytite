@@ -41,7 +41,7 @@ class ApplicationSpec extends Specification {
     // ----------------------------------------------------------------------------------------------
     // GET  /hoge send 404 on a bad request
     "GET  /hoge " in new WithApplication(fakeApp) {
-      route(FakeRequest(GET, "/hoge")) must beNone
+      route(FakeRequest(GET, "/hoge/foo")) must beNone
     }
 
     // GET  / controllers.Application.index(p: Int ?= 1)
@@ -108,14 +108,14 @@ class ApplicationSpec extends Specification {
     // ----------------------------------------------------------------------------------------------
     // Festival
     // ----------------------------------------------------------------------------------------------
-    // GET  /:twiId/fes controllers.Application.festival(p: Int ?= 1, twiId: Long)
-    "GET  /:twiId/fes " in new WithApplication(fakeApp) {
+    // GET  /:twitterScreenName/fes controllers.Application.festival(p: Int ?= 1, twitterScreenName: String)
+    "GET  /:twitterScreenName/fes " in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage, createTableHeart)
       // --- テストデータ作成
       createTestData(createTestDataTwitterUser)
       // --- テスト対象実行
-      val resultRoute = route(FakeRequest(GET, "/900001/fes")).get
+      val resultRoute = route(FakeRequest(GET, "/TEST_USER_SCREEN_NAME")).get
       status(resultRoute) must equalTo(OK)
       contentType(resultRoute) must beSome.which(_ == "text/html")
     }
@@ -506,12 +506,12 @@ class ApplicationSpec extends Specification {
     // ----------------------------------------------------------------------------------------------
     // # JavaScript Ajax
     // ----------------------------------------------------------------------------------------------
-    // GET /javascriptRoutes controllers.JsRouter.javascriptRoutes
-    "GET  /javascriptRoutes" in new WithApplication(fakeApp) {
+    // GET /javascript/Routes controllers.JsRouter.javascriptRoutes
+    "GET  /javascript/Routes" in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser)
       // --- テスト対象実行
-      val resultRoute = route(FakeRequest(GET, "/javascriptRoutes")).get
+      val resultRoute = route(FakeRequest(GET, "/javascript/Routes")).get
       status(resultRoute) must equalTo(OK)
     }
 

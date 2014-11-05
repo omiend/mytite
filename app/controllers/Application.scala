@@ -20,13 +20,13 @@ object Application extends Controller with Secured {
   def index(pageNum: Int) = Action { implicit request =>
     // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
-      case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
+      case Some(twitterId) => TwitterUser.findByTwitterId(twitterId.toLong)
       case _ => None
     }
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("トップ", pageNum, 0, twitterUser, Seq.empty)
     // TwitterUserのリストを取得
-    val resultTuple = TwitterUser.findFromTo(pager.pageNum * pager.maxListCount - pager.maxListCount, pager.maxListCount)
+    val resultTuple = TwitterUser.findByOffset(pager.pageNum * pager.maxListCount - pager.maxListCount, pager.maxListCount)
     // データリスト
     pager.dataList = resultTuple._1
     // 全体件数
@@ -37,26 +37,26 @@ object Application extends Controller with Secured {
   /*****************************************************************************
    * Festival一覧画面起動
    *****************************************************************************/
-  def festival(pageNum: Int, targetTwitterId: Long) = Action { implicit request =>
+  def festival(pageNum: Int, twitterScreenName: String) = Action { implicit request =>
     // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
-      case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
+      case Some(twitterId) => TwitterUser.findByTwitterId(twitterId.toLong)
       case _ => None
     }
     // 参照対象のTwitterUserを取得する
-    TwitterUser.getByTwitterId(targetTwitterId) match {
+    TwitterUser.findByTwitterScreenName(twitterScreenName) match {
       case Some(targetTwitterUser) => {
         // Pagerを初期化
         val pager: Pager[Festival] = Pager[Festival]("@" + targetTwitterUser.twitterScreenName + "のフェス一覧", pageNum, 0, twitterUser, Seq.empty)
         // Festival一覧を取得する
-        val resultTuple = Festival.findFromTo(targetTwitterId, pager.pageNum * pager.maxListCount - pager.maxListCount, pager.maxListCount)
+        val resultTuple = Festival.findByOffset(targetTwitterUser.twitterId, pager.pageNum * pager.maxListCount - pager.maxListCount, pager.maxListCount)
         // データリスト
         pager.dataList = resultTuple._1
         // 全体件数
         pager.totalRows = resultTuple._2.toInt
         Ok(views.html.indexFestival(pager, targetTwitterUser))
       }
-      case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : indexFestival 01")
+      case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : festival 01")
     }
   }
 
@@ -65,46 +65,53 @@ object Application extends Controller with Secured {
    *****************************************************************************/
   def createFestival = IsAuthenticated { twitterId => implicit request =>
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
-    // Pagerを初期化
-    val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス新規登録", 1, 0, twitterUser, Seq.empty)
-    
-    // Festival一覧を取得し、既に３件登録されている場合はエラー
-    Festival.findFromTo(twitterId.toLong, 1, 3) match {
-      case resultTuple if resultTuple._2.toInt >= 1 => Redirect(routes.Application.festival(1, twitterId.toLong)).flashing("error" -> "申し訳ございませんが、フェスは１件までしか登録できません！そのうち沢山登録出来るようにします！")
-      case _ => Ok(views.html.createFestival(pager, festivalAndStageForm))
+    TwitterUser.findByTwitterId(twitterId.toLong) match {
+      case Some(twitterUser) => {
+        // Pagerを初期化
+        val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス新規登録", 1, 0, Some(twitterUser), Seq.empty)
+        // Festival一覧を取得し、既に登録されている場合はエラー
+        Festival.findByOffset(twitterUser.twitterId, 1, 2) match {
+          case resultTuple if resultTuple._2.toInt >= 1 => Redirect(routes.Application.festival(1, twitterUser.twitterScreenName)).flashing("error" -> "申し訳ございませんが、フェスは１件までしか登録できません！そのうち沢山登録出来るようにします！")
+          case _ => Ok(views.html.createFestival(pager, festivalAndStageForm))
+        }
+      }
+      case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : createFestival 01")
     }
   }
-
+  
   /*****************************************************************************
    *** Festival／Stage登録処理
    *****************************************************************************/
   def insertFestival = IsAuthenticated { twitterId => implicit request =>
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
-    // Pagerを初期化
-    val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス新規登録", 1, 0, twitterUser, Seq.empty)
-    festivalAndStageForm.bindFromRequest.fold(
-      formWithErrors => {
-        BadRequest(html.createFestival(pager, formWithErrors))
-      },
-      festivalAndStage => {
-        // 現在日付作成（timestamp）
-        def nowDate: java.util.Date = new java.util.Date
-        // --- Festival作成処理 --- //
-        var festival: Festival = Festival(
-           None
-          ,twitterId.toLong
-          ,festivalAndStage._1  // Festival Name
-          ,festivalAndStage._2  // description
-          ,Some(nowDate)
-          ,Some(nowDate)
+    TwitterUser.findByTwitterId(twitterId.toLong) match {
+      case Some(twitterUser) => {
+        // Pagerを初期化
+        val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス新規登録", 1, 0, Some(twitterUser), Seq.empty)
+        festivalAndStageForm.bindFromRequest.fold(
+          formWithErrors => {
+            BadRequest(html.createFestival(pager, formWithErrors))
+          },
+          festivalAndStage => {
+            // 現在日付作成（timestamp）
+            def nowDate: java.util.Date = new java.util.Date
+            // --- Festival作成処理 --- //
+            var festival: Festival = Festival(
+               None
+              ,twitterUser.twitterId
+              ,festivalAndStage._1  // Festival Name
+              ,festivalAndStage._2  // description
+              ,Some(nowDate)
+              ,Some(nowDate)
+            )
+            // FestivalとStageを登録する
+            Festival.insartWithStage(festival, festivalAndStage._3)
+            Redirect(routes.Application.festival(1, twitterUser.twitterScreenName))
+          }
         )
-        // FestivalとStageを登録する
-        Festival.insartWithStage(festival, festivalAndStage._3)
-        Redirect(routes.Application.festival(1, twitterId.toLong))
       }
-    )
+      case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : insertFestival 01")
+    }
   }
   
   /*****************************************************************************
@@ -112,7 +119,7 @@ object Application extends Controller with Secured {
    *****************************************************************************/
   def editFestival(festivalId: Long) = IsAuthenticated { twitterId => implicit request =>
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
+    var twitterUser: Option[TwitterUser] = TwitterUser.findByTwitterId(twitterId.toLong)
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス更新", 1, 0, twitterUser, Seq.empty)
     // Festivalを取得
@@ -129,27 +136,31 @@ object Application extends Controller with Secured {
    *****************************************************************************/
   def updateFestival(festivalId: Long) = IsAuthenticated { twitterId => implicit request =>
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
-    // Pagerを初期化
-    val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス更新", 1, 0, twitterUser, Seq.empty)
-    // Festivalを取得
-    Festival.findById(festivalId) match {
-      case Some(festival) => {
-        festivalAndStageForm.bindFromRequest.fold(
-          formWithErrors => {
-            BadRequest(views.html.editFestival(pager, festivalId, formWithErrors))
-          },
-          festivalAndStage => {
-            def nowDate: java.util.Date = new java.util.Date
-            festival.festivalName = festivalAndStage._1  // Festival Name
-            festival.description = festivalAndStage._2  // description
-            festival.updateDate = Some(nowDate)
-            Festival.update(festival)
-            Redirect(routes.Application.timetable(twitterId.toLong, festivalId))
+    TwitterUser.findByTwitterId(twitterId.toLong) match {
+      case Some(twitterUser) => {
+        // Pagerを初期化
+        val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス更新", 1, 0, Some(twitterUser), Seq.empty)
+        // Festivalを取得
+        Festival.findById(festivalId) match {
+          case Some(festival) => {
+            festivalAndStageForm.bindFromRequest.fold(
+              formWithErrors => {
+                BadRequest(views.html.editFestival(pager, festivalId, formWithErrors))
+              },
+              festivalAndStage => {
+                def nowDate: java.util.Date = new java.util.Date
+                festival.festivalName = festivalAndStage._1  // Festival Name
+                festival.description = festivalAndStage._2  // description
+                festival.updateDate = Some(nowDate)
+                Festival.update(festival)
+                Redirect(routes.Application.timetable(twitterId.toLong, festivalId))
+              }
+            )
           }
-        )
+          case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : updateFestival 01")
+        }
       }
-      case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : updateFestival 01")
+      case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : updateFestival 02")
     }
   }
   
@@ -158,18 +169,22 @@ object Application extends Controller with Secured {
    *****************************************************************************/
   def deleteFestival(festivalId: Long) = IsAuthenticated { twitterId => implicit request =>
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
-    // Pagerを初期化
-    val pager: Pager[TwitterUser] = Pager[TwitterUser]("@" + twitterUser.get.twitterScreenName + "のフェス一覧", 1, 0, twitterUser, Seq.empty)
-    // 削除対象のFestivalを取得
-    Festival.findById(festivalId) match {
-      // ログインしているTwitterIDと同じIDの場合だけ削除を実行する
-      case Some(festival) if festival.twitterId == twitterId.toLong => {
-        // 削除処理実行
-        Festival.delete(festivalId)
-        Redirect(routes.Application.festival(1, twitterId.toLong))
+    TwitterUser.findByTwitterId(twitterId.toLong) match {
+      case Some(twitterUser) => {
+        // Pagerを初期化
+        val pager: Pager[TwitterUser] = Pager[TwitterUser]("@" + twitterUser.twitterScreenName + "のフェス一覧", 1, 0, Some(twitterUser), Seq.empty)
+        // 削除対象のFestivalを取得
+        Festival.findById(festivalId) match {
+          // ログインしているTwitterIDと同じIDの場合だけ削除を実行する
+          case Some(festival) if festival.twitterId == twitterUser.twitterId => {
+            // 削除処理実行
+            Festival.delete(festivalId)
+            Redirect(routes.Application.festival(1, twitterUser.twitterScreenName))
+          }
+          case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : deleteFestival 01")
+        }
       }
-      case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : deleteFestival 01")
+      case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : deleteFestival 02")
     }
   }
 
@@ -178,12 +193,16 @@ object Application extends Controller with Secured {
    *****************************************************************************/
   def createStage(festivalId: Long) = IsAuthenticated { twitterId => implicit request =>
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
-    // Pagerを初期化
-    val pager: Pager[TwitterUser] = Pager[TwitterUser]("ステージ新規登録画面", 1, 0, twitterUser, Seq.empty)
-    Stage.countByFestivalId(festivalId) match {
-      case count if count == 4 => Redirect(routes.Application.timetable(twitterId.toLong, festivalId)).flashing("error" -> " ステージは４件までしか登録できません")
-      case _ => Ok(views.html.createStage(pager, festivalId, stageForm))
+    TwitterUser.findByTwitterId(twitterId.toLong) match {
+      case Some(twitterUser) => {
+        // Pagerを初期化
+        val pager: Pager[TwitterUser] = Pager[TwitterUser]("ステージ新規登録画面", 1, 0, Some(twitterUser), Seq.empty)
+        Stage.countByFestivalId(festivalId) match {
+          case count if count == 4 => Redirect(routes.Application.timetable(twitterUser.twitterId, festivalId)).flashing("error" -> " ステージは４件までしか登録できません")
+          case _ => Ok(views.html.createStage(pager, festivalId, stageForm))
+        }
+      }
+      case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : createStage 01")
     }
   }
 
@@ -192,24 +211,28 @@ object Application extends Controller with Secured {
    *****************************************************************************/
   def insertStage(festivalId: Long) = IsAuthenticated { twitterId => implicit request =>
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
-    // Pagerを初期化
-    val pager: Pager[TwitterUser] = Pager[TwitterUser]("ステージ新規登録画面", 1, 0, twitterUser, Seq.empty)
-    stageForm.bindFromRequest.fold(
-      formWithErrors => {
-        BadRequest(html.createStage(pager, festivalId, formWithErrors))
-      },
-      stage => {
-        // 現在日付作成（timestamp）
-        def nowDate: java.util.Date = new java.util.Date
-        stage.sort = Option("1")
-        stage.color = Option("white")
-        stage.createDate = Some(nowDate)
-        stage.updateDate = Some(nowDate)
-        Stage.insart(stage)
-        Redirect(routes.Application.timetable(twitterId.toLong, festivalId))
+    TwitterUser.findByTwitterId(twitterId.toLong) match {
+      case Some(twitterUser) => {
+        // Pagerを初期化
+        val pager: Pager[TwitterUser] = Pager[TwitterUser]("ステージ新規登録画面", 1, 0, Some(twitterUser), Seq.empty)
+        stageForm.bindFromRequest.fold(
+          formWithErrors => {
+            BadRequest(html.createStage(pager, festivalId, formWithErrors))
+          },
+          stage => {
+            // 現在日付作成（timestamp）
+            def nowDate: java.util.Date = new java.util.Date
+            stage.sort = Option("1")
+            stage.color = Option("white")
+            stage.createDate = Some(nowDate)
+            stage.updateDate = Some(nowDate)
+            Stage.insart(stage)
+            Redirect(routes.Application.timetable(twitterUser.twitterId, festivalId))
+          }
+        )
       }
-    )
+      case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : insertStage 02")
+    }
   }
   
   /*****************************************************************************
@@ -217,7 +240,7 @@ object Application extends Controller with Secured {
    *****************************************************************************/
   def editStage(festivalId: Long, stageId: Long) = IsAuthenticated { twitterId => implicit request =>
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
+    var twitterUser: Option[TwitterUser] = TwitterUser.findByTwitterId(twitterId.toLong)
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("ステージ更新画面", 1, 0, twitterUser, Seq.empty)
     Stage.findById(stageId) match {
@@ -231,7 +254,7 @@ object Application extends Controller with Secured {
    *****************************************************************************/
   def updateStage(festivalId: Long, stageId: Long) = IsAuthenticated { twitterId => implicit request =>
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
+    var twitterUser: Option[TwitterUser] = TwitterUser.findByTwitterId(twitterId.toLong)
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("ステージ更新画面", 1, 0, twitterUser, Seq.empty)
     stageForm.bindFromRequest.fold(
@@ -252,7 +275,7 @@ object Application extends Controller with Secured {
    *****************************************************************************/
   def deleteStage(festivalId: Long, stageId: Long) = IsAuthenticated { twitterId => implicit request =>
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
+    var twitterUser: Option[TwitterUser] = TwitterUser.findByTwitterId(twitterId.toLong)
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス", 1, 0, twitterUser, Seq.empty)
     // 削除対象のStageを取得
@@ -290,7 +313,7 @@ object Application extends Controller with Secured {
    *****************************************************************************/
   def createPerformance(festivalId: Long) = IsAuthenticated { twitterId => implicit request =>
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
+    var twitterUser: Option[TwitterUser] = TwitterUser.findByTwitterId(twitterId.toLong)
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("パフォーマンス新規登録画面", 1, 0, twitterUser, Seq.empty)
     val stageSelectOptions = getStageOptions(festivalId)
@@ -305,7 +328,7 @@ object Application extends Controller with Secured {
    *****************************************************************************/
   def insertPerformance(festivalId: Long) = IsAuthenticated { twitterId => implicit request =>
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
+    var twitterUser: Option[TwitterUser] = TwitterUser.findByTwitterId(twitterId.toLong)
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("アーティスト新規登録画面", 1, 0, twitterUser, Seq.empty)
     performanceForm.bindFromRequest.fold(
@@ -327,7 +350,7 @@ object Application extends Controller with Secured {
    *****************************************************************************/
   def editPerformance(festivalId: Long, performanceId: Long) = IsAuthenticated { twitterId => implicit request =>
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
+    var twitterUser: Option[TwitterUser] = TwitterUser.findByTwitterId(twitterId.toLong)
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("アーティスト更新画面", 1, 0, twitterUser, Seq.empty)
     Performance.findById(performanceId) match {
@@ -341,7 +364,7 @@ object Application extends Controller with Secured {
    *****************************************************************************/
   def updatePerformance(festivalId: Long, performanceId: Long) = IsAuthenticated { twitterId => implicit request =>
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
+    var twitterUser: Option[TwitterUser] = TwitterUser.findByTwitterId(twitterId.toLong)
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("アーティスト更新画面", 1, 0, twitterUser, Seq.empty)
     performanceForm.bindFromRequest.fold(
@@ -362,7 +385,7 @@ object Application extends Controller with Secured {
    *****************************************************************************/
   def deletePerformance(festivalId: Long, performanceId: Long) = IsAuthenticated { twitterId => implicit request =>
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
-    var twitterUser: Option[TwitterUser] = TwitterUser.getByTwitterId(twitterId.toLong)
+    var twitterUser: Option[TwitterUser] = TwitterUser.findByTwitterId(twitterId.toLong)
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス", 1, 0, twitterUser, Seq.empty)
     // 削除対象のPerformanceを取得
@@ -390,7 +413,7 @@ object Application extends Controller with Secured {
     var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
       case Some(twitterId) => {
         isExists = Heart.findByFestivalAndTwitterId(festivalId, twitterId.toLong)
-        TwitterUser.getByTwitterId(twitterId.toLong)
+        TwitterUser.findByTwitterId(twitterId.toLong)
       }
       case _ => {
         isExists = Heart.countHeartByFestivalId(festivalId)
@@ -400,7 +423,7 @@ object Application extends Controller with Secured {
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス", 1, 0, twitterUser, Seq.empty)
     // Festivalを表示するユーザーを取得する
-    TwitterUser.getByTwitterId(targetTwitterId) match {
+    TwitterUser.findByTwitterId(targetTwitterId) match {
       case Some(targetTwitterUser) => {
         // Festivalを取得する
         Festival.findById(festivalId) match {
@@ -423,7 +446,7 @@ object Application extends Controller with Secured {
   def withdraw = IsAuthenticated { twitterId => implicit request =>
     // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
-      case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
+      case Some(twitterId) => TwitterUser.findByTwitterId(twitterId.toLong)
       case _ => None
     }
     // Pagerを初期化
@@ -433,7 +456,7 @@ object Application extends Controller with Secured {
 
   def deleteAll = IsAuthenticated { twitterId => implicit request =>
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("トップ", 1, 0, None, Seq.empty)
-    TwitterUser.getByTwitterId(twitterId.toLong) match {
+    TwitterUser.findByTwitterId(twitterId.toLong) match {
       case Some(twitterUser) => {
         TwitterUser.deleteAll(twitterId.toLong)
         Redirect(routes.TwitterController.twitterLogout)
@@ -448,7 +471,7 @@ object Application extends Controller with Secured {
   def about = Action { implicit request =>
     // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
-      case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
+      case Some(twitterId) => TwitterUser.findByTwitterId(twitterId.toLong)
       case _ => None
     }
     // Pagerを初期化
@@ -459,7 +482,7 @@ object Application extends Controller with Secured {
   def usage = Action { implicit request =>
     // CookieからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
-      case Some(twitterId) => TwitterUser.getByTwitterId(twitterId.toLong)
+      case Some(twitterId) => TwitterUser.findByTwitterId(twitterId.toLong)
       case _ => None
     }
     // Pagerを初期化
