@@ -115,7 +115,7 @@ object TwitterUser {
   /**
    * TwitterUser twitter_idを指定して取得
    */
-  def getByTwitterId(twitterId: Long): Option[TwitterUser] = {
+  def findByTwitterId(twitterId: Long): Option[TwitterUser] = {
     val params = Seq[NamedParameter](
        'twitter_id -> twitterId
     )
@@ -135,9 +135,31 @@ object TwitterUser {
   }
 
   /**
+   * TwitterUser twitter_screen_name を指定して取得
+   */
+  def findByTwitterScreenName(twitterScreenName: String): Option[TwitterUser] = {
+    val params = Seq[NamedParameter](
+       'twitter_screen_name -> twitterScreenName
+    )
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+          select *
+            from twitter_user
+           where twitter_screen_name = {twitter_screen_name}
+        """
+      ).on(
+        params: _*
+      ).as(
+        TwitterUser.simple.singleOpt
+      )
+    }
+  }
+
+  /**
    * TwitterUser from-toで件数を指定して取得
    */
-  def findFromTo(offset: Int, maxPageCount: Int) = {
+  def findByOffset(offset: Int, maxPageCount: Int) = {
     val params = Seq[NamedParameter](
          'offset       -> offset
         ,'maxPageCount -> maxPageCount

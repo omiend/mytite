@@ -75,7 +75,7 @@ object Festival {
   /**
    * Festival from-toで件数を指定して取得
    */
-  def findFromTo(twitterId: Long, offset: Int, maxPageCount: Int) = {
+  def findByOffset(twitterId: Long, offset: Int, maxPageCount: Int) = {
     DB.withConnection { implicit connection =>
 
       // 親テーブル取得

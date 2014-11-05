@@ -13,9 +13,9 @@ GET  /withdraw             controllers.Application.withdraw
 POST /d                    controllers.Application.deleteAll
 
 # Festival
-GET  /:twitterId/fes           controllers.Application.festival(p: Int ?= 1, twitterId: Long)
-GET  /fes/c                controllers.Application.createFestival
-POST /fes/i                controllers.Application.insertFestival
+GET  /:twitterScreenName        controllers.Application.festival(p: Int ?= 1, twitterScreenName: String)
+GET  /fes/c                     controllers.Application.createFestival
+POST /fes/i                     controllers.Application.insertFestival
 GET  /:festivalId/fes/e         controllers.Application.editFestival(festivalId: Long)
 POST /:festivalId/fes/u         controllers.Application.updateFestival(festivalId: Long)
 POST /:festivalId/fes/d         controllers.Application.deleteFestival(festivalId: Long)
@@ -46,7 +46,7 @@ GET  /twitterLogout        controllers.TwitterController.twitterLogout
 # JavaScript Ajax
 ######################################################
 # javascriptRoutes
-GET  /javascriptRoutes     controllers.JsRouter.javascriptRoutes
+GET     /javascript/Routes                 controllers.JsRouter.javascriptRoutes
 
 # Ajax Festival
 POST    /ajaxUpdateFestival               controllers.AjaxController.ajaxUpdateFestival(festivalId: Long, festivalName: String)
