@@ -59,7 +59,7 @@ object Application extends Controller with Secured {
       case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : indexFestival 01")
     }
   }
-  
+
   /*****************************************************************************
    *** Festival／Stage登録画面起動
    *****************************************************************************/
