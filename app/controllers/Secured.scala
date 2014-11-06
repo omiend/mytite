@@ -23,10 +23,10 @@ trait Secured {
   	Action { request => 
 	  	request.session.get("accessToken") match {
 	  		case Some(accessToken) => {
-				TwitterUser.checkExistsTwitterUser(twitterId.toLong, accessToken, accessTokenSecret) match {
+				TwitterUser.checkExistsTwitterUser(twitterId.toLong, accessToken) match {
 			  		case Some(twitterUser) => f(twitterId)(request)
 			  		// twitter_id、access_tokenでTwitterUserが取得できない場合、認証へ
-			  		case _                 => Results.Redirect(routes.TwitterController.twitterLogin)
+			  		case _ => Results.Redirect(routes.TwitterController.twitterLogin)
 			  	}
 	  		}
 	  		// Access_Tokenが存在しない場合、認証へ

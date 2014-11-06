@@ -89,11 +89,10 @@ object TwitterUser {
   /**
    * ログイン認証用
    */
-  def checkExistsTwitterUser(twitterID:Long, accessToken: String, accessTokenSecret: String): Option[TwitterUser] = {
+  def checkExistsTwitterUser(twitterID:Long, accessToken: String): Option[TwitterUser] = {
     val params = Seq[NamedParameter](
         'twitter_id                   -> twitterID
         ,'twitter_access_token        -> accessToken
-        ,'twitter_access_token_secret -> accessTokenSecret
     )
     DB.withConnection { implicit connection =>
       SQL(
@@ -102,7 +101,6 @@ object TwitterUser {
             from twitter_user
            where twitter_id = {twitter_id}
              and twitter_access_token = {twitter_access_token}
-             and twitter_access_token_secret = {twitter_access_token_secret}
         """
       ).on(
         params: _*
