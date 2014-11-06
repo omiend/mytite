@@ -14,8 +14,8 @@ POST /mytite/d                    controllers.Application.deleteAll
 
 # Festival
 GET  /:twitterScreenName        controllers.Application.festival(p: Int ?= 1, twitterScreenName: String)
-GET  /fes/c                     controllers.Application.createFestival
-POST /fes/i                     controllers.Application.insertFestival
+GET  /:twitterScreenName/c      controllers.Application.createFestival(twitterScreenName: String)
+POST /:twitterScreenName/i      controllers.Application.insertFestival(twitterScreenName: String)
 GET  /:festivalId/fes/e         controllers.Application.editFestival(festivalId: Long)
 POST /:festivalId/fes/u         controllers.Application.updateFestival(festivalId: Long)
 POST /:festivalId/fes/d         controllers.Application.deleteFestival(festivalId: Long)
@@ -35,7 +35,8 @@ POST /:festivalId/:performanceId/per/u  controllers.Application.updatePerformanc
 POST /:festivalId/:performanceId/per/d  controllers.Application.deletePerformance(festivalId: Long, performanceId: Long)
 
 # TimeTable
-GET  /:twitterId/:festivalId/       controllers.Application.timetable(twitterId: Long, festivalId: Long)
+GET  /:twitterId/:festivalId/t               controllers.Application.timetable(twitterId: Long, festivalId: Long)
+GET  /:twitterScreenName/:festivalId/       controllers.Application.timetableByTwitterScreenName(twitterScreenName: String, festivalId: Long)
 
 # Twitter
 GET  /twitter/Login         controllers.TwitterController.twitterLogin

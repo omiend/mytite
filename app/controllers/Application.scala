@@ -63,7 +63,7 @@ object Application extends Controller with Secured {
   /*****************************************************************************
    *** Festival／Stage登録画面起動
    *****************************************************************************/
-  def createFestival = IsAuthenticated { twitterId => implicit request =>
+  def createFestival(twitterScreenName: String) = IsAuthenticated { twitterId => implicit request =>
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
     TwitterUser.findByTwitterId(twitterId.toLong) match {
       case Some(twitterUser) => {
@@ -82,7 +82,7 @@ object Application extends Controller with Secured {
   /*****************************************************************************
    *** Festival／Stage登録処理
    *****************************************************************************/
-  def insertFestival = IsAuthenticated { twitterId => implicit request =>
+  def insertFestival(twitterScreenName: String) = IsAuthenticated { twitterId => implicit request =>
     // IsAuthenticatedからTwitterIdを取得し、TwitterUserを取得する
     TwitterUser.findByTwitterId(twitterId.toLong) match {
       case Some(twitterUser) => {
@@ -407,7 +407,16 @@ object Application extends Controller with Secured {
   /*****************************************************************************
    *** TimeTable画面起動
    *****************************************************************************/
-  def timetable(targetTwitterId: Long, festivalId: Long) = Action { implicit request =>
+  def timetable(twitterId: Long, festivalId: Long) = Action { implicit request =>
+    // Festivalを表示するユーザーを取得する
+    TwitterUser.findByTwitterId(twitterId) match {
+      // timetableByTwitterScreenNameにリダイレクトする
+      case Some(targetTwitterUser) => Redirect(routes.Application.timetableByTwitterScreenName(targetTwitterUser.twitterScreenName, festivalId))
+      case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : timetable 03")
+    }
+  }
+
+  def timetableByTwitterScreenName(twitterScreenName: String, festivalId: Long) = Action { implicit request =>
     var isExists: (Long, Boolean) = (0, false)
     // セッションからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
@@ -423,7 +432,7 @@ object Application extends Controller with Secured {
     // Pagerを初期化
     val pager: Pager[TwitterUser] = Pager[TwitterUser]("フェス", 1, 0, twitterUser, Seq.empty)
     // Festivalを表示するユーザーを取得する
-    TwitterUser.findByTwitterId(targetTwitterId) match {
+    TwitterUser.findByTwitterScreenName(twitterScreenName) match {
       case Some(targetTwitterUser) => {
         // Festivalを取得する
         Festival.findById(festivalId) match {
@@ -439,6 +448,7 @@ object Application extends Controller with Secured {
       case _ => Redirect(routes.Application.index(1)).flashing("error" -> " エラーが発生しました　時間をおいてから再度お試しください - ERROR CODE : timetable 01")
     }
   }
+
 
   /*****************************************************************************
    *** 退会ページ

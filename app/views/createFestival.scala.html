@@ -21,7 +21,7 @@
     </div><!--/span-->
   </div><!--/row-->
 
-  @helper.form(action = routes.Application.insertFestival()) {
+  @helper.form(action = routes.Application.insertFestival(pager.twitterUser.get.twitterScreenName)) {
     <div class="row-fluid">
       <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
         <div class="col-md-12 col-sm-12 col-lg-12">

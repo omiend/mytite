@@ -120,27 +120,27 @@ class ApplicationSpec extends Specification {
       contentType(resultRoute) must beSome.which(_ == "text/html")
     }
 
-    // GET  /fes/c controllers.Application.createFestival
-    "GET  /fes/c " in new WithApplication(fakeApp) {
+    // GET  /:twitterScreenName/c controllers.Application.createFestival
+    "GET  /:twitterScreenName/c " in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage, createTableHeart)
       // --- テストデータ作成
       createTestData(createTestDataTwitterUser)
       // --- テスト対象実行
-      val resultRoute = route(FakeRequest(GET, "/fes/c").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
+      val resultRoute = route(FakeRequest(GET, "/TEST_USER_SCREEN_NAME/c").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       status(resultRoute) must equalTo(OK)
       contentType(resultRoute) must beSome.which(_ == "text/html")
     }
 
-    // POST /fes/i controllers.Application.insertFestival
-    "POST /fes/i " in new WithApplication(fakeApp) {
+    // POST /:twitterScreenName/i controllers.Application.insertFestival
+    "POST /:twitterScreenName/i " in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage)
       // --- テストデータ作成
       createTestData(createTestDataTwitterUser)
       // --- 異常ケース
       // --- テスト対象実行
-      val resultRouteByBadRequest = route(FakeRequest(POST, "/fes/i").withFormUrlEncodedBody(
+      val resultRouteByBadRequest = route(FakeRequest(POST, "/TEST_USER_SCREEN_NAME/i").withFormUrlEncodedBody(
          "festivalName" -> "TEST_FESTIVAL_NAME_XXXXXXXXXXXXXXXXXXXXX"
         ,"description"  -> "TEST_FESTIVAL_DESCRIPTION"
         ,"stageName[0]" -> "TEST_STAGE_NAME_1"
@@ -149,7 +149,7 @@ class ApplicationSpec extends Specification {
       status(resultRouteByBadRequest) must equalTo(BAD_REQUEST)
       // --- 正常ケース
       // --- テスト対象実行
-      val resultRoute = route(FakeRequest(POST, "/fes/i").withFormUrlEncodedBody(
+      val resultRoute = route(FakeRequest(POST, "/TEST_USER_SCREEN_NAME/i").withFormUrlEncodedBody(
          "festivalName" -> "TEST_FESTIVAL_NAME"
         ,"description"  -> "TEST_FESTIVAL_DESCRIPTION"
         ,"stageName[0]" -> "TEST_STAGE_NAME_1"
@@ -456,14 +456,14 @@ class ApplicationSpec extends Specification {
     // ----------------------------------------------------------------------------------------------
     // # TimeTable
     // ----------------------------------------------------------------------------------------------
-    // GET  /:twiId/:festivalId/ controllers.Application.timetable(twiId: Long, festivalId: Long)
-    "GET  /:twiId/:festivalId/ "  in new WithApplication(fakeApp) {
+    // GET  /:twitterScreenName/:festivalId/ controllers.Application.timetable(twiId: Long, festivalId: Long)
+    "GET  /:twitterScreenName/:festivalId/ "  in new WithApplication(fakeApp) {
       // --- Database初期化
       executeDdl(createTableTwitterUser, createTableFestival, createTableStage, createTablePerformance, createTableHeart)
       // --- テストデータ作成
       createTestData(createTestDataTwitterUser, createTestDataFestival, createTestDataStage, createTestDataPerformance, createTestDataHeart)
       // --- テスト対象実行
-      val resultRoute = route(FakeRequest(GET, "/900001/900001/").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
+      val resultRoute = route(FakeRequest(GET, "/TEST_USER_SCREEN_NAME/900001/").withSession("twitterId" -> "900001", "accessToken" -> "ACCESS_TOKEN", "accessTokenSecret" -> "ACCESS_TOKEN_SECRET")).get
       // リターン値
       status(resultRoute) must equalTo(OK)
     }
