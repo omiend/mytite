@@ -113,7 +113,6 @@ object TwitterController extends Controller {
                 Redirect(routes.Application.index(1)).withSession(
                    "twitterId"         -> String.valueOf(twitter.getId())
                   ,"accessToken"       -> accessToken.getToken
-                  ,"accessTokenSecret" -> accessToken.getTokenSecret
                 )
               }
               case _ => Redirect(routes.Application.index(1)).flashing("error" -> "ログインに失敗しました。 - ERROR CODE : twitterOAuthCallback 02")
@@ -134,7 +133,6 @@ object TwitterController extends Controller {
     Redirect(routes.Application.index(1)).withSession(
       request.session - "twitterId" 
                       - "accessToken" 
-                      - "accessTokenSecret"
     )
   }
 }
