@@ -2,12 +2,20 @@ package controllers
 
 import play.api._
 import play.api.mvc._
+import play.api.Play.current
+
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.format.Formats._
+
 import anorm._
 import models._
 import views._
+
+import play.api.db.slick._
+import scala.slick.driver.MySQLDriver.simple._
+
+import org.joda.time.DateTime
 
 /**
  * アプリケーションコントローラ
@@ -36,17 +44,19 @@ object AjaxController extends Controller with Secured {
    *** Ajax用 Stage更新処理
    *****************************************************************************/
   def ajaxUpdateStage(stageId: Long, stageName: String) = IsAuthenticated { twitterId => implicit request =>
-    Stage.findById(stageId) match {
-    case Some(stage) if stageName.length > 20 => BadRequest
-    case Some(stage) if stage.stageName != stageName => {
-        def nowDate: java.util.Date = new java.util.Date
-        stage.stageName = stageName
-        stage.updateDate = Some(nowDate)
-        Stage.update(stageId, stage)
-        Ok
+    DB.withSession{ implicit session => 
+      Stage.findById(stageId) match {
+      case Some(stage) if stageName.length > 20 => BadRequest
+      case Some(stage) if stage.stageName != stageName => {
+          def nowDate = new DateTime
+          stage.stageName = stageName
+          stage.updateDate = Some(nowDate)
+          Stage.update(stageId, stage)
+          Ok
+        }
+        case Some(stage) if stage.stageName == stageName => Ok
+        case _ => BadRequest
       }
-      case Some(stage) if stage.stageName == stageName => Ok
-      case _ => BadRequest
     }
   }
   

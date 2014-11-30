@@ -1,11 +1,9 @@
 package models
 
-import java.util.Date
-import play.api.db._
-import play.api.Play.current
-import anorm._
-import anorm.SqlParser._
-import anorm.features.anyToStatement
+import scala.slick.driver.MySQLDriver.simple._
+
+import org.joda.time.DateTime
+import com.github.tototoshi.slick.MySQLJodaSupport._
 
 /** Twitter Table */
 case class TwitterUser (
@@ -17,311 +15,39 @@ case class TwitterUser (
   ,twitterDescription      : String
 	,twitterAccessToken      : String
 	,twitterAccessTokenSecret: String
-	,createDate              : Option[Date] = None
-	,updateDate              : Option[Date] = None
+	,createDate              : Option[DateTime] = None
+	,updateDate              : Option[DateTime] = None
 ) {
   var heartCount: Long = 0
 }
-
+class TwitterUserTable(tag: Tag) extends Table[TwitterUser](tag, "twitter_user") {
+  def id                       = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
+  def twitterId                = column[Long]("twitter_id", O.NotNull)
+  def twitterName              = column[String]("twitter_name", O.NotNull)
+  def twitterScreenName        = column[String]("twitter_screen_name", O.NotNull)
+  def twitterProfielImageUrl   = column[String]("twitter_profiel_image_url", O.NotNull)
+  def twitterDescription       = column[String]("twitter_description", O.NotNull)
+  def twitterAccessToken       = column[String]("twitter_access_token", O.NotNull)
+  def twitterAccessTokenSecret = column[String]("twitter_access_token_secret", O.NotNull)
+  def createDate               = column[Option[DateTime]]("create_date")
+  def updateDate               = column[Option[DateTime]]("update_date")
+  def * = (id, twitterId, twitterName, twitterScreenName, twitterProfielImageUrl, twitterDescription, twitterAccessToken, twitterAccessTokenSecret, createDate, updateDate) <> ((TwitterUser.apply _).tupled, TwitterUser.unapply)
+}
 object TwitterUser {
-  
-  /**
-   * TwitterUser Simple
-   */
-  val simple = {
-    get[Option[Long]]("id") ~
-    get[Long]("twitter_id") ~
-    get[String]("twitter_name") ~
-    get[String]("twitter_screen_name") ~
-    get[String]("twitter_profiel_image_url") ~
-    get[String]("twitter_description") ~
-    get[String]("twitter_access_token") ~
-    get[String]("twitter_access_token_secret") ~
-    get[Date]("create_date") ~
-    get[Date]("update_date") map {
-      case id~twitterId~twitterName~twitterScreenName~twitterProfielImageUrl~twitterDescription~accessToken~accessTokenSecret~createDate~updateDate => 
-      TwitterUser(
-         id
-        ,twitterId
-        ,twitterName
-        ,twitterScreenName
-        ,twitterProfielImageUrl
-        ,twitterDescription
-        ,accessToken
-        ,accessTokenSecret
-        ,Option(createDate)
-        ,Option(updateDate))
-    }
+  lazy val query = TableQuery[TwitterUserTable]
+  def findById(id: Long)(implicit s: Session): Option[TwitterUser] = query.filter(_.id === id).firstOption
+  def checkExistsTwitterUser(twitterId:Long, twitterAccessToken: String)(implicit s: Session): Option[TwitterUser] = query.filter(_.twitterId === twitterId).filter(_.twitterAccessToken === twitterAccessToken).firstOption
+  def findByTwitterId(twitterId: Long)(implicit s: Session): Option[TwitterUser] = query.filter(_.twitterId === twitterId).firstOption
+  def findByTwitterScreenName(twitterScreenName: String)(implicit s: Session): Option[TwitterUser] = query.filter(_.twitterScreenName === twitterScreenName).firstOption
+  def findByOffset(offset: Int, limit: Int)(implicit s: Session)  = query.drop(offset).take(limit).list
+  def count()(implicit s: Session): Int = query.list.size
+  def insert(twitterUser: TwitterUser)(implicit s: Session) {
+    query.insert(twitterUser)
   }
-
-  /**
-   * Heart Count
-   */
-  val heartCount = {
-    get[Option[Long]]("id") ~
-    get[Long]("heartCount") map {
-      case id~heartCount => (id, heartCount)
-    }
+  def update(id: Long, twitterUser: TwitterUser)(implicit s: Session) {
+    query.filter(_.id === id).update(twitterUser)
   }
-  
-  /**
-   * Idを指定して取得
-   */
-  def findById(id: Long): Option[TwitterUser] = {
-    val params = Seq[NamedParameter](
-       'id -> id
-    )
-    DB.withConnection { implicit connection =>
-      SQL(
-        """
-          select *
-            from twitter_user
-           where id = {id}
-        """
-      ).on(
-        params: _*
-      ).as(
-        TwitterUser.simple.singleOpt
-      )
-    }
-  }
-
-  /**
-   * ログイン認証用
-   */
-  def checkExistsTwitterUser(twitterID:Long, accessToken: String, accessTokenSecret: String): Option[TwitterUser] = {
-    val params = Seq[NamedParameter](
-        'twitter_id                   -> twitterID
-        ,'twitter_access_token        -> accessToken
-        ,'twitter_access_token_secret -> accessTokenSecret
-    )
-    DB.withConnection { implicit connection =>
-      SQL(
-        """
-          select *
-            from twitter_user
-           where twitter_id = {twitter_id}
-             and twitter_access_token = {twitter_access_token}
-             and twitter_access_token_secret = {twitter_access_token_secret}
-        """
-      ).on(
-        params: _*
-      ).as(
-        TwitterUser.simple.singleOpt
-      )
-    }
-  }
-
-  /**
-   * TwitterUser twitter_idを指定して取得
-   */
-  def getByTwitterId(twitterId: Long): Option[TwitterUser] = {
-    val params = Seq[NamedParameter](
-       'twitter_id -> twitterId
-    )
-    DB.withConnection { implicit connection =>
-      SQL(
-        """
-          select *
-            from twitter_user
-           where twitter_id = {twitter_id}
-        """
-      ).on(
-        params: _*
-      ).as(
-        TwitterUser.simple.singleOpt
-      )
-    }
-  }
-
-  /**
-   * TwitterUser from-toで件数を指定して取得
-   */
-  def findFromTo(offset: Int, maxPageCount: Int) = {
-    val params = Seq[NamedParameter](
-         'offset       -> offset
-        ,'maxPageCount -> maxPageCount
-    )
-    DB.withConnection { implicit connection =>
-
-      // 親テーブル取得
-      val resultList: Seq[TwitterUser] = SQL(
-        """
-        select *
-          from twitter_user
-          limit {maxPageCount} offset {offset}
-        """
-      ).on(
-        params: _*
-      ).as(
-        TwitterUser.simple *
-      )
-
-      // 件数取得
-      val totalRows = SQL(
-        """
-        select count(*)
-          from twitter_user
-        """
-      ).as(scalar[Long].single)
-
-      // ハートの件数を取得
-      SQL(
-        """
-        select id
-               ,(select count(h.id) 
-                   from heart h, festival f 
-                  where t.twitter_id = f.twitter_id
-                    and f.id = h.festival_id
-               ) as heartCount
-          from twitter_user t
-         order by heartCount desc
-         limit {maxPageCount} offset {offset}
-        """
-      ).on(
-        params: _*
-      ).as(
-        TwitterUser.heartCount *
-      ) map { countHeart =>
-        for (twitterUser <- resultList) {
-          if (twitterUser.id == countHeart._1) {
-            twitterUser.heartCount = countHeart._2
-          }
-        }
-      }
-      
-      (resultList.sortWith(_.heartCount > _.heartCount), totalRows)
-    }
-  }
-
-  /**
-   * TwitterUser Insert処理
-   */
-  def insart(twitterUser: TwitterUser) {
-    val params = Seq[NamedParameter](
-         'twitter_id                  -> twitterUser.twitterId
-        ,'twitter_name                -> twitterUser.twitterName
-        ,'twitter_screen_name         -> twitterUser.twitterScreenName
-        ,'twitter_profiel_image_url   -> twitterUser.twitterProfielImageUrl
-        ,'twitter_description         -> twitterUser.twitterDescription
-        ,'twitter_access_token        -> twitterUser.twitterAccessToken
-        ,'twitter_access_token_secret -> twitterUser.twitterAccessTokenSecret
-        ,'create_date                 -> twitterUser.createDate.get
-        ,'update_date                 -> twitterUser.updateDate.get
-    )
-    DB.withConnection { implicit connection =>
-      SQL(
-        """
-          insert into twitter_user(
-             twitter_id
-            ,twitter_name
-            ,twitter_screen_name
-            ,twitter_profiel_image_url
-            ,twitter_description
-            ,twitter_access_token
-            ,twitter_access_token_secret
-            ,create_date
-            ,update_date
-          ) values (
-             {twitter_id}
-            ,{twitter_name}
-            ,{twitter_screen_name}
-            ,{twitter_profiel_image_url}
-            ,{twitter_description}
-            ,{twitter_access_token}
-            ,{twitter_access_token_secret}
-            ,{create_date}
-            ,{update_date}
-          )
-        """
-      ).on(
-        params: _*
-      ).executeUpdate()
-    }
-  }
-  
-  /**
-   * TwitterUser Insert処理
-   */
-  def update(twitterUser: TwitterUser) {
-    val params = Seq[NamedParameter](
-         'id                          -> twitterUser.id.get
-        ,'twitter_name                -> twitterUser.twitterName
-        ,'twitter_screen_name         -> twitterUser.twitterScreenName
-        ,'twitter_profiel_image_url   -> twitterUser.twitterProfielImageUrl
-        ,'twitter_description         -> twitterUser.twitterDescription
-        ,'twitter_access_token        -> twitterUser.twitterAccessToken
-        ,'twitter_access_token_secret -> twitterUser.twitterAccessTokenSecret
-        ,'update_date                 -> twitterUser.updateDate.get
-    )
-    DB.withConnection { implicit connection =>
-      SQL(
-        """
-          update twitter_user
-          set  twitter_name                = {twitter_name}
-              ,twitter_screen_name         = {twitter_screen_name}
-              ,twitter_profiel_image_url   = {twitter_profiel_image_url}
-              ,twitter_description         = {twitter_description}
-              ,twitter_access_token        = {twitter_access_token}
-              ,twitter_access_token_secret = {twitter_access_token_secret}
-              ,update_date                 = {update_date}
-          where id = {id}
-        """
-      ).on(
-        params: _*
-      ).executeUpdate()
-    }
-  }
-
-  def deleteAll(twitterId: Long) {
-    val params = Seq[NamedParameter](
-      'twitter_id -> twitterId
-    )
-    DB.withConnection { implicit connection =>
-      // Performance削除処理
-      SQL(
-        """
-          delete from Performance where festival_id in (select festival_id from Festival where twitter_id = {twitter_id})
-        """
-      ).on(
-        params: _*
-      ).executeUpdate()
-
-      // Stage削除処理
-      SQL(
-        """
-          delete from Stage where festival_id in (select festival_id from Festival where twitter_id = {twitter_id})
-        """
-      ).on(
-        params: _*
-      ).executeUpdate()
-
-      // Heartを削除する
-      SQL(
-        """
-          delete from Heart where twitter_id = {twitter_id}
-        """
-      ).on(
-        params: _*
-      ).executeUpdate()
-
-      // Festival削除処理
-      SQL(
-        """
-          delete from Festival where twitter_id = {twitter_id}
-        """
-      ).on(
-        params: _*
-      ).executeUpdate()
-
-      // TwitterUser削除処理
-      SQL(
-        """
-          delete from twitter_user where twitter_id = {twitter_id}
-        """
-      ).on(
-        params: _*
-      ).executeUpdate() 
-    }
+  def deleteAll(id: Long)(implicit s: Session) {
+    query.filter(_.id is id.bind).delete
   }
 }

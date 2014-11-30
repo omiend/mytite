@@ -10,6 +10,10 @@ import play.api.cache._
 
 import twitter4j._
 import twitter4j.auth._
+
+import play.api.db.slick._
+import org.joda.time.DateTime
+
 /**
  * ツイッターログインコントローラ
  */
@@ -18,13 +22,13 @@ object TwitterController extends Controller {
   /**
    * Twitterへログインする
    */
-  def twitterLogin = Action { implicit request =>
+  def twitterLogin = DBAction { implicit request =>
 
     // Twitterオブジェクトの初期化
     val twitter: Twitter = (new TwitterFactory()).getInstance()
 
     // RequestTokenの取得
-    val requestToken: RequestToken = twitter.getOAuthRequestToken("http://" + request.host + "/twitterOAuthCallback")
+    val requestToken: RequestToken = twitter.getOAuthRequestToken("http://" + request.host + "/twitter/OAuthCallback")
 
     // TwitterとRequestTokenのオブジェクトをCacheに格納(1分有効)
     Cache.set("twitter", twitter, 60)
@@ -37,7 +41,7 @@ object TwitterController extends Controller {
   /**
    * TwitterからのCallBack処理
    */
-  def twitterOAuthCallback = Action { implicit request =>
+  def twitterOAuthCallback = DBAction { implicit request =>
     // 承認可否を精査（deniedがあったら承認キャンセル）
     request.queryString.get("denied") match {
 
@@ -71,11 +75,12 @@ object TwitterController extends Controller {
                 var user: User = twitter.showUser(twitter.getId())
 
                 // TwitterUserが取得出来た場合はそのまま利用する
-                def nowDate: java.util.Date = new java.util.Date
-                TwitterUser.getByTwitterId(twitter.getId()) match {
-                  case Some(s) => {
+                def nowDate = new DateTime
+                TwitterUser.findByTwitterId(twitter.getId()) match {
+                  case Some(s:TwitterUser) => {
+                    val id: Long = s.id.get
                     // 既にログインした事有る場合はUpdateを行う
-                    val tmp: TwitterUser = new TwitterUser(s.id
+                    val tmp: TwitterUser = new TwitterUser(Some(id)
                                                           ,twitter.getId()
                                                           ,user.getName()
                                                           ,twitter.getScreenName()
@@ -85,7 +90,7 @@ object TwitterController extends Controller {
                                                           ,accessToken.getTokenSecret
                                                           ,Some(nowDate)
                                                           ,Some(nowDate))
-                    TwitterUser.update(tmp) // Coution! Option.get
+                    TwitterUser.update(id, tmp)
                     Option(tmp)
                   }
                   case _ => {
@@ -100,7 +105,7 @@ object TwitterController extends Controller {
                                                           ,accessToken.getTokenSecret
                                                           ,Some(nowDate)
                                                           ,Some(nowDate))
-                    TwitterUser.insart(tmp)
+                    TwitterUser.insert(tmp)
                     Option(tmp)
                   }
                 }
@@ -113,7 +118,6 @@ object TwitterController extends Controller {
                 Redirect(routes.Application.index(1)).withSession(
                    "twitterId"         -> String.valueOf(twitter.getId())
                   ,"accessToken"       -> accessToken.getToken
-                  ,"accessTokenSecret" -> accessToken.getTokenSecret
                 )
               }
               case _ => Redirect(routes.Application.index(1)).flashing("error" -> "ログインに失敗しました。 - ERROR CODE : twitterOAuthCallback 02")
@@ -134,7 +138,6 @@ object TwitterController extends Controller {
     Redirect(routes.Application.index(1)).withSession(
       request.session - "twitterId" 
                       - "accessToken" 
-                      - "accessTokenSecret"
     )
   }
 }

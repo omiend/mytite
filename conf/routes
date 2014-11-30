@@ -5,17 +5,17 @@
 GET  /                     controllers.Application.index(p: Int ?= 1)
 
 # Static Page
-GET  /usage                controllers.Application.usage
-GET  /about                controllers.Application.about
-GET  /withdraw             controllers.Application.withdraw
+GET  /mytite/usage                controllers.Application.usage
+GET  /mytite/about                controllers.Application.about
+GET  /mytite/withdraw             controllers.Application.withdraw
 
 # Delete All
-POST /d                    controllers.Application.deleteAll
+POST /mytite/d                    controllers.Application.deleteAll
 
 # Festival
-GET  /:twitterId/fes           controllers.Application.festival(p: Int ?= 1, twitterId: Long)
-GET  /fes/c                controllers.Application.createFestival
-POST /fes/i                controllers.Application.insertFestival
+GET  /:twitterScreenName        controllers.Application.festival(p: Int ?= 1, twitterScreenName: String)
+GET  /:twitterScreenName/c      controllers.Application.createFestival(twitterScreenName: String)
+POST /:twitterScreenName/i      controllers.Application.insertFestival(twitterScreenName: String)
 GET  /:festivalId/fes/e         controllers.Application.editFestival(festivalId: Long)
 POST /:festivalId/fes/u         controllers.Application.updateFestival(festivalId: Long)
 POST /:festivalId/fes/d         controllers.Application.deleteFestival(festivalId: Long)
@@ -35,30 +35,31 @@ POST /:festivalId/:performanceId/per/u  controllers.Application.updatePerformanc
 POST /:festivalId/:performanceId/per/d  controllers.Application.deletePerformance(festivalId: Long, performanceId: Long)
 
 # TimeTable
-GET  /:twitterId/:festivalId/       controllers.Application.timetable(twitterId: Long, festivalId: Long)
+GET  /:twitterId/:festivalId/t               controllers.Application.timetable(twitterId: Long, festivalId: Long)
+GET  /:twitterScreenName/:festivalId/       controllers.Application.timetableByTwitterScreenName(twitterScreenName: String, festivalId: Long)
 
 # Twitter
-GET  /twitterLogin         controllers.TwitterController.twitterLogin
-GET  /twitterOAuthCallback controllers.TwitterController.twitterOAuthCallback
-GET  /twitterLogout        controllers.TwitterController.twitterLogout
+GET  /twitter/Login         controllers.TwitterController.twitterLogin
+GET  /twitter/OAuthCallback controllers.TwitterController.twitterOAuthCallback
+GET  /twitter/Logout        controllers.TwitterController.twitterLogout
 
 ######################################################
 # JavaScript Ajax
 ######################################################
 # javascriptRoutes
-GET  /javascriptRoutes     controllers.JsRouter.javascriptRoutes
+GET     /javascript/Routes                 controllers.JsRouter.javascriptRoutes
 
 # Ajax Festival
-POST    /ajaxUpdateFestival               controllers.AjaxController.ajaxUpdateFestival(festivalId: Long, festivalName: String)
+POST    /ajax/UpdateFestival               controllers.AjaxController.ajaxUpdateFestival(festivalId: Long, festivalName: String)
 
 # Ajax Stage
-POST    /ajaxUpdateStage                  controllers.AjaxController.ajaxUpdateStage(stageId: Long, stageName: String)
-POST    /ajaxUpdatePerformance            controllers.AjaxController.ajaxUpdatePerformance(performanceId: Long, artist: String)
-POST    /ajaxUpdatePerformanceByTimeFrame controllers.AjaxController.ajaxUpdatePerformanceByTimeFrame(performanceId: Long, stageId: Long, time: String)
+POST    /ajax/UpdateStage                  controllers.AjaxController.ajaxUpdateStage(stageId: Long, stageName: String)
+POST    /ajax/UpdatePerformance            controllers.AjaxController.ajaxUpdatePerformance(performanceId: Long, artist: String)
+POST    /ajax/UpdatePerformanceByTimeFrame controllers.AjaxController.ajaxUpdatePerformanceByTimeFrame(performanceId: Long, stageId: Long, time: String)
 
 # Ajax Heart
-POST    /ajaxInsertHeart                  controllers.AjaxController.ajaxInsertHeart(festivalId: Long)
-POST    /ajaxDeleteHeart                  controllers.AjaxController.ajaxDeleteHeart(festivalId: Long)
+POST    /ajax/InsertHeart                  controllers.AjaxController.ajaxInsertHeart(festivalId: Long)
+POST    /ajax/DeleteHeart                  controllers.AjaxController.ajaxDeleteHeart(festivalId: Long)
 
 ######################################################
 # Other
