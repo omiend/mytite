@@ -1,5 +1,7 @@
 package models
 
+import play.api.Play.current
+import play.api.db.slick._
 import scala.slick.driver.MySQLDriver.simple._
 
 import org.joda.time.DateTime
@@ -18,7 +20,7 @@ case class TwitterUser (
 	,createDate              : Option[DateTime] = None
 	,updateDate              : Option[DateTime] = None
 ) {
-  var heartCount: Long = 0
+  var heartCount: Long = 111111
 }
 class TwitterUserTable(tag: Tag) extends Table[TwitterUser](tag, "twitter_user") {
   def id                       = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
@@ -39,7 +41,14 @@ object TwitterUser {
   def checkExistsTwitterUser(twitterId:Long, twitterAccessToken: String)(implicit s: Session): Option[TwitterUser] = query.filter(_.twitterId === twitterId).filter(_.twitterAccessToken === twitterAccessToken).firstOption
   def findByTwitterId(twitterId: Long)(implicit s: Session): Option[TwitterUser] = query.filter(_.twitterId === twitterId).firstOption
   def findByTwitterScreenName(twitterScreenName: String)(implicit s: Session): Option[TwitterUser] = query.filter(_.twitterScreenName === twitterScreenName).firstOption
-  def findByOffset(offset: Int, limit: Int)(implicit s: Session)  = query.drop(offset).take(limit).list
+  def findByOffset(offset: Int, limit: Int)(implicit s: Session) = {
+    (for {
+      twitterUser <- query.drop(offset).take(limit).list
+    } yield {
+      twitterUser.heartCount = Heart.countByTwitterId(twitterUser.twitterId)
+      twitterUser
+    })
+  }
   def count()(implicit s: Session): Int = query.list.size
   def insert(twitterUser: TwitterUser)(implicit s: Session) {
     query.insert(twitterUser)

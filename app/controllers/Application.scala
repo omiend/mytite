@@ -463,11 +463,14 @@ object Application extends Controller with Secured {
     // セッションからTwitterIdを取得し、取得出来た場合TwitterUserを取得する
     var twitterUser: Option[TwitterUser] = request.session.get("twitterId") match {
       case Some(twitterId) => {
-        isExists = Heart.findByFestivalAndTwitterId(festivalId, twitterId.toLong)
+        Heart.findByFestivalIdAndTwitterId(festivalId, twitterId.toLong) match {
+          case Some(heart) => isExists = (Heart.countByFestivalId(festivalId), true)
+          case _           => isExists = (Heart.countByFestivalId(festivalId), false)
+        }
         TwitterUser.findByTwitterId(twitterId.toLong)
       }
       case _ => {
-        isExists = Heart.countHeartByFestivalId(festivalId)
+        isExists = (Heart.countByFestivalId(festivalId), false)
         None
       }
     }

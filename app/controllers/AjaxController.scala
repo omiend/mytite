@@ -96,24 +96,28 @@ object AjaxController extends Controller with Secured {
    *** Ajax用 Heart処理
    *****************************************************************************/
   def ajaxInsertHeart(festivalId: Long) = IsAuthenticated { twitterId => implicit request =>
-    Festival.findById(festivalId) match {
-      case Some(festival) => {
-        def nowDate: java.util.Date = new java.util.Date
-        var heart: Heart = Heart(
-           None
-          ,festivalId
-          ,twitterId.toLong
-          ,Some(nowDate)
-          ,Some(nowDate)
-        )
-        Heart.insert(heart)
-        Ok
+    DB.withSession{ implicit session => 
+      Festival.findById(festivalId) match {
+        case Some(festival) => {
+          def nowDate = new DateTime
+          var heart: Heart = Heart(
+             None
+            ,festivalId
+            ,twitterId.toLong
+            ,Some(nowDate)
+            ,Some(nowDate)
+          )
+          Heart.insert(heart)
+          Ok
+        }
+        case _ => BadRequest
       }
-      case _ => BadRequest
     }
   }
   def ajaxDeleteHeart(festivalId: Long) = IsAuthenticated { twitterId => implicit request =>
-    Heart.delete(festivalId, twitterId.toLong)
-    Ok
+    DB.withSession{ implicit session => 
+      Heart.delete(festivalId, twitterId.toLong)
+      Ok
+    }
   }
 }
