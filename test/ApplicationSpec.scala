@@ -40,7 +40,7 @@ class ApplicationSpec extends Specification {
     // Static
     // ----------------------------------------------------------------------------------------------
     // GET  /hoge send 404 on a bad request
-    "GET  /hoge " in new WithApplication(fakeApp) {
+    "GET  /hoge/hogehoge " in new WithApplication(fakeApp) {
       route(FakeRequest(GET, "/hoge/foo")) must beNone
     }
 
