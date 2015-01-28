@@ -33,5 +33,5 @@ object Stage {
   def countByFestivalId(festivalId: Long)(implicit s: Session): Long = query.filter(_.festivalId === festivalId).list.size
   def insert(stage: Stage)(implicit s: Session) = query.insert(stage)
   def update(id: Long, stage: Stage)(implicit s: Session) = query.filter(_.id === id).update(stage)
-  def delete(id: Long)(implicit s: Session) = query.filter(_.id === id.bind).delete
+  def delete(id: Long)(implicit s: Session) = query.filter(_.id === id).delete
 }

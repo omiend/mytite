@@ -4,11 +4,6 @@ import play.api._
 import play.api.mvc._
 import play.api.Play.current
 
-import play.api.data._
-import play.api.data.Forms._
-import play.api.data.format.Formats._
-
-import anorm._
 import models._
 import views._
 
@@ -26,17 +21,19 @@ object AjaxController extends Controller with Secured {
    *** Ajax用 Festival更新処理
    *****************************************************************************/
   def ajaxUpdateFestival(festivalId: Long, festivalName: String) = IsAuthenticated { twitterId => implicit request =>
-    Festival.findById(festivalId) match {
-      case Some(festival) if festivalName.length > 20 => BadRequest
-      case Some(festival) if festival.festivalName != festivalName => {
-        def nowDate: java.util.Date = new java.util.Date
-        festival.festivalName = festivalName
-        festival.updateDate = Some(nowDate)
-        Festival.update(festival)
-        Ok
+    DB.withSession { implicit session => 
+      Festival.findById(festivalId) match {
+        case Some(festival) if festivalName.length > 20 => BadRequest
+        case Some(festival) if festival.festivalName != festivalName => {
+          def nowDate = new DateTime
+          festival.festivalName = festivalName
+          festival.updateDate = Some(nowDate)
+          Festival.update(festivalId, festival)
+          Ok
+        }
+        case Some(festival) if festival.festivalName == festivalName => Ok
+        case _ => BadRequest
       }
-      case Some(festival) if festival.festivalName == festivalName => Ok
-      case _ => BadRequest
     }
   }
   
@@ -64,31 +61,35 @@ object AjaxController extends Controller with Secured {
    *** Ajax用 Performance更新処理
    *****************************************************************************/
   def ajaxUpdatePerformance(performanceId: Long, artist: String) = IsAuthenticated { twitterId => implicit request =>
-    Performance.findById(performanceId) match {
-      case Some(performance) if artist.length > 35 => BadRequest
-      case Some(performance) if performance.artist != artist => {
-        def nowDate: java.util.Date = new java.util.Date
-        performance.artist = artist
-        performance.updateDate = Some(nowDate)
-        Performance.update(performanceId, performance)
-        Ok
+    DB.withSession{ implicit session => 
+      Performance.findById(performanceId) match {
+        case Some(performance) if artist.length > 35 => BadRequest
+        case Some(performance) if performance.artist != artist => {
+          val nowDate: DateTime = new DateTime
+          performance.artist = artist
+          performance.updateDate = Some(nowDate)
+          Performance.update(performanceId, performance)
+          Ok
+        }
+        case Some(performance) if performance.artist == artist => Ok
+        case _ => BadRequest
       }
-      case Some(performance) if performance.artist == artist => Ok
-      case _ => BadRequest
     }
   }
 
   def ajaxUpdatePerformanceByTimeFrame(performanceId: Long, stageId: Long, time: String) = IsAuthenticated { twitterId => implicit request =>
-    Performance.findById(performanceId) match {
-      case Some(performance)  => {
-        def nowDate: java.util.Date = new java.util.Date
-        performance.stageId = stageId
-        performance.time = time
-        performance.updateDate = Some(nowDate)
-        Performance.update(performanceId, performance)
-        Ok
+    DB.withSession{ implicit session => 
+      Performance.findById(performanceId) match {
+        case Some(performance)  => {
+          val nowDate: DateTime = new DateTime
+          performance.stageId = stageId
+          performance.time = time
+          performance.updateDate = Some(nowDate)
+          Performance.update(performanceId, performance)
+          Ok
+        }
+        case _ => BadRequest
       }
-      case _ => BadRequest
     }
   }
 

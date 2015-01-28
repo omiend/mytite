@@ -2,7 +2,8 @@ package models
 
 import java.util.Date
 import play.api.Play.current
-import anorm.Pk
+
+import play.api.db.slick._
 
 /** TimeTable Structure */
 case class TimeTable(val timeLabel: String, var stageList: Seq[Stage]) {
@@ -109,58 +110,61 @@ object TimeTable {
   /** TimeTables作成 */
   def createTimeTable(festivalId: Long, stageList: Seq[Stage]): Seq[TimeTable] = {
 
-    // 返却用 & 初期化
-    val timeTableList: Seq[TimeTable] = TimeTable.TIME_LABEL_LIST map { timeLabel =>
-      TimeTable(timeLabel, stageList)
-    }
+    DB.withSession{ implicit session => 
 
-    // 対象のPerformanceを取得する
-    val performanceList: Seq[Performance] = Performance.findByFestivalId(festivalId)
+      // 返却用 & 初期化
+      val timeTableList: Seq[TimeTable] = TimeTable.TIME_LABEL_LIST map { timeLabel =>
+        TimeTable(timeLabel, stageList)
+      }
 
-    // 時間ラベル順に処理
-    TIME_LABEL_LIST foreach { timeLabel =>
-      // ステージごとの処理
-      stageList foreach { stage =>
-        // 取得したパフォーマンスごとの処理
-        performanceList collect {
-          // パフォーマンスの時間ラベルとステージIDを指定
-          case performance if timeLabel == performance.time && stage.id.get == performance.stageId => {
-            timeTableList collect {
-              case timeTable if timeLabel == timeTable.timeLabel => {
-                // Stage.Idをキーとして、Performanceをセットする
-                timeTable.performanceStageMap = timeTable.performanceStageMap + (stage.id.get -> performance)
+      // 対象のPerformanceを取得する
+      val performanceList: Seq[Performance] = Performance.findByFestivalId(festivalId)
+
+      // 時間ラベル順に処理
+      TIME_LABEL_LIST foreach { timeLabel =>
+        // ステージごとの処理
+        stageList foreach { stage =>
+          // 取得したパフォーマンスごとの処理
+          performanceList collect {
+            // パフォーマンスの時間ラベルとステージIDを指定
+            case performance if timeLabel == performance.time && stage.id.get == performance.stageId => {
+              timeTableList collect {
+                case timeTable if timeLabel == timeTable.timeLabel => {
+                  // Stage.Idをキーとして、Performanceをセットする
+                  timeTable.performanceStageMap = timeTable.performanceStageMap + (stage.id.get -> performance)
+                }
+                case _ =>
               }
-              case _ =>
             }
+            case _ =>
           }
-          case _ =>
         }
       }
-    }
 
-    // --- 時間枠を表上で結合する処理 --- //
-    timeTableList foreach { tmpTimeTable =>
-      stageList foreach { stage =>
-        tmpTimeTable.performanceStageMap.get(stage.id.get) match {
-          case Some(tmpPerformance) if tmpPerformance.getTableRowSpanNumber > 1 => {
-            val deleteTimeLabel: Seq[String] = TimeTable.getTimeLabelByTargetRange(tmpPerformance.getTableRowSpanNumber, tmpPerformance.time)
-            timeTableList collect {
-              case timeTable if deleteTimeLabel.contains(timeTable.timeLabel) => {
-                // Stageを削除
-                timeTable.stageList = timeTable.stageList.filter { _ != stage }
-                // 削除
-                timeTable.performanceStageMap = timeTable.performanceStageMap - stage.id.get
+      // --- 時間枠を表上で結合する処理 --- //
+      timeTableList foreach { tmpTimeTable =>
+        stageList foreach { stage =>
+          tmpTimeTable.performanceStageMap.get(stage.id.get) match {
+            case Some(tmpPerformance) if tmpPerformance.getTableRowSpanNumber > 1 => {
+              val deleteTimeLabel: Seq[String] = TimeTable.getTimeLabelByTargetRange(tmpPerformance.getTableRowSpanNumber, tmpPerformance.time)
+              timeTableList collect {
+                case timeTable if deleteTimeLabel.contains(timeTable.timeLabel) => {
+                  // Stageを削除
+                  timeTable.stageList = timeTable.stageList.filter { _ != stage }
+                  // 削除
+                  timeTable.performanceStageMap = timeTable.performanceStageMap - stage.id.get
+                }
+                case _ =>
               }
-              case _ =>
             }
+            case _ =>
           }
-          case _ =>
         }
       }
-    }
 
-    // 返却
-    timeTableList
+      // 返却
+      timeTableList
+    }
   }
 
   /** 指定した数字の数だけ、指定したTIME_LABEL＋１件目の値を取得する */

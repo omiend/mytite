@@ -50,13 +50,7 @@ object TwitterUser {
     })
   }
   def count()(implicit s: Session): Int = query.list.size
-  def insert(twitterUser: TwitterUser)(implicit s: Session) {
-    query.insert(twitterUser)
-  }
-  def update(id: Long, twitterUser: TwitterUser)(implicit s: Session) {
-    query.filter(_.id === id).update(twitterUser)
-  }
-  def deleteAll(id: Long)(implicit s: Session) {
-    query.filter(_.id is id.bind).delete
-  }
+  def insert(twitterUser: TwitterUser)(implicit s: Session) = query.insert(twitterUser)
+  def update(id: Long, twitterUser: TwitterUser)(implicit s: Session) = query.filter(_.id === id).update(twitterUser)
+  def deleteAll(id: Long)(implicit s: Session) = query.filter(_.id === id).delete
 }
