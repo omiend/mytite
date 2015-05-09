@@ -26,7 +26,6 @@ class FestivalTable(tag: Tag) extends Table[Festival](tag, "festival") {
   def createDate   = column[Option[DateTime]]("create_date")
   def updateDate   = column[Option[DateTime]]("update_date")
   def * = (id, twitterId, festivalName, description, createDate, updateDate) <> ((Festival.apply _).tupled, Festival.unapply)
-  // def ins = twitterId~festivalName~description~createDate~updateDate returning id
 }
 object Festival {
   lazy val query = TableQuery[FestivalTable]
@@ -44,25 +43,29 @@ object Festival {
   def insert(festival: Festival)(implicit s: Session) = query.insert(festival)
   def insertWithStage(festival: Festival, stageNameList: Seq[String])(implicit s: Session) {
     // --- Festival作成処理 --- //
-    val ids = Festival.insert(festival)
-    println("ids ---------------------------------------- " + ids + " | " + festival)
+    val ids = (query returning query.map(_.id)) += festival
     // --- Stage作成処理 --- //
-    var index: Int = 1
-    val nowDate: DateTime = new DateTime
-    for (stageName <- stageNameList) {
-      if (!stageName.isEmpty) {
-        var stage: Stage = Stage(
-           None
-          ,ids
-          ,stageName
-          ,Some("%03d".format(index).toString)
-          ,Some("white")
-          ,Some(nowDate)
-          ,Some(nowDate)
-        )
-        Stage.insert(stage)
-        index = index + 1
+    ids match {
+      case Some(festivalInsertedId) => {
+        var index: Int = 1
+        val nowDate: DateTime = new DateTime
+        for (stageName <- stageNameList) {
+          if (!stageName.isEmpty) {
+            var stage: Stage = Stage(
+               None
+              ,festivalInsertedId
+              ,stageName
+              ,Some("%03d".format(index).toString)
+              ,Some("white")
+              ,Some(nowDate)
+              ,Some(nowDate)
+            )
+            Stage.insert(stage)
+            index = index + 1
+          }
+        }
       }
+      case _ => println("Festival IDが取得出来ない")
     }
   }
   def update(id: Long, festival: Festival)(implicit s: Session) = query.filter(_.id === id).update(festival)
